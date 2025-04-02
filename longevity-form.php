@@ -1,8 +1,265 @@
 <?php
+// OpenAI API Integration for Longevity Analysis
+add_action('wp_ajax_longevity_ai_analysis', 'longevity_ai_analysis_callback');
+add_action('wp_ajax_nopriv_longevity_ai_analysis', 'longevity_ai_analysis_callback');
+
+// Initialize OpenAI API Key - Improved security
+function longevity_store_openai_api_key() {
+    // Only create the option if it doesn't exist
+    if (!get_option('longevity_openai_api_key')) {
+        update_option('longevity_openai_api_key', '');
+    }
+}
+add_action('init', 'longevity_store_openai_api_key');
+
+// Add admin menu for API key management
+function longevity_admin_menu() {
+    add_options_page(
+        'Longevity Assessment Settings',
+        'Longevity Settings',
+        'manage_options',
+        'longevity-settings',
+        'longevity_settings_page'
+    );
+}
+add_action('admin_menu', 'longevity_admin_menu');
+
+// Settings page content
+function longevity_settings_page() {
+    // Save settings if form is submitted
+    if (isset($_POST['longevity_settings_nonce']) && wp_verify_nonce($_POST['longevity_settings_nonce'], 'longevity_save_settings')) {
+        if (isset($_POST['openai_api_key'])) {
+            update_option('longevity_openai_api_key', sanitize_text_field($_POST['openai_api_key']));
+            echo '<div class="notice notice-success"><p>Settings saved successfully!</p></div>';
+        }
+    }
+    
+    // Get current API key (show only first/last 4 chars if exists)
+    $api_key = get_option('longevity_openai_api_key', '');
+    $masked_key = '';
+    if (!empty($api_key)) {
+        $length = strlen($api_key);
+        if ($length > 8) {
+            $masked_key = substr($api_key, 0, 4) . str_repeat('•', $length - 8) . substr($api_key, -4);
+        } else {
+            $masked_key = $api_key; // Key is too short to mask effectively
+        }
+    }
+    
+    // Display settings form
+    ?>
+    <div class="wrap">
+        <h1>Longevity Assessment Settings</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('longevity_save_settings', 'longevity_settings_nonce'); ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="openai_api_key">OpenAI API Key</label></th>
+                    <td>
+                        <input type="password" id="openai_api_key" name="openai_api_key" 
+                               value="<?php echo esc_attr($api_key); ?>" class="regular-text" autocomplete="off">
+                        <?php if (!empty($masked_key)): ?>
+                            <p class="description">Current key: <?php echo esc_html($masked_key); ?></p>
+                        <?php endif; ?>
+                        <p class="description">Enter your OpenAI API key for AI analysis functionality.</p>
+                    </td>
+                </tr>
+            </table>
+            <p class="submit">
+                <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
+            </p>
+        </form>
+    </div>
+    <?php
+}
+
+function longevity_ai_analysis_callback() {
+    // Basic security check
+    check_ajax_referer('longevity_form_nonce', 'security');
+    
+    // Get the OpenAI API key from WordPress options
+    $api_key = get_option('longevity_openai_api_key');
+    
+    // Check if API key exists
+    if (!$api_key || $api_key === 'sk-REPLACE_WITH_YOUR_API_KEY') {
+        wp_send_json_error(array('message' => 'API key not configured. Please contact the site administrator.'));
+        return;
+    }
+    
+    // Get data from the AJAX request
+    $analysis_data = isset($_POST['analysis_data']) ? $_POST['analysis_data'] : null;
+    
+    if (!$analysis_data) {
+        wp_send_json_error(array('message' => 'No data provided for analysis.'));
+        return;
+    }
+    
+    // Sanitize and prepare data for OpenAI
+    $decoded_data = json_decode(stripslashes($analysis_data), true);
+    
+    // Construct the prompt for OpenAI
+    $prompt = "Please analyze this longevity assessment data and provide personalized health insights.\n\n";
+    $prompt .= "USER DATA:\n";
+    $prompt .= "Age: " . $decoded_data['age'] . "\n";
+    $prompt .= "Gender: " . $decoded_data['gender'] . "\n";
+    $prompt .= "Biological Age: " . $decoded_data['biologicalAge'] . " years (";
+    $prompt .= $decoded_data['ageShift'] > 0 ? "+" : "";
+    $prompt .= $decoded_data['ageShift'] . " years from chronological age)\n";
+    $prompt .= "Aging Rate: " . $decoded_data['agingRate'] . "\n";
+    $prompt .= "BMI: " . $decoded_data['bmi'] . " (" . $decoded_data['bmiCategory'] . ")\n";
+    $prompt .= "WHR: " . $decoded_data['whr'] . " (" . $decoded_data['whrCategory'] . ")\n\n";
+    
+    $prompt .= "SCORES (on scale of 0-5, where 5 is optimal):\n";
+    foreach ($decoded_data['scores'] as $metric => $score) {
+        // Format the metric name to be more readable
+        $formatted_metric = ucwords(preg_replace('/(?<!^)[A-Z]/', ' $0', $metric));
+        $prompt .= "$formatted_metric: $score\n";
+    }
+    
+    $prompt .= "\nPOSITIVE FACTORS:\n";
+    foreach ($decoded_data['positiveFactors'] as $factor) {
+        $prompt .= "- " . $factor['name'] . " (impact: -" . abs($factor['impact']) . " years)\n";
+    }
+    
+    $prompt .= "\nNEGATIVE FACTORS:\n";
+    foreach ($decoded_data['negativeFactors'] as $factor) {
+        $prompt .= "- " . $factor['name'] . " (impact: +" . abs($factor['impact']) . " years)\n";
+    }
+    
+    $prompt .= "\nBased on this data, please provide:\n";
+    $prompt .= "1. A brief summary of their overall longevity profile (2-3 sentences)\n";
+    $prompt .= "2. 2-3 key strengths they should maintain\n";
+    $prompt .= "3. 2-3 priority areas where improvement would have the biggest impact\n";
+    $prompt .= "4. 3-5 specific, actionable recommendations tailored to their data\n";
+    $prompt .= "\nFormat your response in JSON with these fields: summary, strengths (array), priorities (array), and recommendations (array).";
+    
+    // Set up the request to OpenAI API
+    $args = array(
+        'headers' => array(
+            'Authorization' => 'Bearer ' . $api_key,
+            'Content-Type' => 'application/json'
+        ),
+        'body' => json_encode(array(
+            'model' => 'gpt-3.5-turbo',
+            'messages' => array(
+                array(
+                    'role' => 'system',
+                    'content' => 'You are a helpful assistant that provides concise, actionable advice about health and longevity.'
+                ),
+                array(
+                    'role' => 'user',
+                    'content' => $prompt
+                )
+            ),
+            'max_tokens' => 600,
+            'temperature' => 0.7
+        )),
+        'timeout' => 30
+    );
+    
+    // Make the request to OpenAI
+    $response = wp_remote_post('https://api.openai.com/v1/chat/completions', $args);
+    
+    // Check for errors
+    if (is_wp_error($response)) {
+        $error_message = $response->get_error_message();
+        error_log('OpenAI API request failed: ' . $error_message);
+        wp_send_json_error(array(
+            'message' => 'Connection to AI service failed: ' . $error_message,
+            'debug' => 'WP_Error occurred'
+        ));
+        return;
+    }
+    
+    // Get the response code and body
+    $response_code = wp_remote_retrieve_response_code($response);
+    $body = wp_remote_retrieve_body($response);
+    
+    // Log the response for debugging
+    error_log('OpenAI API response code: ' . $response_code);
+    error_log('OpenAI API response body (truncated): ' . substr($body, 0, 500));
+    
+    // Check if the response code is not 200 OK
+    if ($response_code !== 200) {
+        $decoded_body = json_decode($body, true);
+        $error_info = isset($decoded_body['error']) ? $decoded_body['error'] : 'Unknown API error';
+        
+        error_log('OpenAI API error: ' . print_r($error_info, true));
+        
+        // Provide specific messages for common API errors
+        $error_message = 'AI service returned an error';
+        if ($response_code === 401) {
+            $error_message = 'Invalid API key. Please check your API key in the Longevity Settings.';
+        } elseif ($response_code === 429) {
+            $error_message = 'API rate limit exceeded. Please try again later.';
+        } elseif ($response_code >= 500) {
+            $error_message = 'AI service is currently unavailable. Please try again later.';
+        }
+        
+        wp_send_json_error(array(
+            'message' => $error_message,
+            'debug' => 'HTTP ' . $response_code . ' error'
+        ));
+        return;
+    }
+    
+    // Parse the response JSON
+    $decoded_body = json_decode($body, true);
+    
+    // Check if we got a valid response
+    if (!isset($decoded_body['choices'][0]['message']['content'])) {
+        wp_send_json_error(array('message' => 'Invalid response from AI service.'));
+        return;
+    }
+    
+    // Extract the AI's response content
+    $ai_content = $decoded_body['choices'][0]['message']['content'];
+    
+    // Try to parse JSON response from the AI
+    $ai_response = json_decode($ai_content, true);
+    
+    // Check if JSON parsing succeeded
+    if (!$ai_response || !isset($ai_response['summary'])) {
+        // If JSON parsing failed, try to extract sections manually
+        $summary = preg_match('/summary[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $summary_match) ? trim($summary_match[1]) : '';
+        
+        preg_match_all('/strengths[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $strengths_match);
+        preg_match_all('/- ([^\n]+)/i', isset($strengths_match[1][0]) ? $strengths_match[1][0] : '', $strengths_items);
+        $strengths = isset($strengths_items[1]) ? array_map('trim', $strengths_items[1]) : [];
+        
+        preg_match_all('/priorities[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $priorities_match);
+        preg_match_all('/- ([^\n]+)/i', isset($priorities_match[1][0]) ? $priorities_match[1][0] : '', $priorities_items);
+        $priorities = isset($priorities_items[1]) ? array_map('trim', $priorities_items[1]) : [];
+        
+        preg_match_all('/recommendations[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $recommendations_match);
+        preg_match_all('/- ([^\n]+)/i', isset($recommendations_match[1][0]) ? $recommendations_match[1][0] : '', $recommendations_items);
+        $recommendations = isset($recommendations_items[1]) ? array_map('trim', $recommendations_items[1]) : [];
+        
+        $ai_response = array(
+            'summary' => $summary,
+            'strengths' => $strengths,
+            'priorities' => $priorities,
+            'recommendations' => $recommendations
+        );
+    }
+    
+    // Send the AI analysis back to the client
+    wp_send_json_success($ai_response);
+}
+
 // Register shortcode
 function longevity_assessment_form() {
     // Ensure jQuery is loaded
     wp_enqueue_script('jquery');
+    
+    // Register our form's JavaScript inline
+    $inline_script = "var longevity_form_data = " . json_encode(array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('longevity_form_nonce')
+    )) . ";";
+    
+    // Print the inline script directly
+    echo '<script>' . $inline_script . '</script>';
 
     ob_start();
     ?>
@@ -310,6 +567,50 @@ function longevity_assessment_form() {
                              </div>
                          </div>
                      </div>
+                     <!-- --- End Age Impact Factors Section --- -->
+
+                     <!-- --- AI Analysis Section --- -->
+                     <div class="full-width-section" id="aiAnalysisSection">
+                         <h3>AI Personalized Analysis</h3>
+                         <div class="ai-analysis-container">
+                             <div class="ai-status">
+                                 <div class="ai-loading">
+                                     <span class="material-icons ai-loading-icon">autorenew</span>
+                                     <p>Analyzing your data...</p>
+                                 </div>
+                             </div>
+                             <div class="ai-content" style="display: none;">
+                                 <div class="ai-header">
+                                     <span class="material-icons ai-icon">psychology</span>
+                                     <div class="ai-branding">
+                                         <h4>AI Health Insights</h4>
+                                         <p class="ai-subtitle">Personalized analysis based on your assessment</p>
+                                     </div>
+                                 </div>
+                                 <div class="ai-sections">
+                                     <div class="ai-section">
+                                         <h5>Summary</h5>
+                                         <div class="ai-summary"></div>
+                                     </div>
+                                     <div class="ai-columns">
+                                         <div class="ai-column">
+                                             <h5>Key Strengths</h5>
+                                             <div class="ai-strengths"></div>
+                                         </div>
+                                         <div class="ai-column">
+                                             <h5>Priority Areas</h5>
+                                             <div class="ai-priorities"></div>
+                                         </div>
+                                     </div>
+                                     <div class="ai-section">
+                                         <h5>Personalized Recommendations</h5>
+                                         <div class="ai-recommendations"></div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <!-- --- End AI Analysis Section --- -->
 
                      <!-- Section: Detailed Breakdown (Full Width) -->
                      <div class="full-width-section" id="detailedBreakdownSection">
@@ -317,8 +618,6 @@ function longevity_assessment_form() {
                          <!-- Populated by JS: Shows scores for each metric -->
                          <div id="detailedBreakdown"></div> <!-- Existing content div -->
                      </div>
-
-                     <!-- --- End Age Impact Factors Section --- -->
                 </div>
             </div>
         </form>
@@ -1023,6 +1322,227 @@ function longevity_assessment_form() {
             }
         }
         /* --- End Age Impact Factors Section --- */
+
+        /* --- AI Analysis Section --- */
+        .ai-analysis-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e5e5e5;
+        }
+
+        .ai-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ai-loading-icon {
+            font-size: 2rem;
+            color: #007AFF;
+        }
+
+        .ai-content {
+            display: none;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-icon {
+            font-size: 2rem;
+            color: #007AFF;
+        }
+
+        .ai-branding {
+            flex: 1;
+        }
+
+        .ai-subtitle {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .ai-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ai-section {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e5e5e5;
+        }
+
+        .ai-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .ai-columns {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ai-column {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e5e5e5;
+        }
+
+        .ai-column:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .ai-summary, .ai-strengths, .ai-priorities, .ai-recommendations {
+            padding: 1rem;
+            border-radius: 8px;
+            background: #fafafa;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e5e5e5;
+        }
+
+        .ai-summary:hover, .ai-strengths:hover, .ai-priorities:hover, .ai-recommendations:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .ai-summary h5, .ai-strengths h5, .ai-priorities h5, .ai-recommendations h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .ai-summary p, .ai-strengths p, .ai-priorities p, .ai-recommendations p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .ai-summary .metric-value, .ai-strengths .metric-value, .ai-priorities .metric-value, .ai-recommendations .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007AFF;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-summary .metric-label, .ai-strengths .metric-label, .ai-priorities .metric-label, .ai-recommendations .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-summary .score-bar, .ai-strengths .score-bar, .ai-priorities .score-bar, .ai-recommendations .score-bar {
+            height: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .ai-summary .score-fill, .ai-strengths .score-fill, .ai-priorities .score-fill, .ai-recommendations .score-fill {
+            height: 100%;
+            background: #007AFF;
+            transition: width 0.5s ease;
+        }
+
+        .ai-summary .breakdown-item, .ai-strengths .breakdown-item, .ai-priorities .breakdown-item, .ai-recommendations .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.95em;
+        }
+
+        .ai-summary .breakdown-item:last-child, .ai-strengths .breakdown-item:last-child, .ai-priorities .breakdown-item:last-child, .ai-recommendations .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .ai-summary .breakdown-label, .ai-strengths .breakdown-label, .ai-priorities .breakdown-label, .ai-recommendations .breakdown-label {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .ai-summary .breakdown-value, .ai-strengths .breakdown-value, .ai-priorities .breakdown-value, .ai-recommendations .breakdown-value {
+            color: #007AFF;
+            font-weight: 600;
+        }
+
+        .ai-summary .age-comparison, .ai-strengths .age-comparison, .ai-priorities .age-comparison, .ai-recommendations .age-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f8f8;
+            border-radius: 12px;
+        }
+
+        .ai-summary .age-value, .ai-strengths .age-value, .ai-priorities .age-value, .ai-recommendations .age-value {
+            text-align: center;
+        }
+
+        .ai-summary .age-value .value, .ai-strengths .age-value .value, .ai-priorities .age-value .value, .ai-recommendations .age-value .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        .ai-summary .age-value .label, .ai-strengths .age-value .label, .ai-priorities .age-value .label, .ai-recommendations .age-value .label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .ai-summary .age-difference, .ai-strengths .age-difference, .ai-priorities .age-difference, .ai-recommendations .age-difference {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #007AFF;
+        }
+
+        @media (max-width: 768px) {
+            .ai-columns {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .ai-column {
+                width: 100%;
+            }
+
+            .ai-summary .metric-value, .ai-strengths .metric-value, .ai-priorities .metric-value, .ai-recommendations .metric-value {
+                font-size: 2rem;
+            }
+
+            .ai-summary .age-comparison, .ai-strengths .age-comparison, .ai-priorities .age-comparison, .ai-recommendations .age-comparison {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        /* --- End AI Analysis Section --- */
     </style>
 
     <!-- JavaScript for Calculations and Form Handling -->
@@ -1242,6 +1762,259 @@ function longevity_assessment_form() {
             const rate = biologicalAge / chronologicalAge;
             debug(`Calculated Aging Rate: ${rate.toFixed(2)} (BioAge: ${biologicalAge.toFixed(1)}, ChronoAge: ${chronologicalAge})`);
             return rate;
+        }
+
+        /**
+         * Initiates an AI analysis of the user's longevity assessment data.
+         */
+        function performAIAnalysis(scores, measurements, age, biologicalAge, ageShift, agingRate, bmi, bmiCategory, whr, whrCategory, positiveFactors, negativeFactors) {
+            debug("Starting AI analysis...");
+            
+            // Show loading indicator
+            const aiSection = document.getElementById('aiAnalysisSection');
+            const loadingDiv = aiSection.querySelector('.ai-loading');
+            const contentDiv = aiSection.querySelector('.ai-content');
+            
+            if (!loadingDiv || !contentDiv) {
+                console.error("AI Analysis section elements not found!");
+                return;
+            }
+            
+            // Show loading animation and hide content
+            loadingDiv.style.display = 'flex';
+            loadingDiv.querySelector('.ai-loading-icon').style.animation = 'spin 1.5s linear infinite';
+            contentDiv.style.display = 'none';
+            
+            // Add a spinning animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .ai-loading-icon {
+                    animation: spin 1.5s linear infinite;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Prepare data for API
+            const analysisData = {
+                age: age,
+                gender: measurements.gender,
+                biologicalAge: biologicalAge.toFixed(1),
+                ageShift: ageShift.toFixed(1),
+                agingRate: agingRate.toFixed(2),
+                bmi: bmi.toFixed(1),
+                bmiCategory: bmiCategory,
+                whr: whr.toFixed(2),
+                whrCategory: whrCategory,
+                scores: scores,
+                positiveFactors: positiveFactors,
+                negativeFactors: negativeFactors
+            };
+            
+            debug("Sending AI analysis data:", analysisData);
+            
+            // Check if longevity_form_data exists
+            if (!window.longevity_form_data) {
+                console.error("Cannot perform AI analysis: longevity_form_data is not defined");
+                displayAIError('Configuration error. Please contact the site administrator.');
+                return;
+            }
+            
+            // Make AJAX request to the server
+            $.ajax({
+                url: window.longevity_form_data.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'longevity_ai_analysis',
+                    security: window.longevity_form_data.nonce,
+                    analysis_data: JSON.stringify(analysisData)
+                },
+                success: function(response) {
+                    debug("AI analysis response received:", response);
+                    
+                    // Hide loading animation
+                    loadingDiv.style.display = 'none';
+                    
+                    if (response.success && response.data) {
+                        // Display the AI analysis results
+                        displayAIAnalysis(response.data);
+                        // Show the content div
+                        contentDiv.style.display = 'block';
+                    } else {
+                        // Display error message with more detail
+                        let errorMsg = 'Error analyzing your data.';
+                        if (response.data && response.data.message) {
+                            errorMsg = response.data.message;
+                        }
+                        debug("AI analysis error:", errorMsg);
+                        displayAIError(errorMsg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    debug("AI analysis request failed:", {xhr: xhr, status: status, error: error});
+                    
+                    // Hide loading animation
+                    loadingDiv.style.display = 'none';
+                    
+                    // Attempt to parse response for more details
+                    let errorMsg = 'Error connecting to the analysis service. Please try again later.';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.data && response.data.message) {
+                            errorMsg = response.data.message;
+                        }
+                    } catch (e) {
+                        // If we can't parse the response, use the default error message
+                    }
+                    
+                    // Display error message
+                    displayAIError(errorMsg);
+                }
+            });
+        }
+        
+        /**
+         * Displays the AI analysis results in the UI.
+         * @param {object} data - The AI analysis data containing summary, strengths, priorities, recommendations.
+         */
+        function displayAIAnalysis(data) {
+            debug("Displaying AI analysis:", data);
+            
+            const aiSection = document.getElementById('aiAnalysisSection');
+            if (!aiSection) {
+                console.error("AI Analysis section not found!");
+                return;
+            }
+            
+            const contentDiv = aiSection.querySelector('.ai-content');
+            if (!contentDiv) {
+                console.error("AI Analysis content div not found!");
+                return;
+            }
+            
+            // Create structure if it doesn't exist
+            if (!document.querySelector('.ai-summary')) {
+                contentDiv.innerHTML = `
+                    <div class="ai-header">
+                        <span class="material-icons ai-icon">psychology</span>
+                        <div class="ai-branding">
+                            <h4>AI Health Insights</h4>
+                            <p class="ai-subtitle">Personalized analysis based on your assessment</p>
+                        </div>
+                    </div>
+                    <div class="ai-section">
+                        <h5>Summary</h5>
+                        <div class="ai-summary"></div>
+                    </div>
+                    <div class="ai-columns">
+                        <div class="ai-column">
+                            <h5>Key Strengths</h5>
+                            <div class="ai-strengths"></div>
+                        </div>
+                        <div class="ai-column">
+                            <h5>Priority Areas</h5>
+                            <div class="ai-priorities"></div>
+                        </div>
+                    </div>
+                    <div class="ai-section">
+                        <h5>Personalized Recommendations</h5>
+                        <div class="ai-recommendations"></div>
+                    </div>
+                `;
+            }
+            
+            const summaryDiv = contentDiv.querySelector('.ai-summary');
+            const strengthsDiv = contentDiv.querySelector('.ai-strengths');
+            const prioritiesDiv = contentDiv.querySelector('.ai-priorities');
+            const recommendationsDiv = contentDiv.querySelector('.ai-recommendations');
+            
+            // Display summary
+            summaryDiv.innerHTML = `<p>${data.summary || 'No summary available.'}</p>`;
+            
+            // Display strengths
+            let strengthsHtml = '';
+            if (data.strengths && data.strengths.length > 0) {
+                strengthsHtml = '<ul>';
+                data.strengths.forEach(strength => {
+                    strengthsHtml += `<li>${strength}</li>`;
+                });
+                strengthsHtml += '</ul>';
+            } else {
+                strengthsHtml = '<p>No specific strengths identified.</p>';
+            }
+            strengthsDiv.innerHTML = strengthsHtml;
+            
+            // Display priorities
+            let prioritiesHtml = '';
+            if (data.priorities && data.priorities.length > 0) {
+                prioritiesHtml = '<ul>';
+                data.priorities.forEach(priority => {
+                    prioritiesHtml += `<li>${priority}</li>`;
+                });
+                prioritiesHtml += '</ul>';
+            } else {
+                prioritiesHtml = '<p>No specific priorities identified.</p>';
+            }
+            prioritiesDiv.innerHTML = prioritiesHtml;
+            
+            // Display recommendations
+            let recommendationsHtml = '';
+            if (data.recommendations && data.recommendations.length > 0) {
+                recommendationsHtml = '<ul>';
+                data.recommendations.forEach(recommendation => {
+                    recommendationsHtml += `<li>${recommendation}</li>`;
+                });
+                recommendationsHtml += '</ul>';
+            } else {
+                recommendationsHtml = '<p>No specific recommendations available.</p>';
+            }
+            recommendationsDiv.innerHTML = recommendationsHtml;
+            
+            // Show the content
+            contentDiv.style.display = 'block';
+        }
+        
+        /**
+         * Displays an error message in the AI Analysis section.
+         * @param {string} message - The error message to display.
+         */
+        function displayAIError(message) {
+            debug("Displaying AI error:", message);
+            
+            const aiSection = document.getElementById('aiAnalysisSection');
+            if (!aiSection) {
+                console.error("AI Analysis section not found!");
+                return;
+            }
+            
+            const contentDiv = aiSection.querySelector('.ai-content');
+            if (!contentDiv) {
+                console.error("AI Analysis content div not found!");
+                return;
+            }
+            
+            // Display error message
+            contentDiv.innerHTML = `
+                <div class="ai-header">
+                    <span class="material-icons ai-icon">psychology</span>
+                    <div class="ai-branding">
+                        <h4>AI Health Insights</h4>
+                        <p class="ai-subtitle">Personalized analysis based on your assessment</p>
+                    </div>
+                </div>
+                <div class="ai-error">
+                    <span class="material-icons" style="font-size: 2rem; color: #e74c3c; margin-bottom: 1rem;">error_outline</span>
+                    <h5>Analysis Error</h5>
+                    <p>${message}</p>
+                    <p>Your assessment results are still valid and available below.</p>
+                </div>
+            `;
+            
+            // Show the content
+            contentDiv.style.display = 'block';
         }
 
         // --- Display & Form Handling ---
@@ -1725,7 +2498,107 @@ function longevity_assessment_form() {
 
             // --- Scroll to Results ---
             resultsSection.scrollIntoView({ behavior: 'smooth' });
-             debug("Scrolled to results section.");
+            debug("Scrolled to results section.");
+             
+            // --- Collect top factors for AI analysis ---
+            function getTopFactors() {
+                const factorDetails = {
+                    physicalActivity: { name: "Physical Activity" },
+                    sleepDuration: { name: "Sleep Duration" },
+                    sleepQuality: { name: "Sleep Quality" },
+                    stressLevels: { name: "Stress Management" },
+                    socialConnections: { name: "Social Connections" },
+                    dietQuality: { name: "Diet Quality" },
+                    alcoholConsumption: { name: "Alcohol Consumption" },
+                    smokingStatus: { name: "Smoking Status" },
+                    cognitiveActivity: { name: "Cognitive Activity" },
+                    sunlightExposure: { name: "Sunlight Exposure" },
+                    supplementIntake: { name: "Supplement Use" },
+                    bmiScore: { name: "Body Mass Index" },
+                    whrScore: { name: "Waist-to-Hip Ratio" },
+                    sitToStand: { name: "Functional Strength" },
+                    breathHold: { name: "Respiratory Function" },
+                    balance: { name: "Balance Ability" },
+                    skinElasticity: { name: "Skin Health" }
+                };
+                
+                // Calculate impact values
+                const impactValues = {};
+                for (let factor in scores) {
+                    if (factor in weights && factor in factorDetails) {
+                        const score = scores[factor];
+                        impactValues[factor] = weights[factor] * (score - 3);
+                    }
+                }
+                
+                // Sort and separate factors
+                const sortedFactors = Object.keys(impactValues)
+                    .filter(factor => factorDetails[factor])
+                    .sort((a, b) => Math.abs(impactValues[b]) - Math.abs(impactValues[a]));
+                
+                const positiveFactors = sortedFactors
+                    .filter(factor => impactValues[factor] > 0)
+                    .map(factor => ({
+                        name: factorDetails[factor].name,
+                        impact: impactValues[factor]
+                    }));
+                
+                const negativeFactors = sortedFactors
+                    .filter(factor => impactValues[factor] < 0)
+                    .map(factor => ({
+                        name: factorDetails[factor].name,
+                        impact: impactValues[factor]
+                    }));
+                    
+                return { positiveFactors, negativeFactors };
+            }
+            
+            // Get the top factors
+            const { positiveFactors, negativeFactors } = getTopFactors();
+            
+            // --- Perform AI Analysis ---
+            const bmiCategory = getBMICategory(bmi);
+            const whrCategory = getWHRCategory(whr, measurements.gender);
+            
+            // Check if we have the necessary data for the API call
+            if (window.longevity_form_data) {
+                // Perform AI analysis with all the calculated data
+                performAIAnalysis(
+                    scores, 
+                    measurements, 
+                    age, 
+                    biologicalAge, 
+                    ageShift, 
+                    agingRate, 
+                    bmi, 
+                    bmiCategory, 
+                    whr, 
+                    whrCategory, 
+                    positiveFactors, 
+                    negativeFactors
+                );
+            } else {
+                console.error("Cannot perform AI analysis: longevity_form_data is not defined");
+                // Show an error message in the AI section
+                const aiSection = document.getElementById('aiAnalysisSection');
+                if (aiSection) {
+                    const loadingDiv = aiSection.querySelector('.ai-loading');
+                    const contentDiv = aiSection.querySelector('.ai-content');
+                    
+                    if (loadingDiv && contentDiv) {
+                        loadingDiv.style.display = 'none';
+                        contentDiv.style.display = 'block';
+                        contentDiv.innerHTML = `
+                            <div class="ai-error">
+                                <span class="material-icons" style="font-size: 2rem; color: #e74c3c; margin-bottom: 1rem;">error_outline</span>
+                                <h4>Analysis Unavailable</h4>
+                                <p>The AI analysis service is currently unavailable.</p>
+                                <p>Your assessment results are still valid and available below.</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
         }
 
         /**
