@@ -612,6 +612,35 @@ function longevity_assessment_form() {
                      </div>
                      <!-- --- End AI Analysis Section --- -->
 
+                     <!-- --- Aging Rate Gauge Section --- -->
+                     <div class="full-width-section" id="agingRateGaugeSection">
+                         <h3>Pace of Aging</h3>
+                         <div class="aging-rate-gauge-container">
+                             <div class="gauge-icons">
+                                 <span class="material-icons slow-icon">slow_motion_video</span>
+                                 <span class="material-icons fast-icon">directions_run</span>
+                             </div>
+                             <div class="aging-rate-gauge">
+                                 <div class="gauge-arc"></div>
+                                 <div class="gauge-needle" id="agingRateNeedle"></div>
+                                 <div class="gauge-center-circle"></div>
+                             </div>
+                             <div class="gauge-value-display">
+                                 <span id="agingRateValueText">--</span>
+                                 <span class="gauge-value-label">Aging Rate</span>
+                             </div>
+                             <div class="gauge-scale-labels">
+                                 <span>0.6</span>
+                                 <span>1.0</span>
+                                 <span>1.4</span>
+                             </div>
+                             <p class="gauge-description">
+                                 An aging rate of 1.0 means biological aging matches chronological aging. Lower values indicate slower aging, higher values indicate faster aging.
+                             </p>
+                         </div>
+                     </div>
+                     <!-- --- End Aging Rate Gauge Section --- -->
+
                      <!-- Section: Detailed Breakdown (Full Width) -->
                      <div class="full-width-section" id="detailedBreakdownSection">
                          <h3>Detailed Breakdown</h3>
@@ -1543,6 +1572,174 @@ function longevity_assessment_form() {
             }
         }
         /* --- End AI Analysis Section --- */
+
+        /* --- Aging Rate Gauge Section --- */
+        #agingRateGaugeSection {
+            padding: 2rem;
+            margin: 2rem 0;
+            background: #f9f9f9;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        #agingRateGaugeSection h3 {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        #agingRateGaugeSection h3:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #007AFF;
+            border-radius: 3px;
+        }
+
+        .aging-rate-gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .aging-rate-gauge {
+            position: relative;
+            width: 250px; /* Increased size */
+            height: 125px; /* Half height for semi-circle */
+            overflow: hidden; /* Hide the bottom half */
+            margin-bottom: -20px; /* Adjust overlap */
+        }
+
+        .gauge-arc {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%; /* Double height to allow full circle for gradient */
+            border-radius: 50%;
+            /* Conic gradient for variable thickness effect */
+            background: conic-gradient(
+                from -120deg, /* Start angle */
+                transparent 0deg 60deg, /* Gap at the bottom */
+                #00c6ff 60deg 65deg,  /* Thin start (blue) */
+                #00c6ff 65deg 90deg,  /* Transition */
+                #f5a623 90deg 100deg, /* Mid color (orange) */
+                #f56b23 100deg 240deg, /* Thick end (red-orange) */
+                transparent 240deg 360deg /* Gap at the bottom */
+            );
+            /* Mask to create the arc shape and variable thickness */
+            mask-image: radial-gradient(
+                circle at 50% 50%,
+                transparent 80px, /* Inner transparent radius */
+                black 80px 82px, /* Thin part start */
+                black 82px 105px, /* Thickening part */
+                black 105px 125px, /* Thickest part end */
+                transparent 125px /* Outer transparent radius */
+            );
+            -webkit-mask-image: radial-gradient(
+                circle at 50% 50%,
+                transparent 80px,
+                black 80px 82px,
+                black 82px 105px,
+                black 105px 125px,
+                transparent 125px
+            );
+        }
+        
+        .gauge-needle {
+            position: absolute;
+            bottom: 0; /* Position at the bottom center */
+            left: 50%;
+            width: 3px;
+            height: 110px; /* Needle length */
+            background: #333;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-120deg); /* Start pointing left (0.6) */
+            transition: transform 0.5s ease-out;
+            z-index: 2;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .gauge-center-circle {
+            position: absolute;
+            bottom: -6px; /* Position over the needle base */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            z-index: 3;
+        }
+
+        .gauge-icons {
+            position: relative;
+            width: 280px; /* Wider than gauge */
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px; /* Space above icons */
+            padding: 0 10px;
+        }
+
+        .slow-icon, .fast-icon {
+            font-size: 2.5rem; /* Larger icons */
+            color: #666;
+        }
+        
+        /* Replace Material Icons with Tortoise/Rabbit if available or use placeholders */
+        .slow-icon::before { content: "🐢"; font-size: 2.5rem; }
+        .fast-icon::before { content: "🐇"; font-size: 2.5rem; }
+        .slow-icon, .fast-icon { display: inline-block; width: 30px; text-align: center; }
+        
+        .gauge-value-display {
+            text-align: center;
+            margin-top: 1rem; /* Space below gauge */
+            margin-bottom: 0.5rem;
+        }
+
+        #agingRateValueText {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            display: block;
+            line-height: 1.1;
+        }
+
+        .gauge-value-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .gauge-scale-labels {
+            width: 270px; /* Match icon width */
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+            padding: 0 5px;
+            margin-top: -5px; /* Position closer to icons */
+        }
+
+        .gauge-description {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            max-width: 300px;
+            margin-top: 1.5rem;
+            line-height: 1.5;
+        }
+        /* --- End Aging Rate Gauge Section --- */
+
+        /* --- Detailed Breakdown Section --- */
+
     </style>
 
     <!-- JavaScript for Calculations and Form Handling -->
@@ -2059,6 +2256,37 @@ function longevity_assessment_form() {
             const ageShift = calculateAgeShift(scores, age);
             const biologicalAge = calculateBiologicalAge(age, ageShift);
             const agingRate = calculateAgingRate(biologicalAge, age);
+
+            // --- Update Aging Rate Gauge ---
+            const agingRateNeedle = document.getElementById('agingRateNeedle');
+            const agingRateValueText = document.getElementById('agingRateValueText');
+            if (agingRateNeedle && agingRateValueText) {
+                if (!isNaN(agingRate)) {
+                    agingRateValueText.textContent = agingRate.toFixed(2);
+                    
+                    // Map aging rate (0.6 to 1.4) to angle (-120 to +120 degrees)
+                    const minRate = 0.6;
+                    const maxRate = 1.4;
+                    const minAngle = -120;
+                    const maxAngle = 120;
+                    
+                    // Clamp the aging rate within the expected range
+                    const clampedRate = Math.max(minRate, Math.min(maxRate, agingRate));
+                    
+                    // Linear mapping
+                    const percentage = (clampedRate - minRate) / (maxRate - minRate);
+                    const angle = minAngle + percentage * (maxAngle - minAngle);
+                    
+                    agingRateNeedle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                    debug(`Aging Rate Gauge Updated: Rate=${agingRate.toFixed(2)}, Angle=${angle.toFixed(1)}deg`);
+                } else {
+                    agingRateValueText.textContent = 'N/A';
+                    agingRateNeedle.style.transform = `translateX(-50%) rotate(-120deg)`; // Reset to start
+                    debug("Aging Rate Gauge: Invalid aging rate, reset gauge.");
+                }
+            } else {
+                console.error("Aging Rate Gauge elements not found!");
+            }
 
             // --- Populate Biological Age Card ---
             const biologicalAgeDiv = document.getElementById('biologicalAgeDisplay');
