@@ -252,6 +252,9 @@ function longevity_assessment_form() {
     // Ensure jQuery is loaded
     wp_enqueue_script('jquery');
     
+    // Include Chart.js library
+    wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array('jquery'), null, true);
+    
     // Register our form's JavaScript inline
     $inline_script = "var longevity_form_data = " . json_encode(array(
         'ajax_url' => admin_url('admin-ajax.php'),
@@ -611,35 +614,6 @@ function longevity_assessment_form() {
                          </div>
                      </div>
                      <!-- --- End AI Analysis Section --- -->
-
-                     <!-- --- Aging Rate Gauge Section --- -->
-                     <div class="full-width-section" id="agingRateGaugeSection">
-                         <h3>Pace of Aging</h3>
-                         <div class="aging-rate-gauge-container">
-                             <div class="gauge-icons">
-                                 <span class="material-icons slow-icon">slow_motion_video</span>
-                                 <span class="material-icons fast-icon">directions_run</span>
-                             </div>
-                             <div class="aging-rate-gauge">
-                                 <div class="gauge-arc"></div>
-                                 <div class="gauge-needle" id="agingRateNeedle"></div>
-                                 <div class="gauge-center-circle"></div>
-                             </div>
-                             <div class="gauge-value-display">
-                                 <span id="agingRateValueText">--</span>
-                                 <span class="gauge-value-label">Aging Rate</span>
-                             </div>
-                             <div class="gauge-scale-labels">
-                                 <span>0.6</span>
-                                 <span>1.0</span>
-                                 <span>1.4</span>
-                             </div>
-                             <p class="gauge-description">
-                                 An aging rate of 1.0 means biological aging matches chronological aging. Lower values indicate slower aging, higher values indicate faster aging.
-                             </p>
-                         </div>
-                     </div>
-                     <!-- --- End Aging Rate Gauge Section --- -->
 
                      <!-- Section: Detailed Breakdown (Full Width) -->
                      <div class="full-width-section" id="detailedBreakdownSection">
@@ -1573,173 +1547,149 @@ function longevity_assessment_form() {
         }
         /* --- End AI Analysis Section --- */
 
-        /* --- Aging Rate Gauge Section --- */
-        #agingRateGaugeSection {
-            padding: 2rem;
-            margin: 2rem 0;
-            background: #f9f9f9;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-        }
-
-        #agingRateGaugeSection h3 {
-            text-align: center;
-            margin-bottom: 2.5rem;
-            font-weight: 600;
-            position: relative;
-            padding-bottom: 1rem;
-        }
-
-        #agingRateGaugeSection h3:after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: #007AFF;
-            border-radius: 3px;
-        }
-
-        .aging-rate-gauge-container {
+        /* --- Detailed Breakdown Chart Section --- */
+        .detailed-breakdown-toggle {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
         }
 
-        .aging-rate-gauge {
-            position: relative;
-            width: 250px; /* Increased size */
-            height: 125px; /* Half height for semi-circle */
-            overflow: hidden; /* Hide the bottom half */
-            margin-bottom: -20px; /* Adjust overlap */
+        .segmented-control {
+            display: inline-flex;
+            background-color: #e9e9eb; /* Lighter gray background */
+            border-radius: 9px; /* Apple standard corner radius */
+            padding: 3px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .gauge-arc {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 200%; /* Double height to allow full circle for gradient */
-            border-radius: 50%;
-            /* Conic gradient for variable thickness effect */
-            background: conic-gradient(
-                from -120deg, /* Start angle */
-                transparent 0deg 60deg, /* Gap at the bottom */
-                #00c6ff 60deg 65deg,  /* Thin start (blue) */
-                #00c6ff 65deg 90deg,  /* Transition */
-                #f5a623 90deg 100deg, /* Mid color (orange) */
-                #f56b23 100deg 240deg, /* Thick end (red-orange) */
-                transparent 240deg 360deg /* Gap at the bottom */
-            );
-            /* Mask to create the arc shape and variable thickness */
-            mask-image: radial-gradient(
-                circle at 50% 50%,
-                transparent 80px, /* Inner transparent radius */
-                black 80px 82px, /* Thin part start */
-                black 82px 105px, /* Thickening part */
-                black 105px 125px, /* Thickest part end */
-                transparent 125px /* Outer transparent radius */
-            );
-            -webkit-mask-image: radial-gradient(
-                circle at 50% 50%,
-                transparent 80px,
-                black 80px 82px,
-                black 82px 105px,
-                black 105px 125px,
-                transparent 125px
-            );
-        }
-        
-        .gauge-needle {
-            position: absolute;
-            bottom: 0; /* Position at the bottom center */
-            left: 50%;
-            width: 3px;
-            height: 110px; /* Needle length */
-            background: #333;
-            transform-origin: bottom center;
-            transform: translateX(-50%) rotate(-120deg); /* Start pointing left (0.6) */
-            transition: transform 0.5s ease-out;
-            z-index: 2;
-            border-radius: 2px 2px 0 0;
-        }
-
-        .gauge-center-circle {
-            position: absolute;
-            bottom: -6px; /* Position over the needle base */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 12px;
-            background: #333;
-            border-radius: 50%;
-            z-index: 3;
-        }
-
-        .gauge-icons {
-            position: relative;
-            width: 280px; /* Wider than gauge */
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px; /* Space above icons */
-            padding: 0 10px;
-        }
-
-        .slow-icon, .fast-icon {
-            font-size: 2.5rem; /* Larger icons */
-            color: #666;
-        }
-        
-        /* Replace Material Icons with Tortoise/Rabbit if available or use placeholders */
-        .slow-icon::before { content: "🐢"; font-size: 2.5rem; }
-        .fast-icon::before { content: "🐇"; font-size: 2.5rem; }
-        .slow-icon, .fast-icon { display: inline-block; width: 30px; text-align: center; }
-        
-        .gauge-value-display {
-            text-align: center;
-            margin-top: 1rem; /* Space below gauge */
-            margin-bottom: 0.5rem;
-        }
-
-        #agingRateValueText {
-            font-size: 2rem;
-            font-weight: 700;
+        .segmented-control button {
+            padding: 8px 20px;
+            margin: 0;
+            border: none;
+            background-color: transparent;
             color: #1d1d1f;
-            display: block;
-            line-height: 1.1;
+            font-size: 13px; /* Slightly smaller than labels, typical for controls */
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 7px; /* Slightly less than container */
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            min-height: 32px; /* Ensure adequate touch height */
+            line-height: 1; /* Adjust for vertical alignment */
         }
 
-        .gauge-value-label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 4px;
-            display: block;
+        .segmented-control button.active {
+            background-color: #ffffff;
+            color: #1d1d1f;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .gauge-scale-labels {
-            width: 270px; /* Match icon width */
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #888;
-            padding: 0 5px;
-            margin-top: -5px; /* Position closer to icons */
+        .segmented-control button:not(.active):hover {
+            background-color: rgba(0, 0, 0, 0.05); /* Subtle hover effect */
         }
 
-        .gauge-description {
-            font-size: 0.85rem;
-            color: #666;
+        .chart-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 32px 16px; /* Reduced horizontal padding */
+            margin: 24px auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            min-height: 450px;
+            width: 95%; /* Made slightly wider */
+            max-width: 750px; /* Increased max width */
+        }
+
+        .chart-container.hidden {
+            display: none; /* Initially hide */
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .chart-container.visible {
+            display: block; /* Make visible */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chart-title {
+            color: #1d1d1f;
+            font-size: 1.25rem; /* Larger title */
+            font-weight: 600;
             text-align: center;
-            max-width: 300px;
-            margin-top: 1.5rem;
-            line-height: 1.5;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
-        /* --- End Aging Rate Gauge Section --- */
+        /* --- End Detailed Breakdown Chart Section --- */
 
-        /* --- Detailed Breakdown Section --- */
+        /* Ensure chart canvas is responsive */
+        canvas {
+            max-width: 100%;
+            height: auto !important; /* Override Chart.js inline style */
+        }
+        
+        /* Chart fallback for printing */
+        .chart-fallback {
+            display: none;
+        }
+        
+        .chart-print-image {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        @media print {
+            .chart-fallback {
+                display: block;
+                page-break-inside: avoid;
+                margin: 20px auto;
+                text-align: center;
+            }
+            
+            canvas {
+                display: none !important;
+            }
+            
+            .chart-container {
+                box-shadow: none;
+                border: 1px solid #eee;
+                page-break-inside: avoid;
+            }
+            
+            .noprint, 
+            .detailed-breakdown-toggle, 
+            .segmented-control {
+                display: none !important;
+            }
+        }
 
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .chart-container {
+                padding: 20px;
+                min-height: 400px;
+                width: 95%;
+            }
+            
+            .chart-title {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chart-container {
+                padding: 15px;
+                min-height: 350px;
+            }
+            
+            /* Adjust segmented control for smaller screens */
+            .segmented-control button {
+                padding: 6px 15px;
+                font-size: 12px;
+            }
+        }
     </style>
 
     <!-- JavaScript for Calculations and Form Handling -->
@@ -1789,7 +1739,6 @@ function longevity_assessment_form() {
             breathHold: 0.03,      // Impact of breath-holding capacity
             balance: 0.05,         // Impact of balance test performance
             skinElasticity: 0.02,  // Impact of skin elasticity test
-            overallHealthScore: 0.1  // Impact of a general health score (currently defaulted to 3)
         };
 
         // --- Core Calculation Functions ---
@@ -2249,44 +2198,11 @@ function longevity_assessment_form() {
             // Add calculated BMI/WHR scores to the main scores object
             scores.bmiScore = bmiScore;
             scores.whrScore = whrScore;
-            // Assign a default overallHealthScore (since it's not collected from the form)
-            scores.overallHealthScore = 3;
 
             // Calculate Age-related metrics
             const ageShift = calculateAgeShift(scores, age);
             const biologicalAge = calculateBiologicalAge(age, ageShift);
             const agingRate = calculateAgingRate(biologicalAge, age);
-
-            // --- Update Aging Rate Gauge ---
-            const agingRateNeedle = document.getElementById('agingRateNeedle');
-            const agingRateValueText = document.getElementById('agingRateValueText');
-            if (agingRateNeedle && agingRateValueText) {
-                if (!isNaN(agingRate)) {
-                    agingRateValueText.textContent = agingRate.toFixed(2);
-                    
-                    // Map aging rate (0.6 to 1.4) to angle (-120 to +120 degrees)
-                    const minRate = 0.6;
-                    const maxRate = 1.4;
-                    const minAngle = -120;
-                    const maxAngle = 120;
-                    
-                    // Clamp the aging rate within the expected range
-                    const clampedRate = Math.max(minRate, Math.min(maxRate, agingRate));
-                    
-                    // Linear mapping
-                    const percentage = (clampedRate - minRate) / (maxRate - minRate);
-                    const angle = minAngle + percentage * (maxAngle - minAngle);
-                    
-                    agingRateNeedle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-                    debug(`Aging Rate Gauge Updated: Rate=${agingRate.toFixed(2)}, Angle=${angle.toFixed(1)}deg`);
-                } else {
-                    agingRateValueText.textContent = 'N/A';
-                    agingRateNeedle.style.transform = `translateX(-50%) rotate(-120deg)`; // Reset to start
-                    debug("Aging Rate Gauge: Invalid aging rate, reset gauge.");
-                }
-            } else {
-                console.error("Aging Rate Gauge elements not found!");
-            }
 
             // --- Populate Biological Age Card ---
             const biologicalAgeDiv = document.getElementById('biologicalAgeDisplay');
@@ -2704,25 +2620,75 @@ function longevity_assessment_form() {
                 console.error("Age Impact Factors columns not found!");
             }
 
-            // --- Populate Detailed Breakdown Card ---
-            let breakdownHTML = '';
-            const breakdownKeys = Object.keys(weights);
+            // --- Populate Detailed Breakdown Section with Toggle and Charts ---
+            const breakdownSection = document.getElementById('detailedBreakdownSection');
+            const detailedBreakdownDiv = document.getElementById('detailedBreakdown');
+            // Filter out overallHealthScore as it has no user input
+            const breakdownKeys = Object.keys(weights).filter(key => key !== 'overallHealthScore');
 
-            for (let metric of breakdownKeys) {
-                const score = scores[metric];
-                const label = metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                breakdownHTML += `
-                    <div class="breakdown-item">
-                        <span class="breakdown-label">${label}</span>
-                        <span class="breakdown-value">${typeof score === 'number' && !isNaN(score) ? score : 'N/A'}/5</span>
+            if (breakdownSection && detailedBreakdownDiv) {
+                // Clear previous content and add structure
+                detailedBreakdownDiv.innerHTML = '';
+
+                // Add Toggle (Segmented Control)
+                const toggleContainer = document.createElement('div');
+                toggleContainer.className = 'detailed-breakdown-toggle';
+                toggleContainer.innerHTML = `
+                    <div class="segmented-control">
+                        <button type="button" class="active" data-chart="scores">Polar Chart</button> 
+                        <button type="button" data-chart="impact">Column Chart</button>
                     </div>
                 `;
+                detailedBreakdownDiv.appendChild(toggleContainer);
+
+                // Add Chart Containers
+                const scoreChartContainer = document.createElement('div');
+                scoreChartContainer.id = 'scoreChartContainer';
+                scoreChartContainer.className = 'chart-container visible'; // Show scores by default
+                detailedBreakdownDiv.appendChild(scoreChartContainer);
+
+                const impactChartContainer = document.createElement('div');
+                impactChartContainer.id = 'impactChartContainer';
+                impactChartContainer.className = 'chart-container hidden'; // Hide impact by default
+                detailedBreakdownDiv.appendChild(impactChartContainer);
+
+                // Create Charts
+                try {
+                    createScoreRadarChart(scores, breakdownKeys, scoreChartContainer);
+                    createImpactBarChart(scores, weights, breakdownKeys, impactChartContainer);
+                    debug("Detailed Breakdown Charts created.");
+                } catch (error) {
+                    console.error("Error creating charts:", error);
+                    detailedBreakdownDiv.innerHTML += '<p style="text-align:center; color: red;">Error displaying charts.</p>';
+                }
+
+                // Add Toggle Logic
+                const toggleButtons = toggleContainer.querySelectorAll('.segmented-control button');
+                toggleButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Update button active state
+                        toggleButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+
+                        // Toggle chart visibility
+                        const chartToShow = this.getAttribute('data-chart');
+                        if (chartToShow === 'scores') {
+                            scoreChartContainer.classList.remove('hidden');
+                            scoreChartContainer.classList.add('visible');
+                            impactChartContainer.classList.remove('visible');
+                            impactChartContainer.classList.add('hidden');
+                        } else {
+                            impactChartContainer.classList.remove('hidden');
+                            impactChartContainer.classList.add('visible');
+                            scoreChartContainer.classList.remove('visible');
+                            scoreChartContainer.classList.add('hidden');
+                        }
+                    });
+                });
+
+            } else {
+                console.error("Detailed Breakdown section or div not found!");
             }
-            const detailedBreakdownDiv = document.getElementById('detailedBreakdown');
-             if (detailedBreakdownDiv) {
-                detailedBreakdownDiv.innerHTML = breakdownHTML;
-                 debug("Detailed Breakdown HTML updated.");
-            } else { console.error("Element with ID 'detailedBreakdown' not found!"); }
 
             // --- Scroll to Results ---
             resultsSection.scrollIntoView({ behavior: 'smooth' });
@@ -2789,7 +2755,7 @@ function longevity_assessment_form() {
             const whrCategory = getWHRCategory(whr, measurements.gender);
             
             // Check if we have the necessary data for the API call
-            if (window.longevity_form_data) {
+            if (window.longevity_form_data && window.Chart) { // Also check for Chart.js
                 // Perform AI analysis with all the calculated data
                 performAIAnalysis(
                     scores, 
@@ -2806,26 +2772,8 @@ function longevity_assessment_form() {
                     negativeFactors
                 );
             } else {
-                console.error("Cannot perform AI analysis: longevity_form_data is not defined");
-                // Show an error message in the AI section
-                const aiSection = document.getElementById('aiAnalysisSection');
-                if (aiSection) {
-                    const loadingDiv = aiSection.querySelector('.ai-loading');
-                    const contentDiv = aiSection.querySelector('.ai-content');
-                    
-                    if (loadingDiv && contentDiv) {
-                        loadingDiv.style.display = 'none';
-                        contentDiv.style.display = 'block';
-                        contentDiv.innerHTML = `
-                            <div class="ai-error">
-                                <span class="material-icons" style="font-size: 2rem; color: #e74c3c; margin-bottom: 1rem;">error_outline</span>
-                                <h4>Analysis Unavailable</h4>
-                                <p>The AI analysis service is currently unavailable.</p>
-                                <p>Your assessment results are still valid and available below.</p>
-                            </div>
-                        `;
-                    }
-                }
+                console.error("Cannot perform AI analysis: longevity_form_data or Chart.js missing");
+                displayAIError('Configuration error prevented AI analysis.'); // Use the existing error display
             }
         }
 
@@ -2926,7 +2874,15 @@ function longevity_assessment_form() {
                     // Assumes the input field's `name` attribute matches the key.
                     // If names differ (like 'sitStand' vs 'sitStandInput'), adjust here.
                     const inputName = key; // Example: const inputName = (key === 'sitStand') ? 'sitStandCapability' : key;
-                    const value = parseInt(formData.get(inputName), 10); // Get value, convert to integer
+                    const rawValue = formData.get(inputName);
+                    const value = parseInt(rawValue, 10); // Get value, convert to integer
+                    
+                    // --- Specific Debugging Added ---
+                    if (inputName === 'activity' || inputName === 'sitStand') {
+                        debug(`Value retrieved for ${inputName}:`, { raw: rawValue, parsed: value });
+                    }
+                    // --- End Specific Debugging ---
+                    
                     scores[key] = !isNaN(value) ? value : 3; // Use parsed value or default to 3
                 });
 
@@ -2959,6 +2915,21 @@ function longevity_assessment_form() {
 
                 // --- Trigger Calculations & Display ---
                 // Pass the collected data to the displayResults function, which handles calculations.
+                
+                // Map form field names to weights property names to ensure connection
+                const weightPropertyMap = {
+                    'activity': 'physicalActivity',
+                    'sitStand': 'sitToStand'
+                };
+                
+                // Add mapped properties to scores object
+                Object.keys(weightPropertyMap).forEach(formField => {
+                    if (scores[formField] !== undefined) {
+                        scores[weightPropertyMap[formField]] = scores[formField];
+                        debug(`Mapped ${formField} (${scores[formField]}) to ${weightPropertyMap[formField]}`);
+                    }
+                });
+                
                 displayResults(scores, measurements, measurements.age);
                 return true; // Return true to indicate success
             }
@@ -2990,6 +2961,485 @@ function longevity_assessment_form() {
              debug("Document ready, setting up form listener...");
             setupFormListener(); // Call the function to attach the listener to the form
         });
+
+        // --- Chart Creation Functions ---
+
+        /**
+         * Creates the Score Radar Chart.
+         * @param {object} scores - Object containing user scores.
+         * @param {array} breakdownKeys - Array of metric keys.
+         * @param {HTMLElement} containerElement - The DOM element to render the chart in.
+         */
+        function createScoreRadarChart(scores, breakdownKeys, containerElement) {
+            debug("Creating Score Radar Chart...");
+            if (!window.Chart) {
+                console.error("Chart.js not loaded!");
+                containerElement.innerHTML = '<p style="text-align:center; color: red;">Chart library not loaded.</p>';
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.id = 'scoreRadarChart';
+            // Set minimum height for better visibility
+            canvas.style.minHeight = '350px';
+            canvas.style.margin = '0 auto'; // Keep centering
+
+            // Format labels for better display - shorten or wrap long labels
+            const formatLabel = (label) => {
+                // Clean up labels
+                let formattedLabel = label
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                    .replace(' Score', '')
+                    .replace('Bmi', 'BMI')
+                    .replace('Whr', 'WHR');
+                
+                // Truncate very long labels with ellipsis for display
+                if (formattedLabel.length > 15) {
+                    return formattedLabel.substring(0, 13) + '...';
+                }
+                return formattedLabel;
+            };
+
+            // Prepare data with custom point colors based on scores
+            const rawScores = breakdownKeys.map(metric => {
+                const score = scores[metric];
+                return typeof score === 'number' && !isNaN(score) ? score : null; // Use null for missing data
+            });
+
+            // Enhanced color gradient for points based on scores
+            const pointColors = rawScores.map(val => {
+                if (val === null) return 'rgba(150, 150, 150, 1)'; // Gray for missing data
+                if (val >= 4.5) return 'rgba(0, 180, 0, 1)';       // Excellent - Darker Green
+                else if (val >= 3.5) return 'rgba(100, 200, 0, 1)'; // Good - Light Green
+                else if (val >= 3.0) return 'rgba(200, 200, 0, 1)'; // Above Average - Yellow-Green
+                else if (val >= 2.5) return 'rgba(255, 200, 0, 1)'; // Average - Yellow
+                else if (val >= 2.0) return 'rgba(255, 150, 0, 1)'; // Below Average - Orange
+                else if (val >= 1.5) return 'rgba(255, 100, 0, 1)'; // Poor - Light Red
+                else return 'rgba(200, 0, 0, 1)';                   // Very Poor - Red
+            });
+
+            // Prepare data
+            const data = {
+                labels: breakdownKeys.map(metric => formatLabel(metric)),
+                datasets: [{
+                    label: 'Health Metrics (0–5)',
+                    data: rawScores,
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 0.8)',
+                    pointBackgroundColor: pointColors,
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: pointColors,
+                    pointRadius: window.innerWidth <= 480 ? 3 : 4,
+                    pointHoverRadius: window.innerWidth <= 480 ? 5 : 6,
+                    borderWidth: 2
+                }]
+            };
+
+            // Prepare config
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1, // Keep it square
+                    layout: {
+                        padding: {
+                            top: 10,
+                            right: 20, 
+                            bottom: 10,
+                            left: 20
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            beginAtZero: true,
+                            grid: { 
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
+                            },
+                            angleLines: { 
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
+                            },
+                            pointLabels: {
+                                font: { 
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                    size: window.innerWidth <= 480 ? 10 : 12,
+                                    weight: 'bold'
+                                },
+                                color: '#2C3E50',
+                                padding: window.innerWidth <= 480 ? 4 : 8,
+                                centerPointLabels: false,
+                                display: true
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                backdropColor: 'rgba(255, 255, 255, 0.75)', // Improve tick readability
+                                backdropPadding: 3,
+                                font: { 
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                    size: window.innerWidth <= 480 ? 9 : 11
+                                },
+                                color: '#86868b',
+                                showLabelBackdrop: false,
+                                z: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 20,
+                                padding: window.innerWidth <= 480 ? 10 : 15,
+                                font: {
+                                    size: window.innerWidth <= 480 ? 11 : 13
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(44, 62, 80, 0.8)',
+                            titleFont: { 
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                size: window.innerWidth <= 480 ? 12 : 13
+                            },
+                            bodyFont: { 
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                size: window.innerWidth <= 480 ? 11 : 12
+                            },
+                            padding: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const score = context.raw;
+                                    if (score === null) return 'No data';
+                                    
+                                    let status = '';
+                                    if (score >= 4.5) status = ' (Excellent)';
+                                    else if (score >= 3.5) status = ' (Good)';
+                                    else if (score >= 2.5) status = ' (Average)';
+                                    else if (score >= 1.5) status = ' (Below Average)';
+                                    else status = ' (Poor)';
+                                    
+                                    return `Score: ${score}${status}`;
+                                },
+                                title: function(tooltipItems) {
+                                    const dataIndex = tooltipItems[0].dataIndex;
+                                    const originalMetric = breakdownKeys[dataIndex];
+                                    return originalMetric
+                                        .replace(/([A-Z])/g, ' $1')
+                                        .replace(/^./, str => str.toUpperCase())
+                                        .replace(' Score', '')
+                                        .replace('Bmi', 'BMI')
+                                        .replace('Whr', 'WHR');
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Add title and render chart
+            const title = document.createElement('h4');
+            title.className = 'chart-title';
+            title.textContent = 'Score Visualization';
+            containerElement.innerHTML = ''; // Clear previous content
+            containerElement.appendChild(title);
+            containerElement.appendChild(canvas);
+            new Chart(canvas, config);
+            debug("Score Radar Chart rendered.");
+            
+            // Create fallback image for print
+            try {
+                setTimeout(() => {
+                    // Delay creating fallback to ensure chart is fully rendered
+                    const chartInstance = Chart.getChart(canvas);
+                    if (chartInstance) {
+                        chartInstance.toBase64Image('image/png', 1.0).then(image => {
+                            const fallbackDiv = document.createElement('div');
+                            fallbackDiv.id = 'scoreChartFallbackImage';
+                            fallbackDiv.className = 'chart-fallback';
+                            fallbackDiv.innerHTML = `<img src="${image}" class="chart-print-image" alt="Health Metrics Radar Chart">`;
+                            containerElement.appendChild(fallbackDiv);
+                        });
+                    }
+                }, 500);
+            } catch (e) {
+                console.log("Error creating chart fallback image:", e);
+            }
+        }
+
+
+        /**
+         * Creates the Factor Impact Bar Chart.
+         * @param {object} scores - Object containing user scores.
+         * @param {object} weights - Object containing metric weights.
+         * @param {array} breakdownKeys - Array of metric keys.
+         * @param {HTMLElement} containerElement - The DOM element to render the chart in.
+         */
+        function createImpactBarChart(scores, weights, breakdownKeys, containerElement) {
+             debug("Creating Factor Impact Bar Chart...");
+             if (!window.Chart) {
+                 console.error("Chart.js not loaded!");
+                 containerElement.innerHTML = '<p style="text-align:center; color: red;">Chart library not loaded.</p>';
+                 return;
+             }
+
+             const canvas = document.createElement('canvas');
+             canvas.id = 'impactBarChart';
+             canvas.style.maxHeight = '450px'; // Adjust height for bar chart
+
+             // Calculate impact values (difference from baseline 3)
+             const diffs = breakdownKeys.map(key => {
+                 const score = scores[key];
+                 const weight = weights[key];
+                 if (typeof score === 'number' && !isNaN(score) && typeof weight === 'number') {
+                     // Impact = weight * (score - 3). Positive impact means better than average (reduces age).
+                     return weight * (score - 3);
+                 }
+                 return null; // Use null for missing data
+             });
+
+             // Enhanced gradient for bar chart with distinct average color
+             const barColors = diffs.map(d => {
+                 if (d === null) return 'rgba(150, 150, 150, 0.7)'; // Gray for missing data
+                 if (d >= 1.5) return 'rgba(0, 180, 0, 0.9)';         // Excellent - Dark Green
+                 else if (d >= 0.5) return 'rgba(100, 200, 0, 0.9)';  // Good - Light Green
+                 else if (d > 0) return 'rgba(144, 238, 144, 0.9)';   // Above Average - Pale Green
+                 else if (d === 0) return 'rgba(75, 0, 130, 0.9)';    // Average - Royal Purple
+                 else if (d >= -0.5) return 'rgba(147, 112, 219, 0.9)'; // Slightly Below Average - Light Purple
+                 else if (d >= -1) return 'rgba(255, 165, 0, 0.9)';    // Below Average - Orange
+                 else if (d >= -1.5) return 'rgba(255, 99, 71, 0.9)';  // Poor - Light Red
+                 else return 'rgba(200, 0, 0, 0.9)';                   // Very Poor - Dark Red
+             });
+
+             // Dynamic border colors with distinct average color
+             const borderColors = diffs.map(d => {
+                 if (d === null) return 'rgba(120, 120, 120, 1)'; // Gray border for missing data
+                 if (d >= 1.5) return 'rgba(0, 100, 0, 1)';          // Dark Green border
+                 else if (d >= 0.5) return 'rgba(34, 139, 34, 1)';   // Forest Green border
+                 else if (d > 0) return 'rgba(0, 128, 0, 1)';        // Green border
+                 else if (d === 0) return 'rgba(50, 0, 90, 1)';      // Deep Purple border for average
+                 else if (d >= -0.5) return 'rgba(75, 0, 130, 1)';   // Indigo border
+                 else if (d >= -1) return 'rgba(255, 140, 0, 1)';    // Dark Orange border
+                 else if (d >= -1.5) return 'rgba(220, 20, 60, 1)';  // Crimson border
+                 else return 'rgba(139, 0, 0, 1)';                   // Dark Red border
+             });
+
+             // Format labels for better display
+             const labels = breakdownKeys.map(metric =>
+                 (metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()))
+                 .replace(' Score', '')
+                 .replace('Bmi', 'BMI')
+                 .replace('Whr', 'WHR')
+             );
+
+             // Determine optimal Y axis range
+             let minVal = Math.min(...diffs.filter(d => d !== null));
+             let maxVal = Math.max(...diffs.filter(d => d !== null));
+             let yMin = Math.min(-2, (minVal < -3) ? minVal - 0.5 : -3);
+             let yMax = Math.max(2, (maxVal > 2) ? maxVal + 0.5 : 2);
+
+             // Prepare data
+             const data = {
+                 labels: labels,
+                 datasets: [{
+                     label: 'Health Score Deviation',
+                     data: diffs,
+                     backgroundColor: barColors,
+                     borderColor: borderColors,
+                     borderWidth: 1,
+                     borderRadius: 4,
+                     barPercentage: 0.7,
+                     categoryPercentage: 0.8,
+                     hoverBackgroundColor: diffs.map(d => {
+                         if (d === null) return 'rgba(150, 150, 150, 1)';
+                         return d >= 0 ? 'rgba(0, 200, 0, 1)' : 'rgba(255, 0, 0, 1)';
+                     })
+                 }]
+             };
+
+             // Prepare config with zone highlighting
+             const config = {
+                 type: 'bar',
+                 data: data,
+                 options: {
+                     responsive: true,
+                     maintainAspectRatio: false, // Allow flexible height
+                     indexAxis: 'x', // Vertical bars
+                     scales: {
+                         y: {
+                             min: yMin, 
+                             max: yMax,
+                             grid: {
+                                 color: 'rgba(0, 0, 0, 0.05)'
+                             },
+                             ticks: {
+                                 font: {
+                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                                     size: window.innerWidth <= 480 ? 10 : 11
+                                 },
+                                 color: '#86868b',
+                                 callback: function(value) {
+                                     return value.toFixed(1) + ' yrs'; // Format Y-axis ticks
+                                 }
+                             },
+                             title: {
+                                 display: true,
+                                 text: 'Estimated Age Impact',
+                                 font: { 
+                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                     size: 12, 
+                                     weight: '500' 
+                                 },
+                                 color: '#1d1d1f',
+                                 padding: { top: 0, bottom: 10 }
+                             },
+                             afterDraw: function(chart) {
+                                 const ctx = chart.ctx;
+                                 const yAxis = chart.scales.y;
+                                 const chartArea = chart.chartArea;
+                                 
+                                 // Reference line at 0
+                                 ctx.save();
+                                 ctx.beginPath();
+                                 ctx.moveTo(chartArea.left, yAxis.getPixelForValue(0));
+                                 ctx.lineTo(chartArea.right, yAxis.getPixelForValue(0));
+                                 ctx.lineWidth = 1.5;
+                                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                                 ctx.stroke();
+                                 
+                                 // Enhanced zone coloring
+                                 // Excellent zone (> 1.5)
+                                 const excellentZoneTop = yAxis.getPixelForValue(yMax);
+                                 const excellentZoneBottom = yAxis.getPixelForValue(1.5);
+                                 ctx.fillStyle = 'rgba(0, 180, 0, 0.1)';
+                                 ctx.fillRect(chartArea.left, excellentZoneTop, chartArea.right - chartArea.left, excellentZoneBottom - excellentZoneTop);
+                                 
+                                 // Good zone (0.5 to 1.5)
+                                 const goodZoneTop = yAxis.getPixelForValue(1.5);
+                                 const goodZoneBottom = yAxis.getPixelForValue(0.5);
+                                 ctx.fillStyle = 'rgba(100, 200, 0, 0.1)';
+                                 ctx.fillRect(chartArea.left, goodZoneTop, chartArea.right - chartArea.left, goodZoneBottom - goodZoneTop);
+                                 
+                                 // Average zone (-0.5 to 0.5)
+                                 const avgZoneTop = yAxis.getPixelForValue(0.5);
+                                 const avgZoneBottom = yAxis.getPixelForValue(-0.5);
+                                 ctx.fillStyle = 'rgba(75, 0, 130, 0.1)';
+                                 ctx.fillRect(chartArea.left, avgZoneTop, chartArea.right - chartArea.left, avgZoneBottom - avgZoneTop);
+                                 
+                                 // Below average zone (-1.5 to -0.5)
+                                 const belowAvgZoneTop = yAxis.getPixelForValue(-0.5);
+                                 const belowAvgZoneBottom = yAxis.getPixelForValue(-1.5);
+                                 ctx.fillStyle = 'rgba(255, 165, 0, 0.1)';
+                                 ctx.fillRect(chartArea.left, belowAvgZoneTop, chartArea.right - chartArea.left, belowAvgZoneBottom - belowAvgZoneTop);
+                                 
+                                 // Poor zone (< -1.5)
+                                 const poorZoneTop = yAxis.getPixelForValue(-1.5);
+                                 const poorZoneBottom = yAxis.getPixelForValue(yMin);
+                                 ctx.fillStyle = 'rgba(200, 0, 0, 0.1)';
+                                 ctx.fillRect(chartArea.left, poorZoneTop, chartArea.right - chartArea.left, poorZoneBottom - poorZoneTop);
+                                 
+                                 ctx.restore();
+                             }
+                         },
+                         x: {
+                             grid: { display: false }, // Cleaner X-axis
+                             ticks: {
+                                 font: { 
+                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                     size: window.innerWidth <= 480 ? 9 : 11
+                                 },
+                                 color: '#1d1d1f',
+                                 maxRotation: 45, // Always allow rotation to prevent overlap
+                                 minRotation: window.innerWidth <= 480 ? 45 : 0,
+                                 autoSkip: true,
+                                 maxTicksLimit: window.innerWidth <= 480 ? 8 : 12
+                             }
+                         }
+                     },
+                     plugins: {
+                         legend: { 
+                             display: true,
+                             position: 'bottom',
+                             labels: {
+                                 boxWidth: 20,
+                                 padding: window.innerWidth <= 480 ? 10 : 15,
+                                 font: {
+                                     size: window.innerWidth <= 480 ? 11 : 13
+                                 }
+                             }
+                         },
+                         tooltip: {
+                             enabled: true,
+                             backgroundColor: 'rgba(44, 62, 80, 0.8)',
+                             titleColor: '#ffffff',
+                             titleFont: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', size: 13, weight: '600' },
+                             bodyColor: '#ffffff',
+                             bodyFont: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', size: 12 },
+                             padding: 10,
+                             boxPadding: 5,
+                             cornerRadius: 6,
+                             borderColor: 'rgba(255, 255, 255, 0.1)',
+                             borderWidth: 1,
+                             callbacks: {
+                                 label: function(context) {
+                                     const value = context.raw;
+                                     if (value === null) return 'No data';
+                                     
+                                     let status = '';
+                                     if (value >= 1.5) status = ' (Excellent)';
+                                     else if (value >= 0.5) status = ' (Good)';
+                                     else if (value > -0.5) status = ' (Average)';
+                                     else if (value > -1.5) status = ' (Below Average)';
+                                     else status = ' (Poor)';
+                                     
+                                     return `Difference: ${value.toFixed(1)}${status}`;
+                                 }
+                             }
+                         }
+                     }
+                 }
+             };
+
+             // Add title and render chart
+             const title = document.createElement('h4');
+             title.className = 'chart-title';
+             title.textContent = 'Factor Impact Visualization';
+             containerElement.innerHTML = ''; // Clear previous content
+             containerElement.appendChild(title);
+             containerElement.appendChild(canvas);
+             new Chart(canvas, config);
+             debug("Factor Impact Bar Chart rendered.");
+             
+             // Create fallback image for print
+             try {
+                 setTimeout(() => {
+                     // Delay creating fallback to ensure chart is fully rendered
+                     const chartInstance = Chart.getChart(canvas);
+                     if (chartInstance) {
+                         chartInstance.toBase64Image('image/png', 1.0).then(image => {
+                             const fallbackDiv = document.createElement('div');
+                             fallbackDiv.id = 'impactChartFallbackImage';
+                             fallbackDiv.className = 'chart-fallback';
+                             fallbackDiv.innerHTML = `<img src="${image}" class="chart-print-image" alt="Factor Impact Chart">`;
+                             containerElement.appendChild(fallbackDiv);
+                         });
+                     }
+                 }, 500);
+             } catch (e) {
+                 console.log("Error creating chart fallback image:", e);
+             }
+        }
+
+        // --- Display & Form Handling ---
 
     })(jQuery); // Pass jQuery to the closure to use the `$` alias safely
     </script>
