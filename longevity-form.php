@@ -8,6 +8,9 @@ function longevity_assessment_form() {
     ?>
     <!-- Form Container -->
     <div class="longevity-form-container">
+        <!-- Google Material Icons for factor icons -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
         <!-- Form Sections -->
         <form id="longevityForm" class="longevity-form">
             <!-- Section 1: Personal Information -->
@@ -283,12 +286,39 @@ function longevity_assessment_form() {
                          <div id="bodyMeasurements"></div> <!-- Existing content div -->
                      </div>
 
+                     <!-- --- Age Impact Factors Section --- -->
+                     <div class="full-width-section" id="ageImpactSection">
+                         <h3>Age Impact Factors</h3>
+                         <div class="impact-factors-container">
+                             <div class="impact-column">
+                                 <div class="impact-column-header">
+                                     <div class="icon impact-positive">
+                                         <span class="material-icons">trending_down</span>
+                                     </div>
+                                     <h4>Factors Lowering Your Age</h4>
+                                 </div>
+                                 <!-- Positive factors will be populated by JS -->
+                             </div>
+                             <div class="impact-column">
+                                 <div class="impact-column-header">
+                                     <div class="icon impact-negative">
+                                         <span class="material-icons">trending_up</span>
+                                     </div>
+                                     <h4>Factors Raising Your Age</h4>
+                                 </div>
+                                 <!-- Negative factors will be populated by JS -->
+                             </div>
+                         </div>
+                     </div>
+
                      <!-- Section: Detailed Breakdown (Full Width) -->
                      <div class="full-width-section" id="detailedBreakdownSection">
                          <h3>Detailed Breakdown</h3>
                          <!-- Populated by JS: Shows scores for each metric -->
                          <div id="detailedBreakdown"></div> <!-- Existing content div -->
                      </div>
+
+                     <!-- --- End Age Impact Factors Section --- -->
                 </div>
             </div>
         </form>
@@ -830,6 +860,169 @@ function longevity_assessment_form() {
             margin-bottom: 5px;
         }
         /* --- End Gauge Styling --- */
+
+        /* --- Age Impact Factors Section --- */
+        .impact-factors-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .impact-column {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .impact-column:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .impact-column-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .impact-column-header h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.01em;
+            color: #1d1d1f;
+        }
+
+        .impact-column-header .icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .impact-positive .icon {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .impact-negative .icon {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .impact-factor {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+            min-height: 44px; /* Apple's minimum touch target size */
+            align-items: flex-start;
+            transition: background-color 0.15s ease;
+        }
+
+        .impact-factor:hover {
+            background-color: #f9f9f9;
+        }
+
+        .impact-factor:last-child {
+            border-bottom: none;
+        }
+
+        .factor-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #555;
+        }
+
+        .factor-content {
+            flex: 1;
+        }
+
+        .factor-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1d1d1f;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .factor-impact {
+            display: inline-block;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .impact-negative .factor-impact {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .impact-positive .factor-impact {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .factor-description {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        #ageImpactSection {
+            background: #fafafa;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        
+        #ageImpactSection h3 {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        #ageImpactSection h3:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #007AFF;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .impact-factors-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .impact-column:first-child {
+                margin-bottom: 1rem;
+            }
+        }
+        /* --- End Age Impact Factors Section --- */
     </style>
 
     <!-- JavaScript for Calculations and Form Handling -->
@@ -1233,14 +1426,291 @@ function longevity_assessment_form() {
                 console.error("Element with ID 'bodyMeasurements' not found!");
             }
 
+            // --- Populate Age Impact Factors Section ---
+            // This will identify the top factors impacting the biological age (both positive and negative)
+            function generateAgeImpactFactors(scores) {
+                // Define factor descriptions and icons
+                const factorDetails = {
+                    physicalActivity: {
+                        name: "Physical Activity",
+                        icon: "directions_run",
+                        descriptions: {
+                            positive: "Regular physical activity helps maintain muscle mass, cardiovascular health, and metabolic function.",
+                            negative: "Low levels of physical activity can lead to decreased muscle mass, cardiovascular health issues, and metabolic dysfunction."
+                        }
+                    },
+                    sleepDuration: {
+                        name: "Sleep Duration",
+                        icon: "bedtime",
+                        descriptions: {
+                            positive: "Optimal sleep duration supports cellular repair, hormone regulation, and cognitive function.",
+                            negative: "Insufficient sleep impairs cellular repair, disrupts hormone balance, and accelerates cognitive aging."
+                        }
+                    },
+                    sleepQuality: {
+                        name: "Sleep Quality",
+                        icon: "nightlight",
+                        descriptions: {
+                            positive: "High quality sleep enables deeper restorative processes and better hormonal regulation.",
+                            negative: "Poor sleep quality prevents deep restorative processes and disrupts hormonal balance."
+                        }
+                    },
+                    stressLevels: {
+                        name: "Stress Management",
+                        icon: "spa",
+                        descriptions: {
+                            positive: "Effective stress management protects telomeres and reduces inflammation.",
+                            negative: "Chronic stress shortens telomeres and increases systemic inflammation."
+                        }
+                    },
+                    socialConnections: {
+                        name: "Social Connections",
+                        icon: "people",
+                        descriptions: {
+                            positive: "Strong social connections support immune function and reduce chronic stress.",
+                            negative: "Social isolation is linked to increased inflammation and stress hormones."
+                        }
+                    },
+                    dietQuality: {
+                        name: "Diet Quality",
+                        icon: "restaurant",
+                        descriptions: {
+                            positive: "A nutrient-rich diet provides antioxidants and anti-inflammatory compounds.",
+                            negative: "Poor diet quality increases oxidative stress and inflammation."
+                        }
+                    },
+                    alcoholConsumption: {
+                        name: "Alcohol Consumption",
+                        icon: "liquor",
+                        descriptions: {
+                            positive: "Minimal alcohol intake reduces liver stress and cellular damage.",
+                            negative: "Excessive alcohol consumption damages cells and accelerates aging processes."
+                        }
+                    },
+                    smokingStatus: {
+                        name: "Smoking Status",
+                        icon: "smoke_free",
+                        descriptions: {
+                            positive: "Being smoke-free preserves lung function and reduces oxidative damage.",
+                            negative: "Smoking causes extensive oxidative damage and accelerates cellular aging."
+                        }
+                    },
+                    cognitiveActivity: {
+                        name: "Cognitive Activity",
+                        icon: "psychology",
+                        descriptions: {
+                            positive: "Regular mental stimulation builds cognitive reserve and neural connections.",
+                            negative: "Limited cognitive engagement leads to faster cognitive decline."
+                        }
+                    },
+                    sunlightExposure: {
+                        name: "Sunlight Exposure",
+                        icon: "wb_sunny",
+                        descriptions: {
+                            positive: "Balanced sunlight exposure supports vitamin D production and circadian rhythm.",
+                            negative: "Inadequate sunlight affects vitamin D levels and disrupts sleep patterns."
+                        }
+                    },
+                    supplementIntake: {
+                        name: "Supplement Use",
+                        icon: "medication",
+                        descriptions: {
+                            positive: "Strategic supplementation addresses nutritional gaps and supports cellular health.",
+                            negative: "Lack of key nutrients can impair cellular function and repair mechanisms."
+                        }
+                    },
+                    bmiScore: {
+                        name: "Body Mass Index",
+                        icon: "monitor_weight",
+                        descriptions: {
+                            positive: "Healthy BMI supports metabolic health and reduces inflammation.",
+                            negative: "Suboptimal BMI increases inflammation and metabolic burden."
+                        }
+                    },
+                    whrScore: {
+                        name: "Waist-to-Hip Ratio",
+                        icon: "straighten",
+                        descriptions: {
+                            positive: "Balanced fat distribution indicates lower visceral fat and inflammation.",
+                            negative: "Higher WHR suggests increased visceral fat, which produces inflammatory compounds."
+                        }
+                    },
+                    sitToStand: {
+                        name: "Functional Strength",
+                        icon: "accessibility_new",
+                        descriptions: {
+                            positive: "Good functional strength supports independence and reduces fall risk.",
+                            negative: "Poor functional strength increases dependence and risk of injuries."
+                        }
+                    },
+                    breathHold: {
+                        name: "Respiratory Function",
+                        icon: "air",
+                        descriptions: {
+                            positive: "Strong respiratory function indicates good lung capacity and oxygen exchange.",
+                            negative: "Limited breath hold capacity may indicate reduced lung function."
+                        }
+                    },
+                    balance: {
+                        name: "Balance Ability",
+                        icon: "airline_seat_recline_normal",
+                        descriptions: {
+                            positive: "Good balance indicates strong neuromuscular coordination and reduces fall risk.",
+                            negative: "Poor balance suggests neuromuscular decline and increased injury risk."
+                        }
+                    },
+                    skinElasticity: {
+                        name: "Skin Health",
+                        icon: "face",
+                        descriptions: {
+                            positive: "Good skin elasticity reflects collagen maintenance and hydration.",
+                            negative: "Reduced skin elasticity indicates collagen breakdown and dehydration."
+                        }
+                    }
+                };
+
+                // Calculate the impact values (difference from average)
+                const impactValues = {};
+                
+                // For each factor, calculate the difference from the average score (3)
+                // Multiply by the weight to get the actual impact
+                for (let factor in scores) {
+                    if (factor in weights && factor in factorDetails) {
+                        const score = scores[factor];
+                        // Calculate impact (negative values mean they're adding age, positive values mean reducing age)
+                        // This is because higher scores are better, and we want to show how much they add/subtract from age
+                        impactValues[factor] = weights[factor] * (score - 3);
+                    }
+                }
+                
+                // Sort factors by impact (absolute value)
+                const sortedFactors = Object.keys(impactValues)
+                    .filter(factor => factorDetails[factor]) // Ensure we have details for this factor
+                    .sort((a, b) => Math.abs(impactValues[b]) - Math.abs(impactValues[a]));
+                
+                // Separate positive and negative factors
+                const positiveFactors = sortedFactors.filter(factor => impactValues[factor] > 0);
+                const negativeFactors = sortedFactors.filter(factor => impactValues[factor] < 0);
+                
+                // Take top 3 of each (or fewer if there aren't 3)
+                const topPositive = positiveFactors.slice(0, 3);
+                const topNegative = negativeFactors.slice(0, 3);
+                
+                // Generate HTML for positive factors
+                let positiveHtml = '';
+                topPositive.forEach(factor => {
+                    const details = factorDetails[factor];
+                    const impact = impactValues[factor];
+                    positiveHtml += `
+                        <div class="impact-factor">
+                            <div class="factor-icon">
+                                <span class="material-icons">
+                                    ${details.icon}
+                                </span>
+                            </div>
+                            <div class="factor-content">
+                                <div class="factor-name">
+                                    <span>${details.name}</span>
+                                    <span class="factor-impact impact-positive">-${Math.abs(impact).toFixed(1)} yrs</span>
+                                </div>
+                                <div class="factor-description">
+                                    ${details.descriptions.positive}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // If no positive factors found, add a placeholder
+                if (topPositive.length === 0) {
+                    positiveHtml = `
+                        <div class="impact-factor">
+                            <div class="factor-content">
+                                <div class="factor-description" style="text-align: center; padding: 20px 0;">
+                                    No significant positive factors identified. Consider improving your lifestyle scores.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Generate HTML for negative factors
+                let negativeHtml = '';
+                topNegative.forEach(factor => {
+                    const details = factorDetails[factor];
+                    const impact = impactValues[factor];
+                    negativeHtml += `
+                        <div class="impact-factor">
+                            <div class="factor-icon">
+                                <span class="material-icons">
+                                    ${details.icon}
+                                </span>
+                            </div>
+                            <div class="factor-content">
+                                <div class="factor-name">
+                                    <span>${details.name}</span>
+                                    <span class="factor-impact impact-negative">+${Math.abs(impact).toFixed(1)} yrs</span>
+                                </div>
+                                <div class="factor-description">
+                                    ${details.descriptions.negative}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // If no negative factors found, add a placeholder
+                if (topNegative.length === 0) {
+                    negativeHtml = `
+                        <div class="impact-factor">
+                            <div class="factor-content">
+                                <div class="factor-description" style="text-align: center; padding: 20px 0;">
+                                    Great job! No significant negative factors identified.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                return {
+                    positive: positiveHtml,
+                    negative: negativeHtml
+                };
+            }
+
+            const impactFactorsHtml = generateAgeImpactFactors(scores);
+            const positiveFactorsDiv = document.querySelector('#ageImpactSection .impact-column:first-child');
+            const negativeFactorsDiv = document.querySelector('#ageImpactSection .impact-column:last-child');
+            
+            if (positiveFactorsDiv && negativeFactorsDiv) {
+                // Update the content of the columns, preserving the headers
+                const positiveHeader = positiveFactorsDiv.querySelector('.impact-column-header');
+                const negativeHeader = negativeFactorsDiv.querySelector('.impact-column-header');
+                
+                positiveFactorsDiv.innerHTML = '';
+                negativeFactorsDiv.innerHTML = '';
+                
+                // Add headers back
+                positiveFactorsDiv.appendChild(positiveHeader);
+                negativeFactorsDiv.appendChild(negativeHeader);
+                
+                // Add the new factor content
+                positiveFactorsDiv.innerHTML += impactFactorsHtml.positive;
+                negativeFactorsDiv.innerHTML += impactFactorsHtml.negative;
+                
+                debug("Age Impact Factors HTML updated.");
+            } else {
+                console.error("Age Impact Factors columns not found!");
+            }
+
             // --- Populate Detailed Breakdown Card ---
             let breakdownHTML = '';
             const breakdownKeys = Object.keys(weights);
 
             for (let metric of breakdownKeys) {
-                 const score = scores[metric];
-                 const label = metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                 breakdownHTML += `
+                const score = scores[metric];
+                const label = metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                breakdownHTML += `
                     <div class="breakdown-item">
                         <span class="breakdown-label">${label}</span>
                         <span class="breakdown-value">${typeof score === 'number' && !isNaN(score) ? score : 'N/A'}/5</span>
