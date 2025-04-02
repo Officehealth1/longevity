@@ -1,0 +1,193 @@
+## **Longevity Assessment Form**
+
+### **Section 1: Personal Information**
+
+- **Full Name:**
+    
+    *Input Type:* Text Field
+    
+- **Date of Birth:**
+    
+    *Input Type:* Date Picker
+    
+- **Gender:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Male
+    - Female
+    - Other
+    - Prefer not to say
+- **Email Address:**
+    
+    *Input Type:* Email Field
+    
+- **Phone Number:**
+    
+    *Input Type:* Text Field
+    
+
+---
+
+### **Section 2: Body Measurements**
+
+- **Height (cm):**
+    
+    *Input Type:* Numeric Field
+    
+- **Weight (kg):**
+    
+    *Input Type:* Numeric Field
+    
+- **Waist Circumference (cm):**
+    
+    *Input Type:* Numeric Field
+    
+- **Hip Circumference (cm):**
+    
+    *Input Type:* Numeric Field
+    
+- **Neck Circumference (cm):**
+    
+    *Input Type:* Numeric Field
+    
+- **Wrist Circumference (cm):**
+    
+    *Input Type:* Numeric Field
+    
+
+---
+
+### **Section 3: Lifestyle Factors**
+
+- **Physical Activity Level:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Sedentary (little or no exercise)
+    - Lightly active (light exercise/sports 1-3 days/week)
+    - Moderately active (moderate exercise/sports 3-5 days/week)
+    - Very active (hard exercise/sports 6-7 days a week)
+    - Super active (very hard exercise/physical job & exercise 2x/day)
+- **Sleep Duration (hours per night):**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Less than 4 hours
+    - 4-5 hours
+    - 6-7 hours
+    - 8-9 hours
+    - More than 9 hours
+- **Sleep Quality:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Very Poor
+    - Poor
+    - Fair
+    - Good
+    - Excellent
+- **Stress Levels:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Very Low
+    - Low
+    - Moderate
+    - High
+    - Very High
+- **Social Connections:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - None
+    - Rarely
+    - Occasionally
+    - Often
+    - Regularly
+- **Diet Quality:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Very Poor
+    - Poor
+    - Average
+    - Good
+    - Excellent
+- **Alcohol Consumption (drinks per week):**
+    
+    *Input Type:* Dropdown Menu
+    
+    - None
+    - 1-2 drinks
+    - 3-5 drinks
+    - 6-10 drinks
+    - More than 10 drinks
+- **Smoking Status:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Never Smoked
+    - Former Smoker
+    - Occasional Smoker
+    - Regular Smoker
+    - Heavy Smoker
+- **Cognitive Activity:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Never
+    - Rarely
+    - Occasionally
+    - Often
+    - Regularly
+- **Sunlight Exposure (average hours per day):**
+    
+    *Input Type:* Dropdown Menu
+    
+    - Less than 15 minutes
+    - 15-30 minutes
+    - 30-60 minutes
+    - 1-2 hours
+    - More than 2 hours
+- **Supplement Intake:**
+    
+    *Input Type:* Dropdown Menu
+    
+    - None
+    - Occasional
+    - Regular
+    - Frequent
+    - Daily
+
+---
+
+### **Section 4: Physical Performance Metrics**
+
+- **Sit-to-Stand Test:**
+    
+    *Input Type:* Numeric Field
+    
+- **Breath Hold Test (seconds):**
+    
+    *Input Type:* Numeric Field
+    
+- **Balance Test (seconds):**
+    
+    *Input Type:* Numeric Field
+    
+- **Skin Elasticity (seconds):**
+    
+    *Input Type:* Numeric Field
+    
+
+---
+
+## **Results Section:**
+
+- **Overall Health Score:** Gauge chart (0–100%)
+- **Biological Age vs. Chronological Age:** Side-by-side bar chart
+- **Lifestyle Metrics:** Radar chart
+- **Physical Performance Metrics:** Bar chart
+- **BMI and Waist-to-Hip Ratio (WHR):** Dual-axis bar chart
+- **Aging Rate:** Line chart showing percentage aging rate over time
