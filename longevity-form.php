@@ -255,6 +255,9 @@ function longevity_assessment_form() {
     // Include Chart.js library
     wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array('jquery'), null, true);
     
+    // Include Chart.js Annotation plugin
+    wp_enqueue_script('chart-js-annotation', 'https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation', array('chart-js'), null, true);
+    
     // Register our form's JavaScript inline
     $inline_script = "var longevity_form_data = " . json_encode(array(
         'ajax_url' => admin_url('admin-ajax.php'),
@@ -1085,30 +1088,47 @@ function longevity_assessment_form() {
 
         .gauge-bar {
             width: 100%;
-            height: 12px; /* Thicker bar (increased from 8px) */
-            border-radius: 10px;
-            /* More refined color gradient with smoother transitions */
+            height: 10px; /* Slightly thinner but still visible */
+            border-radius: 20px; /* More rounded ends */
+            /* Adjusted gradient to align with BMI categories on the 15-40 scale */
+            /* BMI scale points at: 15, 18.5, 25, 30, 40 */
+            /* For a 15-40 scale (25 point range), percentages are:
+               15 = 0%, 18.5 = 14%, 25 = 40%, 30 = 60%, 40 = 100% */
             background: linear-gradient(to right,
-                #e74c3c 0%, #e74c3c 16.66%, /* Red - High Risk (left) - more vibrant */
-                #f39c12 16.66%, #f39c12 33.33%, /* Orange - Moderate Risk - more vibrant */
-                #27ae60 33.33%, #27ae60 66.66%, /* Green - Healthy / Low Risk (center) - more vibrant */
-                #f39c12 66.66%, #f39c12 83.33%, /* Orange - Moderate Risk - more vibrant */
-                #e74c3c 83.33%, #e74c3c 100% /* Red - High Risk (right) - more vibrant */
+                #FF3B30 0%, #FF3B30 14%, /* Apple red (Underweight <18.5) */
+                #34C759 14%, #34C759 40%, /* Apple green (Healthy 18.5-24.9) */
+                #FF9500 40%, #FF9500 60%, /* Apple orange (Overweight 25-29.9) */
+                #FF3B30 60%, #FF3B30 100% /* Apple red (Obese ≥30) */
             );
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
 
         .gauge-marker {
             position: absolute;
-            top: 8px; /* Position at the bar, not below it */
-            left: 50%; /* Default position, JS will override */
+            top: 7px;
+            left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 6px solid #333; /* Darker triangle for better visibility */
-            z-index: 2; /* Ensure marker is above the bar */
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000; /* Black for high contrast */
+            z-index: 2;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+        }
+
+        /* Add a small white dot at the gauge-marker intersection with bar for better visibility */
+        .gauge-marker::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            top: -10px; /* Position above the triangle */
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
         }
 
         .gauge-interpretation {
@@ -1128,18 +1148,30 @@ function longevity_assessment_form() {
             color: #888;
         }
 
-        /* Improve the Body Composition section container */
+        /* Improve the Body Composition section container with Apple-like styling */
         #bodyMeasurementsSection {
             padding: 2rem;
             margin-top: 2rem;
             margin-bottom: 2rem;
-            background: #fafafa;
-            border-radius: 12px;
+            background: linear-gradient(to bottom, #ffffff, #f8f8f8); /* Subtle gradient background */
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Subtle elevated shadow */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", sans-serif; /* Apple system fonts */
+        }
+
+        #bodyMeasurementsSection:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
         }
 
         #bodyMeasurementsSection h3 {
-            color: #333;
+            color: #1d1d1f; /* Apple-like dark gray */
             margin-bottom: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.01em; /* Slightly tighter letter spacing */
+            font-size: 1.5rem;
+            text-align: center;
         }
 
         #bodyMeasurements {
@@ -1147,19 +1179,108 @@ function longevity_assessment_form() {
             margin: 0 auto; /* Center content */
         }
 
-        /* Style the gauge category/risk level information */
-        .gauge-metric .gauge-category {
-            font-weight: 600;
-            color: #333;
-        }
-
-        /* Add a subtle outer container for the gauge */
+        /* Enhanced gauge styling with Apple design cues */
         .gauge-outer {
             background: #ffffff;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 5px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0; /* Start invisible and fade in */
+        }
+
+        /* Set different animation delays for second gauge to create staggered effect */
+        .gauge-outer:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .gauge-outer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+        }
+
+        .gauge-metric {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .gauge-label {
+            font-size: 1.1em;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: -0.01em; /* Apple-like tight letter spacing */
+        }
+
+        /* Style the gauge category/risk level information */
+        .gauge-metric .gauge-category {
+            font-weight: 500;
+            color: #666;
+            letter-spacing: 0;
+            font-size: 0.9em;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .gauge-bar {
+            width: 100%;
+            height: 10px; /* Slightly thinner but still visible */
+            border-radius: 20px; /* More rounded ends */
+            /* Smoother color gradient with Apple-like colors */
+            background: linear-gradient(to right,
+                #FF3B30 0%, #FF3B30 16.66%, /* Apple red */
+                #FF9500 16.66%, #FF9500 33.33%, /* Apple orange */
+                #34C759 33.33%, #34C759 66.66%, /* Apple green */
+                #FF9500 66.66%, #FF9500 83.33%, /* Apple orange */
+                #FF3B30 83.33%, #FF3B30 100% /* Apple red */
+            );
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        .gauge-marker {
+            position: absolute;
+            top: 7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000; /* Black for high contrast */
+            z-index: 2;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+        }
+
+        /* Improved scale markers */
+        .gauge-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            padding: 0 2px;
+            font-size: 0.75em;
+            color: #86868b; /* Apple secondary text color */
+            font-weight: 500;
+        }
+
+        .gauge-interpretation {
+            font-size: 0.9em;
+            color: #86868b; /* Apple secondary text color */
+            margin-top: 12px;
+            font-weight: 400;
+            line-height: 1.4; /* Improved line height for better readability */
+            letter-spacing: -0.01em;
+            padding: 0 2px; /* Add slight padding for text alignment */
         }
         /* --- End Gauge Styling --- */
 
@@ -1690,6 +1811,49 @@ function longevity_assessment_form() {
                 font-size: 12px;
             }
         }
+
+        /* Add fade-in animation for gauges and ensure San Francisco font family */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Add subtle tick marks to the gauge bars for better visual precision */
+        .gauge-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            height: 14px; /* Slightly taller than the bar */
+            width: 1px;
+            background-color: rgba(255,255,255,0.7);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        /* Add focus styles for accessibility */
+        .gauge-outer:focus-within {
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.3);
+            outline: none;
+        }
+
+        /* Improve the Body Composition section container with Apple-like styling */
+        #bodyMeasurementsSection {
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(to bottom, #ffffff, #f8f8f8); /* Subtle gradient background */
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Subtle elevated shadow */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", sans-serif; /* Apple system fonts */
+        }
     </style>
 
     <!-- JavaScript for Calculations and Form Handling -->
@@ -1717,75 +1881,97 @@ function longevity_assessment_form() {
         }
 
         // --- Calculation Weights ---
-        // These weights determine the impact of each metric on the age shift calculation.
-        // A higher weight means the metric has a larger influence.
-        // The age shift is calculated based on the difference between the user's score and the average score (3).
-        // Adjust these values based on research or desired emphasis for each factor.
+        // These weights are like importance points for each health habit.
+        // Think of them as "health points" - the bigger the number, the more that habit matters for your health age.
+        // If you want to make a habit more important, just give it a bigger number!
+        // Example: If exercise should be super important, you might change 0.2 to 0.4
         const weights = {
-            physicalActivity: 0.2,    // Impact of physical activity level
-            sleepDuration: 0.15,   // Impact of average sleep hours
-            sleepQuality: 0.15,    // Impact of perceived sleep quality
-            stressLevels: 0.1,     // Impact of perceived stress level
-            socialConnections: 0.05, // Impact of social interaction frequency/quality
-            dietQuality: 0.2,      // Impact of overall diet healthiness
-            alcoholConsumption: 0.05, // Impact of alcohol intake frequency/amount
-            smokingStatus: 0.1,      // Impact of smoking habits
-            cognitiveActivity: 0.05, // Impact of mentally stimulating activities
-            sunlightExposure: 0.03,  // Impact of daily sunlight exposure
-            supplementIntake: 0.02,  // Impact of regular supplement use
-            bmiScore: 0.1,         // Impact of Body Mass Index score
-            whrScore: 0.1,         // Impact of Waist-to-Hip Ratio score
-            sitToStand: 0.05,      // Impact of sit-to-stand test performance
-            breathHold: 0.03,      // Impact of breath-holding capacity
-            balance: 0.05,         // Impact of balance test performance
-            skinElasticity: 0.02,  // Impact of skin elasticity test
+            // Body & Fitness Factors
+            physicalActivity: 0.2,    // How much exercise matters for your health age
+            sitToStand: 0.05,         // How much your ability to get up from a chair matters 
+            breathHold: 0.03,         // How much your breathing strength matters
+            balance: 0.05,            // How much your balance matters
+            
+            // Sleep Factors
+            sleepDuration: 0.15,      // How much sleep time matters
+            sleepQuality: 0.15,       // How much good sleep matters
+            
+            // Mental & Social Factors
+            stressLevels: 0.1,        // How much stress affects your health age
+            socialConnections: 0.05,  // How much friends and family time matters
+            cognitiveActivity: 0.05,  // How much brain exercise matters
+            
+            // Lifestyle Factors
+            dietQuality: 0.2,         // How much healthy eating matters
+            alcoholConsumption: 0.05, // How much drinking alcohol matters
+            smokingStatus: 0.1,       // How much smoking matters
+            supplementIntake: 0.02,   // How much vitamins and supplements matter
+            sunlightExposure: 0.03,   // How much sunshine matters
+            
+            // Body Measurements
+            bmiScore: 0.1,            // How much your weight-to-height ratio matters
+            whrScore: 0.1,            // How much your waist-to-hip ratio matters
+            skinElasticity: 0.02,     // How much your skin health matters
         };
 
-        // --- Core Calculation Functions ---
+        // --- End Calculation Weights ---
 
         /**
          * Calculates Body Mass Index (BMI).
-         * Formula: weight (kg) / (height (m))^2
-         * @param {number} heightCm - Height in centimeters.
-         * @param {number} weightKg - Weight in kilograms.
-         * @returns {number|NaN} - Calculated BMI or NaN if inputs are invalid.
+         * Think of this as your "body size number."
+         * 
+         * We take your weight and divide it by your height squared.
+         * Like figuring out how much space you take up compared to how tall you are.
+         * 
+         * @param {number} heightCm - How tall you are in centimeters.
+         * @param {number} weightKg - How much you weigh in kilograms.
+         * @returns {number|NaN} - Your BMI number or NaN if we can't calculate it.
          */
         function calculateBMI(heightCm, weightKg) {
-            // Basic validation for non-zero positive inputs
+            // Check if height and weight are positive numbers
             if (!heightCm || heightCm <= 0 || !weightKg || weightKg <= 0) return NaN;
-            // Convert height to meters for the calculation
+            // Turn height from centimeters to meters, then calculate
             return weightKg / ((heightCm / 100) ** 2);
         }
 
         /**
          * Calculates Waist-to-Hip Ratio (WHR).
-         * Formula: waist circumference / hip circumference
-         * @param {number} waistCm - Waist circumference in centimeters.
-         * @param {number} hipCm - Hip circumference in centimeters.
-         * @returns {number|NaN} - Calculated WHR or NaN if inputs are invalid.
+         * This is your "body shape number."
+         * 
+         * We divide your waist size by your hip size.
+         * It helps show if you carry weight more in your belly or your hips.
+         * 
+         * @param {number} waistCm - How big around your belly button is in centimeters.
+         * @param {number} hipCm - How big around your hips are in centimeters.
+         * @returns {number|NaN} - Your WHR number or NaN if we can't calculate it.
          */
         function calculateWHR(waistCm, hipCm) {
-            // Basic validation for non-zero positive inputs
-            if (!waistCm || waistCm <= 0 || !hipCm || hipCm <= 0) return NaN; // Prevent division by zero/invalid input
+            // Check if measurements are positive numbers
+            if (!waistCm || waistCm <= 0 || !hipCm || hipCm <= 0) return NaN;
             return waistCm / hipCm;
         }
 
         /**
-         * Determines a score (0-5) based on the calculated BMI.
-         * Higher scores generally indicate healthier BMI ranges.
-         * Ranges:
-         * < 18.5: 1 (Underweight)
-         * 18.5 - 19.9: 3
-         * 20.0 - 22.0: 5 (Optimal)
-         * 22.1 - 25.0: 4
-         * 25.1 - 27.5: 3
-         * 27.6 - 30.0: 2
-         * > 30.0: 1 (Obese)
-         * @param {number} bmi - Calculated BMI value.
-         * @returns {number} - Score from 0 (invalid) to 5.
+         * Gives a health score based on your BMI.
+         * Think of this as turning your BMI into a report card grade from 0-5.
+         * 
+         * 5 is the best score - like getting an A+
+         * 1 is the worst score - like getting a D
+         * 
+         * These are the BMI grades:
+         * < 18.5: 1 (Too thin)
+         * 18.5 - 19.9: 3 (Good)
+         * 20.0 - 22.0: 5 (Perfect!)
+         * 22.1 - 25.0: 4 (Very good)
+         * 25.1 - 27.5: 3 (Good)
+         * 27.6 - 30.0: 2 (Not so good)
+         * > 30.0: 1 (Too heavy)
+         * 
+         * @param {number} bmi - Your calculated BMI.
+         * @returns {number} - Your BMI health score from 0-5.
          */
         function getBMIScore(bmi) {
-            if (isNaN(bmi)) return 0; // Handle invalid BMI input
+            if (isNaN(bmi)) return 0; // If BMI is missing, score is 0
             if (bmi < 18.5) return 1;
             if (bmi < 20) return 3;
             if (bmi <= 22) return 5;
@@ -1796,41 +1982,50 @@ function longevity_assessment_form() {
         }
 
         /**
-         * Determines a score (0-5) based on the calculated WHR and gender.
-         * Lower WHR values generally indicate lower health risks.
-         * Different thresholds are used for males and females.
-         * @param {number} whr - Calculated WHR value.
-         * @param {string} gender - User's selected gender ("male", "female", "other").
-         * @returns {number} - Score from 0 (invalid) to 5.
+         * Gives a health score based on your WHR and gender.
+         * This turns your waist-hip ratio into a grade from 0-5.
+         * 
+         * Boys and girls have different healthy shapes, so we score them differently.
+         * 5 is the best score (healthiest shape)
+         * 1 is the lowest score (less healthy shape)
+         * 
+         * @param {number} whr - Your waist-to-hip ratio.
+         * @param {string} gender - If you're a boy or girl ("male", "female", or "other").
+         * @returns {number} - Your shape health score from 0-5.
          */
         function getWHRScore(whr, gender) {
-            if (isNaN(whr) || !gender) return 0; // Handle invalid WHR or missing gender
-            const lowerCaseGender = gender.toLowerCase(); // Ensure case-insensitivity
+            if (isNaN(whr) || !gender) return 0; // If WHR is missing, score is 0
+            const lowerCaseGender = gender.toLowerCase();
 
-            // Female WHR Score Ranges:
+            // Girls' scoring:
             if (lowerCaseGender === "female") {
-                if (whr <= 0.75) return 5; // Optimal
-                if (whr <= 0.80) return 4;
-                if (whr <= 0.85) return 3;
-                if (whr <= 0.90) return 2;
-                return 1; // High risk
-            } else { // Male (and Other) WHR Score Ranges:
-                // Using male standards as default for "other" or non-female inputs
-                if (whr <= 0.85) return 5; // Optimal
-                if (whr <= 0.90) return 4;
-                if (whr <= 0.95) return 3;
-                if (whr <= 1.00) return 2;
-                return 1; // High risk
+                if (whr <= 0.75) return 5; // Super healthy shape
+                if (whr <= 0.80) return 4; // Very healthy shape
+                if (whr <= 0.85) return 3; // Healthy shape
+                if (whr <= 0.90) return 2; // Less healthy shape
+                return 1; // Least healthy shape
+            } else { // Boys' scoring:
+                if (whr <= 0.85) return 5; // Super healthy shape
+                if (whr <= 0.90) return 4; // Very healthy shape
+                if (whr <= 0.95) return 3; // Healthy shape
+                if (whr <= 1.00) return 2; // Less healthy shape
+                return 1; // Least healthy shape
             }
         }
 
         /**
-         * Calculates the estimated shift in biological age relative to chronological age.
-         * A positive shift suggests accelerated aging, a negative shift suggests slower aging.
-         * Calculated by summing the weighted differences between each score and the average (3).
-         * @param {object} scores - Object containing all user scores (lifestyle, BMI, WHR, etc.).
-         * @param {number} age - User's chronological age.
-         * @returns {number} - The calculated age shift in years.
+         * Calculates how much older or younger your body is compared to your actual age.
+         * Think of this as your "health bonus or penalty years."
+         * 
+         * If you have good health habits, you get minus years (younger body age).
+         * If you have bad health habits, you get plus years (older body age).
+         * 
+         * We look at all your health habits, and give each one a score.
+         * Then we add them all up to see how many years to add or subtract.
+         * 
+         * @param {object} scores - All your health scores for different habits.
+         * @param {number} age - Your real age in years.
+         * @returns {number} - How many years to add or subtract from your age.
          */
         function calculateAgeShift(scores, age) {
             let totalShift = 0;
@@ -1838,73 +2033,103 @@ function longevity_assessment_form() {
             debug("Scores being used for shift:", scores);
             debug("Weights used:", weights);
 
-            // Iterate through each metric defined in the weights object
+            // Look at each health habit and calculate its effect
             for (let metric in weights) {
-                const score = scores[metric]; // Get the user's score for this metric
-                // Check if the score is a valid number
+                const score = scores[metric]; // Get your score for this habit
+                
                 if (typeof score === 'number' && !isNaN(score)) {
-                    // Calculate the shift contribution for this metric
-                    // Formula: weight * (average_score - user_score)
-                    // A score above 3 results in a negative shift (good), below 3 is positive (bad)
+                    // How this works:
+                    // 3 is an average score
+                    // If your score is higher than 3, you get minus years (younger)
+                    // If your score is lower than 3, you get plus years (older)
+                    // We multiply by the importance of each habit (its weight)
                     const shiftContribution = weights[metric] * (3 - score);
                     totalShift += shiftContribution;
                     debug(`Metric: ${metric}, Score: ${score}, Weight: ${weights[metric]}, Shift Contribution: ${shiftContribution.toFixed(2)}`);
                 } else {
-                    // Log if a score is missing or invalid for a weighted metric
                     debug(`Invalid or missing score for metric: ${metric}. Skipping.`);
                 }
             }
-             debug("Total shift before age adjustment:", totalShift.toFixed(2));
+            debug("Total shift before age adjustment:", totalShift.toFixed(2));
 
-            // Apply age-based adjustments to make the shift more realistic
-            // Younger individuals (<25) with good scores (negative shift) have the effect reduced.
+            // Make the results more realistic based on your age
+            // Age adjustments explained in simple terms:
+            
             if (age < 25 && totalShift < 0) {
-                 // Reduce the negative shift, capped by a percentage of their age.
-                 const adjustment = Math.max(totalShift * 0.3, -(age * 0.2));
-                 debug(`Age < 25 adjustment: ${adjustment.toFixed(2)} (from ${totalShift.toFixed(2)})`);
-                 totalShift = adjustment;
+                // Young people (under 25) with good habits:
+                // We reduce the "younger" effect, because young people are already young!
+                // You can only be so much "younger" than your actual age when you're already young.
+                const adjustment = Math.max(totalShift * 0.3, -(age * 0.2));
+                debug(`Age < 25 adjustment: ${adjustment.toFixed(2)} (from ${totalShift.toFixed(2)})`);
+                totalShift = adjustment;
             } else if (age < 35) {
-                 // Reduce the overall shift (positive or negative) for individuals under 35.
-                 const adjustment = totalShift * 0.5;
-                 debug(`Age < 35 adjustment: ${adjustment.toFixed(2)} (from ${totalShift.toFixed(2)})`);
-                 totalShift = adjustment;
+                // People under 35:
+                // We reduce the effect by half, since age differences aren't as dramatic
+                // for younger adults
+                const adjustment = totalShift * 0.5;
+                debug(`Age < 35 adjustment: ${adjustment.toFixed(2)} (from ${totalShift.toFixed(2)})`);
+                totalShift = adjustment;
             } else if (age > 65) {
-                 // Reduce the overall shift for individuals over 65.
-                 const adjustment = totalShift * 0.7;
-                 debug(`Age > 65 adjustment: ${adjustment.toFixed(2)} (from ${totalShift.toFixed(2)})`);
-                 totalShift = adjustment;
+                // Older people (over 65):
+                // We reduce the effect, since at older ages some aging is normal
+                // and can't be completely avoided
+                const adjustment = totalShift * 0.7;
+                debug(`Age > 65 adjustment: ${adjustment.toFixed(2)} (from ${totalShift.toFixed(2)})`);
+                totalShift = adjustment;
             }
-             debug("Final age shift:", totalShift.toFixed(2));
+            debug("Final age shift:", totalShift.toFixed(2));
             return totalShift;
         }
 
         /**
-         * Calculates the estimated biological age.
-         * Formula: chronologicalAge + (ageShift * scalingFactor)
-         * @param {number} chronologicalAge - User's actual age.
-         * @param {number} ageShift - Calculated age shift from calculateAgeShift().
-         * @returns {number|NaN} - Estimated biological age or NaN if inputs invalid.
+         * Calculates your "body age" based on health habits.
+         * Think of this as your "real body age" versus your birthday age.
+         * 
+         * Your birthday age is how many years since you were born.
+         * Your body age is how old your body seems based on your health.
+         * 
+         * If you have healthy habits, your body might be "younger" than your birthday age.
+         * If you have unhealthy habits, your body might be "older" than your birthday age.
+         * 
+         * Example: A 40-year-old with great habits might have a body age of 35!
+         * 
+         * @param {number} chronologicalAge - Your birthday age (years since birth).
+         * @param {number} ageShift - Years to add/subtract based on health habits.
+         * @returns {number|NaN} - Your estimated body age.
          */
         function calculateBiologicalAge(chronologicalAge, ageShift) {
-            // Scaling factor to moderate the impact of the age shift
-            const scalingFactor = 0.8;
-            if (isNaN(chronologicalAge) || isNaN(ageShift)) return NaN; // Check inputs
+            // Scale factor - we don't apply 100% of the age shift
+            // This makes the results more realistic (not too extreme)
+            const scalingFactor = 0.8; // We use 80% of the calculated age shift
+            
+            if (isNaN(chronologicalAge) || isNaN(ageShift)) return NaN; // Check for valid numbers
+            
             const bioAge = chronologicalAge + (ageShift * scalingFactor);
             debug(`Calculated Biological Age: ${bioAge.toFixed(1)} (Chrono: ${chronologicalAge}, Shift: ${ageShift.toFixed(2)}, Scale: ${scalingFactor})`);
             return bioAge;
         }
 
         /**
-         * Calculates the aging rate.
-         * Formula: biologicalAge / chronologicalAge
-         * A rate > 1 suggests faster aging, < 1 suggests slower aging.
-         * @param {number} biologicalAge - Calculated biological age.
-         * @param {number} chronologicalAge - User's actual age.
-         * @returns {number|NaN} - Aging rate or NaN if inputs invalid.
+         * Calculates your "aging speed."
+         * This is like your "health speedometer" - are you aging faster or slower than normal?
+         * 
+         * Think of it like this:
+         * - If the number equals 1.0: You're aging at a normal speed
+         * - If the number is over 1.0: You're aging faster than normal (not good)
+         * - If the number is under 1.0: You're aging slower than normal (good!)
+         * 
+         * Example: 
+         * - 0.9 means you're aging 10% slower than average (great!)
+         * - 1.2 means you're aging 20% faster than average (not so good)
+         * 
+         * @param {number} biologicalAge - Your calculated body age.
+         * @param {number} chronologicalAge - Your actual birthday age.
+         * @returns {number|NaN} - Your aging speed (rate).
          */
         function calculateAgingRate(biologicalAge, chronologicalAge) {
-            // Ensure chronological age is valid and positive for division
-            if (isNaN(biologicalAge) || !chronologicalAge || chronologicalAge <= 0) return NaN; // Check inputs
+            // Make sure we have valid numbers and don't divide by zero
+            if (isNaN(biologicalAge) || !chronologicalAge || chronologicalAge <= 0) return NaN;
+            
             const rate = biologicalAge / chronologicalAge;
             debug(`Calculated Aging Rate: ${rate.toFixed(2)} (BioAge: ${biologicalAge.toFixed(1)}, ChronoAge: ${chronologicalAge})`);
             return rate;
@@ -2290,7 +2515,7 @@ function longevity_assessment_form() {
                                     <span>40</span>
                                 </div>
                                 <div class="gauge-interpretation">
-                                    BMI (Body Mass Index) measures weight relative to height. A BMI between 18.5-24.9 is considered healthy.
+                                    BMI (Body Mass Index) measures weight relative to height. A BMI between 18.5-24.9 is considered healthy (green zone), 25-29.9 is overweight (yellow zone), and 30+ is obese (red zone).
                                 </div>
                             </div>
                         </div>
@@ -2327,7 +2552,7 @@ function longevity_assessment_form() {
                                     <span>${isFemale ? '1.0' : '1.15'}</span>
                                 </div>
                                 <div class="gauge-interpretation">
-                                    WHR (Waist-to-Hip Ratio) measures body fat distribution. ${isFemale ? 'For women, a WHR of 0.8 or less indicates low health risk.' : 'For men, a WHR of 0.95 or less indicates low health risk.'}
+                                    WHR (Waist-to-Hip Ratio) measures body fat distribution. ${isFemale ? 'For women, a WHR of 0.8 or less indicates low health risk (green zone).' : 'For men, a WHR of 0.95 or less indicates low health risk (green zone).'}
                                 </div>
                             </div>
                         </div>
@@ -2338,6 +2563,18 @@ function longevity_assessment_form() {
 
                 bodyMeasurementsDiv.innerHTML = bmiHtml + whrHtml;
                 debug("Body Measurements HTML updated with gauges.");
+                
+                // Add subtle animation to the markers after content is rendered
+                setTimeout(() => {
+                    const markers = bodyMeasurementsDiv.querySelectorAll('.gauge-marker');
+                    markers.forEach(marker => {
+                        marker.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                        marker.style.transform = 'translateX(-50%) translateY(-2px)';
+                        setTimeout(() => {
+                            marker.style.transform = 'translateX(-50%) translateY(0)';
+                        }, 100);
+                    });
+                }, 300);
 
             } else {
                 console.error("Element with ID 'bodyMeasurements' not found!");
@@ -2657,62 +2894,20 @@ function longevity_assessment_form() {
                 // Clear previous content and add structure
                 detailedBreakdownDiv.innerHTML = '';
 
-                // Add Toggle (Segmented Control)
-                const toggleContainer = document.createElement('div');
-                toggleContainer.className = 'detailed-breakdown-toggle';
-                toggleContainer.innerHTML = `
-                    <div class="segmented-control">
-                        <button type="button" class="active" data-chart="scores">Polar Chart</button> 
-                        <button type="button" data-chart="impact">Column Chart</button>
-                    </div>
-                `;
-                detailedBreakdownDiv.appendChild(toggleContainer);
-
-                // Add Chart Containers
+                // Add Chart Container - only the Polar Chart container
                 const scoreChartContainer = document.createElement('div');
                 scoreChartContainer.id = 'scoreChartContainer';
-                scoreChartContainer.className = 'chart-container visible'; // Show scores by default
+                scoreChartContainer.className = 'chart-container visible';
                 detailedBreakdownDiv.appendChild(scoreChartContainer);
 
-                const impactChartContainer = document.createElement('div');
-                impactChartContainer.id = 'impactChartContainer';
-                impactChartContainer.className = 'chart-container hidden'; // Hide impact by default
-                detailedBreakdownDiv.appendChild(impactChartContainer);
-
-                // Create Charts
+                // Create Chart - only the Polar Chart
                 try {
                     createScoreRadarChart(scores, breakdownKeys, scoreChartContainer);
-                    createImpactBarChart(scores, weights, breakdownKeys, impactChartContainer);
-                    debug("Detailed Breakdown Charts created.");
+                    debug("Detailed Breakdown Chart created.");
                 } catch (error) {
-                    console.error("Error creating charts:", error);
-                    detailedBreakdownDiv.innerHTML += '<p style="text-align:center; color: red;">Error displaying charts.</p>';
+                    console.error("Error creating chart:", error);
+                    detailedBreakdownDiv.innerHTML += '<p style="text-align:center; color: red;">Error displaying chart.</p>';
                 }
-
-                // Add Toggle Logic
-                const toggleButtons = toggleContainer.querySelectorAll('.segmented-control button');
-                toggleButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        // Update button active state
-                        toggleButtons.forEach(btn => btn.classList.remove('active'));
-                        this.classList.add('active');
-
-                        // Toggle chart visibility
-                        const chartToShow = this.getAttribute('data-chart');
-                        if (chartToShow === 'scores') {
-                            scoreChartContainer.classList.remove('hidden');
-                            scoreChartContainer.classList.add('visible');
-                            impactChartContainer.classList.remove('visible');
-                            impactChartContainer.classList.add('hidden');
-                        } else {
-                            impactChartContainer.classList.remove('hidden');
-                            impactChartContainer.classList.add('visible');
-                            scoreChartContainer.classList.remove('visible');
-                            scoreChartContainer.classList.add('hidden');
-                        }
-                    });
-                });
-
             } else {
                 console.error("Detailed Breakdown section or div not found!");
             }
@@ -2992,6 +3187,13 @@ function longevity_assessment_form() {
         // before trying to attach the form listener.
         $(document).ready(function() {
              debug("Document ready, setting up form listener...");
+             
+             // Register Chart.js plugins if they exist
+             if (window.Chart && window.ChartAnnotation) {
+                 Chart.register(ChartAnnotation);
+                 debug("Chart.js Annotation plugin registered");
+             }
+             
             setupFormListener(); // Call the function to attach the listener to the form
         });
 
@@ -3048,15 +3250,15 @@ function longevity_assessment_form() {
             // Prepare data with custom point colors based on scores - using filtered keys
             const rawScores = filteredBreakdownKeys.map(metric => scores[metric]);
 
-            // Enhanced color gradient for points based on scores
+            // Enhanced color gradient for points based on scores - improved for premium look
             const pointColors = rawScores.map(val => {
                 if (val >= 4.5) return 'rgba(0, 180, 0, 1)';       // Excellent - Darker Green
-                else if (val >= 3.5) return 'rgba(100, 200, 0, 1)'; // Good - Light Green
-                else if (val >= 3.0) return 'rgba(200, 200, 0, 1)'; // Above Average - Yellow-Green
-                else if (val >= 2.5) return 'rgba(255, 200, 0, 1)'; // Average - Yellow
-                else if (val >= 2.0) return 'rgba(255, 150, 0, 1)'; // Below Average - Orange
-                else if (val >= 1.5) return 'rgba(255, 100, 0, 1)'; // Poor - Light Red
-                else return 'rgba(200, 0, 0, 1)';                   // Very Poor - Red
+                else if (val >= 3.5) return 'rgba(76, 187, 23, 1)'; // Good - Apple Green
+                else if (val >= 3.0) return 'rgba(156, 204, 10, 1)'; // Above Average - Light Green
+                else if (val >= 2.5) return 'rgba(255, 204, 0, 1)'; // Average - Apple Yellow
+                else if (val >= 2.0) return 'rgba(255, 149, 0, 1)'; // Below Average - Apple Orange
+                else if (val >= 1.5) return 'rgba(255, 59, 48, 1)'; // Poor - Apple Red
+                else return 'rgba(215, 0, 21, 1)';                  // Very Poor - Deep Red
             });
 
             // Prepare data with filtered keys
@@ -3067,13 +3269,14 @@ function longevity_assessment_form() {
                     data: rawScores,
                     fill: true,
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(0, 122, 255, 0.8)', // Apple blue
                     pointBackgroundColor: pointColors,
-                    pointBorderColor: '#fff',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 1.5,
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: pointColors,
-                    pointRadius: window.innerWidth <= 480 ? 3 : 4,
-                    pointHoverRadius: window.innerWidth <= 480 ? 5 : 6,
+                    pointRadius: window.innerWidth <= 480 ? 4 : 5, // Increased size
+                    pointHoverRadius: window.innerWidth <= 480 ? 6 : 7, // Increased hover size
                     borderWidth: 2
                 }]
             };
@@ -3088,11 +3291,15 @@ function longevity_assessment_form() {
                     aspectRatio: 1, // Keep it square
                     layout: {
                         padding: {
-                            top: 10,
-                            right: 20, 
-                            bottom: 10,
-                            left: 20
+                            top: 15,
+                            right: 25, 
+                            bottom: 15,
+                            left: 25
                         }
+                    },
+                    animation: {
+                        duration: 1000, // Animation duration in milliseconds
+                        easing: 'easeOutQuart', // Easing function for smooth animation
                     },
                     scales: {
                         r: {
@@ -3100,35 +3307,55 @@ function longevity_assessment_form() {
                             max: 5,
                             beginAtZero: true,
                             grid: { 
-                                color: 'rgba(0, 0, 0, 0.1)',
+                                color: 'rgba(0, 0, 0, 0.08)', // Lighter grid lines
                                 lineWidth: 1
                             },
                             angleLines: { 
-                                color: 'rgba(0, 0, 0, 0.1)',
+                                color: 'rgba(0, 0, 0, 0.08)', // Lighter angle lines
                                 lineWidth: 1
                             },
                             pointLabels: {
                                 font: { 
                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
-                                    size: window.innerWidth <= 480 ? 10 : 12,
-                                    weight: 'bold'
+                                    size: window.innerWidth <= 480 ? 11 : 13, // Increased size for better readability
+                                    weight: '500' // Semi-bold for better legibility
                                 },
                                 color: '#2C3E50',
-                                padding: window.innerWidth <= 480 ? 4 : 8,
+                                padding: window.innerWidth <= 480 ? 6 : 10, // Increased padding
                                 centerPointLabels: false,
                                 display: true
                             },
                             ticks: {
                                 stepSize: 1,
-                                backdropColor: 'rgba(255, 255, 255, 0.75)', // Improve tick readability
+                                backdropColor: 'rgba(255, 255, 255, 0.85)', // Improved tick readability
                                 backdropPadding: 3,
                                 font: { 
                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
-                                    size: window.innerWidth <= 480 ? 9 : 11
+                                    size: window.innerWidth <= 480 ? 10 : 11 // Minimum 11pt as per Apple guidelines
                                 },
-                                color: '#86868b',
+                                color: '#636366', // Apple gray
                                 showLabelBackdrop: false,
                                 z: 1
+                            },
+                            backgroundColor: function(context) {
+                                const chart = context.chart;
+                                const {ctx, chartArea} = chart;
+                                if (!chartArea) {
+                                    return;
+                                }
+                                // Create gradient for the background
+                                // High scores (3-5) zone with very light blue
+                                const outerAreaGradient = ctx.createRadialGradient(
+                                    chart.getDatasetMeta(0).data[0].x,
+                                    chart.getDatasetMeta(0).data[0].y,
+                                    0,
+                                    chart.getDatasetMeta(0).data[0].x,
+                                    chart.getDatasetMeta(0).data[0].y,
+                                    chart.scales.r.drawingArea
+                                );
+                                outerAreaGradient.addColorStop(0.6, 'rgba(255, 255, 255, 0)');
+                                outerAreaGradient.addColorStop(1, 'rgba(239, 246, 255, 0.3)');
+                                return outerAreaGradient;
                             }
                         }
                     },
@@ -3140,13 +3367,13 @@ function longevity_assessment_form() {
                                 boxWidth: 20,
                                 padding: window.innerWidth <= 480 ? 10 : 15,
                                 font: {
-                                    size: window.innerWidth <= 480 ? 11 : 13
+                                    size: window.innerWidth <= 480 ? 11 : 13 // Minimum 11pt as per Apple guidelines
                                 }
                             }
                         },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: 'rgba(44, 62, 80, 0.8)',
+                            backgroundColor: 'rgba(44, 62, 80, 0.9)', // More opaque for better visibility
                             titleFont: { 
                                 family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
                                 size: window.innerWidth <= 480 ? 12 : 13
@@ -3155,7 +3382,8 @@ function longevity_assessment_form() {
                                 family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
                                 size: window.innerWidth <= 480 ? 11 : 12
                             },
-                            padding: 8,
+                            padding: 10, // Increased padding
+                            cornerRadius: 6, // More rounded corners for Apple-like UI
                             callbacks: {
                                 label: function(context) {
                                     const score = context.raw;
@@ -3186,21 +3414,21 @@ function longevity_assessment_form() {
                 }
             };
 
-            // Add title and render chart
-            const title = document.createElement('h4');
-            title.className = 'chart-title';
-            title.textContent = 'Score Visualization';
+            // Render chart (removing title as requested)
             containerElement.innerHTML = ''; // Clear previous content
-            containerElement.appendChild(title);
+            
+            // Update canvas size for better visibility
+            canvas.style.minHeight = '400px'; // Increased from 350px
+            canvas.style.margin = '0 auto';
+            
             containerElement.appendChild(canvas);
-            new Chart(canvas, config);
+            const chartInstance = new Chart(canvas, config);
             debug("Score Radar Chart rendered.");
             
             // Create fallback image for print
             try {
                 setTimeout(() => {
                     // Delay creating fallback to ensure chart is fully rendered
-                    const chartInstance = Chart.getChart(canvas);
                     if (chartInstance) {
                         chartInstance.toBase64Image('image/png', 1.0).then(image => {
                             const fallbackDiv = document.createElement('div');
@@ -3257,6 +3485,34 @@ function longevity_assessment_form() {
                  }
                  return 0; // Use 0 for missing weights (shouldn't happen with filtered keys)
              });
+             
+             // ===== BEGIN VISUAL SCALING FACTOR =====
+             // This scaling is applied ONLY for visual display in the chart, not for actual calculations
+             // IMPORTANT: You can adjust this scaling factor to make the bars more visible
+             const visualScalingFactor = 8.0; // Adjust this value as needed
+             
+             // Create a copy of the diffs array with the visual scaling applied
+             // Original values are preserved in 'diffs' array for tooltips and other calculations
+             const scaledDiffs = diffs.map(value => value * visualScalingFactor);
+             
+             // Store original values for tooltip display
+             const originalDiffs = [...diffs];
+             // ===== END VISUAL SCALING FACTOR =====
+
+             // Generate colors based on impact value (using original diffs, not scaled)
+             const barColors = diffs.map(value => {
+                 if (value > 0) {
+                     // Positive impact (good) - green gradient based on magnitude
+                     const intensity = Math.min(1, value / 1.0); // Scale intensity based on impact 
+                     return `rgba(0, ${Math.floor(150 + 90 * intensity)}, 0, 0.8)`;
+                 } else if (value < 0) {
+                     // Negative impact (bad) - red gradient based on magnitude
+                     const intensity = Math.min(1, Math.abs(value) / 1.0); // Scale intensity based on impact
+                     return `rgba(${Math.floor(150 + 90 * intensity)}, 0, 0, 0.8)`;
+                 }
+                 // Neutral (exactly average) - gray
+                 return 'rgba(150, 150, 150, 0.8)';
+             });
 
              // Format labels for better display
              const labels = filteredBreakdownKeys.map(metric =>
@@ -3266,28 +3522,61 @@ function longevity_assessment_form() {
                  .replace('Whr', 'WHR')
              );
 
-             // Determine optimal Y axis range
-             let minVal = Math.min(...diffs.filter(d => d !== null));
-             let maxVal = Math.max(...diffs.filter(d => d !== null));
+             // Determine optimal Y axis range for the scaled values
+             let minVal = Math.min(...scaledDiffs.filter(d => d !== null));
+             let maxVal = Math.max(...scaledDiffs.filter(d => d !== null));
+             
+             // Add some padding to the y-axis range
              let yMin = Math.min(-4, (minVal < -4) ? minVal - 0.5 : -4);
              let yMax = Math.max(6, (maxVal > 6) ? maxVal + 0.5 : 6);
+             
+             // If all values are very small, ensure the chart still has a reasonable scale
+             if (Math.abs(maxVal) < 1 && Math.abs(minVal) < 1) {
+                 yMin = -4;
+                 yMax = 6;
+             }
 
-             // Prepare data with uniform blue bars
+             // Prepare data with colored bars based on impact - using SCALED values for display
              const data = {
                  labels: labels,
                  datasets: [{
                      label: 'Health Score Deviation',
-                     data: diffs,
-                     backgroundColor: 'rgba(54, 162, 235, 0.8)', // Uniform blue color for all bars
-                     borderColor: 'rgba(54, 162, 235, 1)',
+                     data: scaledDiffs, // Use the scaled values for the bars
+                     backgroundColor: barColors,
+                     borderColor: barColors.map(color => color.replace('0.8', '1')),
                      borderWidth: 1,
-                     borderRadius: 0, // No rounded corners
+                     borderRadius: 4, // Slightly rounded corners
                      barPercentage: 0.7,
                      categoryPercentage: 0.85
                  }]
              };
 
-             // Prepare simplified config
+             // Sort the data for better visualization (optional)
+             const sortByImpact = false; // Set to true to enable sorting
+             if (sortByImpact) {
+                 // Create a combined array of [label, diff, color] for sorting
+                 const combined = labels.map((label, i) => ({
+                     label: label,
+                     scaledDiff: scaledDiffs[i],
+                     originalDiff: originalDiffs[i], // Keep track of original values
+                     color: barColors[i]
+                 }));
+                 
+                 // Sort by impact value (descending)
+                 combined.sort((a, b) => b.scaledDiff - a.scaledDiff);
+                 
+                 // Reassign sorted values
+                 data.labels = combined.map(item => item.label);
+                 data.datasets[0].data = combined.map(item => item.scaledDiff);
+                 data.datasets[0].backgroundColor = combined.map(item => item.color);
+                 data.datasets[0].borderColor = combined.map(item => item.color.replace('0.8', '1'));
+                 
+                 // Update originalDiffs array order to match the sorted order
+                 originalDiffs.length = 0;
+                 combined.forEach(item => originalDiffs.push(item.originalDiff));
+             }
+
+             // Prepare enhanced config
              const config = {
                  type: 'bar',
                  data: data,
@@ -3309,11 +3598,21 @@ function longevity_assessment_form() {
                                  },
                                  color: '#86868b',
                                  callback: function(value) {
-                                     return value.toFixed(0); // Simplified tick format
+                                     // Display simplified tick values. These are visually scaled but
+                                     // we don't need to indicate that on the axis
+                                     return value.toFixed(0);
                                  }
                              },
                              title: {
-                                 display: false // Hide axis title
+                                 display: true,
+                                 text: 'Impact on Biological Age (years)',
+                                 font: {
+                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                                     size: window.innerWidth <= 480 ? 11 : 12,
+                                     weight: 'bold'
+                                 },
+                                 color: '#2C3E50',
+                                 padding: {top: 0, bottom: 10}
                              }
                          },
                          x: {
@@ -3337,7 +3636,7 @@ function longevity_assessment_form() {
                          },
                          tooltip: {
                              enabled: true,
-                             backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                              titleFont: { 
                                  family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
                                  size: window.innerWidth <= 480 ? 12 : 13 
@@ -3346,11 +3645,26 @@ function longevity_assessment_form() {
                                  family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
                                  size: window.innerWidth <= 480 ? 11 : 12 
                              },
-                             padding: 8,
+                             padding: 10,
                              callbacks: {
+                                 title: function(context) {
+                                     return context[0].label;
+                                 },
                                  label: function(context) {
-                                     const value = context.raw;
-                                     return value === null ? 'No data' : `Value: ${value.toFixed(1)}`;
+                                     // Use the index of the hovered bar to get the ORIGINAL (unscaled) value
+                                     const index = context.dataIndex;
+                                     const originalValue = originalDiffs[index];
+                                     
+                                     if (originalValue === null) return 'No data';
+                                     
+                                     // Format impact message based on original (unscaled) value
+                                     if (originalValue > 0) {
+                                         return `Reduces biological age by ${originalValue.toFixed(2)} years`;
+                                     } else if (originalValue < 0) {
+                                         return `Increases biological age by ${Math.abs(originalValue).toFixed(2)} years`;
+                                     } else {
+                                         return 'No impact on biological age';
+                                     }
                                  }
                              }
                          }
@@ -3358,15 +3672,78 @@ function longevity_assessment_form() {
                  }
              };
 
-             // Add title and render chart
+             // Add explanatory subtitle below title
              const title = document.createElement('h4');
              title.className = 'chart-title';
              title.textContent = 'Factor Impact';
+             
+             const subtitle = document.createElement('p');
+             subtitle.className = 'chart-subtitle';
+             subtitle.textContent = 'How each factor affects your biological age';
+             subtitle.style.textAlign = 'center';
+             subtitle.style.fontSize = '14px';
+             subtitle.style.marginTop = '5px';
+             subtitle.style.color = '#5a5a5a';
+             
+             // Create zero line annotation to emphasize positive/negative boundary
+             config.options.plugins.annotation = {
+                 annotations: {
+                     zeroLine: {
+                         type: 'line',
+                         yMin: 0,
+                         yMax: 0,
+                         borderColor: 'rgba(0, 0, 0, 0.3)',
+                         borderWidth: 1,
+                         borderDash: [4, 4],
+                     }
+                 }
+             };
+             
              containerElement.innerHTML = ''; // Clear previous content
              containerElement.appendChild(title);
+             containerElement.appendChild(subtitle);
              containerElement.appendChild(canvas);
-             new Chart(canvas, config);
-             debug("Factor Impact Bar Chart rendered.");
+             
+             // Create a legend to explain colors with note about visual scaling
+             const legend = document.createElement('div');
+             legend.className = 'chart-custom-legend';
+             legend.style.display = 'flex';
+             legend.style.justifyContent = 'center';
+             legend.style.alignItems = 'center';
+             legend.style.marginTop = '15px';
+             legend.style.fontSize = '13px';
+             legend.innerHTML = `
+                <div style="display: flex; align-items: center; margin-right: 20px;">
+                    <span style="display: inline-block; width: 12px; height: 12px; background-color: rgba(0, 200, 0, 0.8); margin-right: 5px;"></span>
+                    <span>Reduces age</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="display: inline-block; width: 12px; height: 12px; background-color: rgba(200, 0, 0, 0.8); margin-right: 5px;"></span>
+                    <span>Increases age</span>
+                </div>
+             `;
+             
+             // Add note about visual scaling
+             const scalingNote = document.createElement('div');
+             scalingNote.style.fontSize = '11px';
+             scalingNote.style.color = '#888';
+             scalingNote.style.textAlign = 'center';
+             scalingNote.style.marginTop = '5px';
+             scalingNote.innerHTML = `<i>Note: Chart bars are visually scaled for better readability. Tooltips show actual values.</i>`;
+             legend.appendChild(scalingNote);
+             
+             containerElement.appendChild(legend);
+             
+             // Initialize Chart with annotation plugin if available
+             if (window.Chart && (window.ChartAnnotation || typeof Chart.Annotation !== 'undefined')) {
+                 new Chart(canvas, config);
+             } else {
+                 // If annotation plugin not available, remove it from the config
+                 delete config.options.plugins.annotation;
+                 new Chart(canvas, config);
+             }
+             
+             debug("Factor Impact Bar Chart rendered with visual scaling factor: " + visualScalingFactor);
              
              // Create fallback image for print
              try {
