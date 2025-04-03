@@ -321,194 +321,198 @@ function longevity_assessment_form() {
                     <label for="hip">Hip Circumference (cm) <span class="info-icon"><span class="tooltip">Measure around the widest part of your hips. Keep the tape measure horizontal.</span></span></label>
                     <input type="number" id="hip" name="hip">
                 </div>
+                <div class="form-group">
+                    <label for="overallHealthPercent">Overall Health Percentage (%) <span class="info-icon"><span class="tooltip">If you have completed a separate health assessment that provided an overall health score (as a percentage), please enter that score here.</span></span></label>
+                    <input type="number" id="overallHealthPercent" name="overallHealthPercent" min="0" max="100" step="1">
+                </div>
             </div>
 
             <!-- Section 3: Lifestyle Factors -->
             <div class="form-section" id="section3">
                 <h2>Lifestyle Factors</h2>
                 <div class="form-group">
-                    <label for="activity">Physical Activity Level <span class="info-icon"><span class="tooltip">Select the intensity level that best describes your regular physical activity. Consider both exercise and daily activities.</span></span></label>
+                    <label for="activity">Physical Activity Level <span class="info-icon"><span class="tooltip">Select the option that best describes your typical weekly physical activity. Consider the type, frequency and intensity of your exercise and daily movement.</span></span></label>
                     <select id="activity" name="activity">
                         <option value="">Select Activity Level</option>
-                        <option value="0">Sedentary</option>
-                        <option value="1">Very low intensity</option>
-                        <option value="2">Low intensity</option>
-                        <option value="3" selected>Moderate intensity</option>
-                        <option value="4">High intensity</option>
-                        <option value="5">Very high intensity</option>
+                        <option value="0">Sedentary (minimal activity)</option>
+                        <option value="1">Very low (occasional walking)</option>
+                        <option value="2">Low (regular walking or light activity)</option>
+                        <option value="3" selected>Moderate (regular moderate exercise)</option>
+                        <option value="4">High (structured exercise 3+ times/week)</option>
+                        <option value="5">Very high (intense training 4+ times/week)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="sleepDuration">Sleep Duration <span class="info-icon"><span class="tooltip">Enter your average sleep duration per night. Include both deep and light sleep periods.</span></span></label>
+                    <label for="sleepDuration">Sleep Duration <span class="info-icon"><span class="tooltip">Choose the sleep duration that most closely matches your average nightly sleep over the past month. Base your answer on a typical night rather than an occasional variation.</span></span></label>
                     <select id="sleepDuration" name="sleepDuration">
                         <option value="">Select Sleep Duration</option>
-                        <option value="0">Less than 4 hours</option>
-                        <option value="1">4 to 5 hours</option>
-                        <option value="2">5 to 6 hours</option>
-                        <option value="3" selected>6 to 7 hours</option>
-                        <option value="4">7 to 8 hours</option>
-                        <option value="5">More than 8 hours</option>
+                        <option value="0">Less than 4 hours (severely insufficient)</option>
+                        <option value="1">4–5 hours (very short sleep)</option>
+                        <option value="2">5–6 hours (short sleep)</option>
+                        <option value="3" selected>6–7 hours (slightly below average)</option>
+                        <option value="4">7–8 hours (recommended duration)</option>
+                        <option value="5">More than 8 hours (extended sleep)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="sleepQuality">Sleep Quality <span class="info-icon"><span class="tooltip">Rate how well you typically sleep, considering factors like restfulness and interruptions.</span></span></label>
+                    <label for="sleepQuality">Sleep Quality <span class="info-icon"><span class="tooltip">Rate how frequently you experience restful, uninterrupted sleep. Consider factors such as feeling refreshed in the morning and the number of awakenings during the night.</span></span></label>
                     <select id="sleepQuality" name="sleepQuality">
                         <option value="">Select Sleep Quality</option>
-                        <option value="0">Very poor</option>
-                        <option value="1">Poor</option>
-                        <option value="2">Below average</option>
-                        <option value="3" selected>Average</option>
-                        <option value="4">Good</option>
-                        <option value="5">Excellent</option>
+                        <option value="0">Never (I never sleep well)</option>
+                        <option value="1">Rarely (seldom restful sleep)</option>
+                        <option value="2">Occasionally (inconsistent quality)</option>
+                        <option value="3" selected>Sometimes (moderate quality sleep)</option>
+                        <option value="4">Often (mostly restful sleep)</option>
+                        <option value="5">Always (consistently high quality sleep)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="stressLevels">Stress Levels <span class="info-icon"><span class="tooltip">Assess your overall stress levels, including both physical and emotional stress factors.</span></span></label>
+                    <label for="stressLevels">Stress Levels <span class="info-icon"><span class="tooltip">Indicate how often you feel stressed or overwhelmed. Reflect on both work and personal life to determine your usual stress level.</span></span></label>
                     <select id="stressLevels" name="stressLevels">
                         <option value="">Select Stress Level</option>
-                        <option value="0">Extreme stress</option>
-                        <option value="1">High stress</option>
-                        <option value="2">Moderate stress</option>
-                        <option value="3" selected>Manageable stress</option>
-                        <option value="4">Low stress</option>
-                        <option value="5">Minimal or no stress</option>
+                        <option value="0">Constantly stressed (high anxiety, unrelenting)</option>
+                        <option value="1">Very high stress (frequent overwhelming stress)</option>
+                        <option value="2">Moderate stress (often challenging to manage)</option>
+                        <option value="3" selected>Sometimes stressed (occasional stress episodes)</option>
+                        <option value="4">Low stress (generally calm)</option>
+                        <option value="5">Rarely stressed (minimal stress, very relaxed)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="socialConnections">Social Connections <span class="info-icon"><span class="tooltip">Evaluate your social support network and frequency of meaningful social interactions.</span></span></label>
+                    <label for="socialConnections">Social Connections <span class="info-icon"><span class="tooltip">Select the option that best represents the frequency of your social interactions, including contact with friends, family and community groups.</span></span></label>
                     <select id="socialConnections" name="socialConnections">
                         <option value="">Select Social Connection Level</option>
-                        <option value="0">Completely isolated</option>
-                        <option value="1">Very few connections</option>
-                        <option value="2">Limited social interactions</option>
-                        <option value="3" selected>Moderate connections</option>
-                        <option value="4">Good social network</option>
-                        <option value="5">Excellent social network</option>
+                        <option value="0">None (no regular social interaction)</option>
+                        <option value="1">Rarely (infrequent social contact)</option>
+                        <option value="2">Occasionally (sporadic interaction with friends/family)</option>
+                        <option value="3" selected>Regularly (consistent weekly social contact)</option>
+                        <option value="4">Often (frequent social engagement)</option>
+                        <option value="5">Daily (social interactions every day)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="dietQuality">Diet Quality <span class="info-icon"><span class="tooltip">Rate your overall diet quality, considering variety, balance, and nutritional value.</span></span></label>
+                    <label for="dietQuality">Diet Quality <span class="info-icon"><span class="tooltip">Select the option that best describes the overall quality of your regular diet. Think about the variety, nutrient density and frequency of processed foods in your meals.</span></span></label>
                     <select id="dietQuality" name="dietQuality">
                         <option value="">Select Diet Quality</option>
-                        <option value="0">Very poor</option>
-                        <option value="1">Poor</option>
-                        <option value="2">Below average</option>
-                        <option value="3" selected>Average</option>
-                        <option value="4">Good</option>
-                        <option value="5">Excellent</option>
+                        <option value="0">Very poor (nutrient deficient, unhealthy choices)</option>
+                        <option value="1">Poor (limited variety, low nutrient density)</option>
+                        <option value="2">Below average (occasional healthy meals, frequent unhealthy choices)</option>
+                        <option value="3" selected>Average (balanced diet with some healthy choices)</option>
+                        <option value="4">Good (mostly nutritious and balanced)</option>
+                        <option value="5">Excellent (high nutrient density, varied and balanced)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="alcoholConsumption">Alcohol Consumption <span class="info-icon"><span class="tooltip">Select the option that best describes your typical alcohol consumption patterns.</span></span></label>
+                    <label for="alcoholConsumption">Alcohol Consumption <span class="info-icon"><span class="tooltip">Select your average weekly alcohol consumption. Base your answer on standard drink sizes as defined in your region.</span></span></label>
                     <select id="alcoholConsumption" name="alcoholConsumption">
                         <option value="">Select Alcohol Consumption</option>
-                        <option value="0">Excessive daily intake</option>
-                        <option value="1">Regular heavy intake</option>
-                        <option value="2">Moderate regular intake</option>
-                        <option value="3" selected>Light social drinking</option>
-                        <option value="4">Occasional minimal intake</option>
-                        <option value="5">No intake</option>
+                        <option value="0">15+ drinks per week (heavy drinking)</option>
+                        <option value="1">10-14 drinks per week (frequent heavy drinking)</option>
+                        <option value="2">6-9 drinks per week (moderate consumption)</option>
+                        <option value="3" selected>3-5 drinks per week (light to moderate consumption)</option>
+                        <option value="4">1-2 drinks per week (occasional drinking)</option>
+                        <option value="5">0 drinks (abstainer)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="smokingStatus">Smoking Status <span class="info-icon"><span class="tooltip">Indicate your current smoking status, including any history of smoking.</span></span></label>
+                    <label for="smokingStatus">Smoking Status <span class="info-icon"><span class="tooltip">Choose the option that best describes your current or past smoking habits. Consider both the frequency and recency of your smoking behaviour.</span></span></label>
                     <select id="smokingStatus" name="smokingStatus">
                         <option value="">Select Smoking Status</option>
-                        <option value="0">Heavy smoker</option>
-                        <option value="1">Regular smoker</option>
-                        <option value="2">Occasional smoker</option>
-                        <option value="3" selected>Ex-smoker</option>
-                        <option value="4">Rare smoker</option>
-                        <option value="5">Never smoked</option>
+                        <option value="0">Current daily smoker (smokes every day)</option>
+                        <option value="1">Regular smoker (smokes on most days)</option>
+                        <option value="2">Occasional smoker (smokes infrequently)</option>
+                        <option value="3" selected>Recently quit (stopped smoking within the last 6 months)</option>
+                        <option value="4">Former smoker (quit more than 6 months ago)</option>
+                        <option value="5">Never smoked (no history of smoking)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="cognitiveActivity">Cognitive Activity <span class="info-icon"><span class="tooltip">Rate your engagement in mentally stimulating activities like reading, puzzles, or learning new skills.</span></span></label>
+                    <label for="cognitiveActivity">Cognitive Activity <span class="info-icon"><span class="tooltip">Select how often you engage in activities that challenge your brain. This can include puzzles, reading, learning new skills or other mentally stimulating tasks.</span></span></label>
                     <select id="cognitiveActivity" name="cognitiveActivity">
                         <option value="">Select Cognitive Activity Level</option>
-                        <option value="0">Very low mental activity</option>
-                        <option value="1">Low mental activity</option>
-                        <option value="2">Below average activity</option>
-                        <option value="3" selected>Moderate activity</option>
-                        <option value="4">High mental activity</option>
-                        <option value="5">Very high mental activity</option>
+                        <option value="0">Never (no cognitive activities, e.g. puzzles or reading)</option>
+                        <option value="1">Rarely (infrequent mental stimulation)</option>
+                        <option value="2">Occasionally (sporadic cognitive activities)</option>
+                        <option value="3" selected>Regularly (weekly engagement in brain-stimulating tasks)</option>
+                        <option value="4">Frequently (almost daily mental stimulation)</option>
+                        <option value="5">Daily (consistent daily mental exercises such as puzzles or reading)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="sunlightExposure">Sunlight Exposure <span class="info-icon"><span class="tooltip">Consider your daily exposure to natural sunlight, including both direct and indirect exposure.</span></span></label>
+                    <label for="sunlightExposure">Sunlight Exposure <span class="info-icon"><span class="tooltip">Choose the duration of natural sunlight you typically receive daily. Consider exposure during morning or afternoon hours, not just while indoors.</span></span></label>
                     <select id="sunlightExposure" name="sunlightExposure">
                         <option value="">Select Sunlight Exposure</option>
-                        <option value="0">Almost no exposure</option>
-                        <option value="1">Rare exposure</option>
-                        <option value="2">Limited exposure</option>
-                        <option value="3" selected>Moderate exposure</option>
-                        <option value="4">Good exposure</option>
-                        <option value="5">Optimal exposure</option>
+                        <option value="0">Less than 10 minutes (minimal exposure)</option>
+                        <option value="1">10-20 minutes (brief exposure)</option>
+                        <option value="2">20-30 minutes (short daily exposure)</option>
+                        <option value="3" selected>30-60 minutes (moderate daily exposure)</option>
+                        <option value="4">1-2 hours (extended daily exposure)</option>
+                        <option value="5">More than 2 hours (high exposure)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="supplementIntake">Supplement Intake <span class="info-icon"><span class="tooltip">Rate your regular use of dietary supplements, vitamins, or minerals.</span></span></label>
+                    <label for="supplementIntake">Supplement Intake <span class="info-icon"><span class="tooltip">Indicate how often you take dietary supplements such as vitamins or minerals. Reflect on your routine over the past month.</span></span></label>
                     <select id="supplementIntake" name="supplementIntake">
                         <option value="">Select Supplement Intake</option>
-                        <option value="0">None</option>
-                        <option value="1">Rarely</option>
-                        <option value="2">Occasionally</option>
-                        <option value="3" selected>Regularly</option>
-                        <option value="4">Frequently</option>
-                        <option value="5">Optimal supplementation</option>
+                        <option value="0">None (no supplements)</option>
+                        <option value="1">Rarely (less than once per week)</option>
+                        <option value="2">Occasionally (1-2 times per week)</option>
+                        <option value="3" selected>Regularly (3-4 times per week)</option>
+                        <option value="4">Frequently (5-6 times per week)</option>
+                        <option value="5">Daily (every day)</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Section 4: Physical Performance -->
+            <!-- Section 4: Physical Performance Metrics -->
             <div class="form-section" id="section4">
                 <h2>Physical Performance Metrics</h2>
                 <div class="form-group">
-                    <label for="sitStand">Sit-to-Stand Capability <span class="info-icon"><span class="tooltip">Assess your ability to perform sit-to-stand movements from a chair without assistance.</span></span></label>
+                    <label for="sitStand">Sit-to-Stand Test <span class="info-icon"><span class="tooltip">Record the number of complete sit-to-stand repetitions you can perform in 30 seconds using a standard chair. Ensure you count only full, proper repetitions.</span></span></label>
                     <select id="sitStand" name="sitStand">
                         <option value="">Select Capability Level</option>
-                        <option value="0">Unable</option>
-                        <option value="1">Very difficult</option>
-                        <option value="2">Some difficulty</option>
-                        <option value="3" selected>Moderate capability</option>
-                        <option value="4">Good capability</option>
-                        <option value="5">Excellent capability</option>
+                        <option value="0">0 points (unable to perform any stand-ups)</option>
+                        <option value="1">1-2 points (minimal performance)</option>
+                        <option value="2">3-5 points (below average performance)</option>
+                        <option value="3" selected>6-7 points (average performance)</option>
+                        <option value="4">8-9 points (above average performance)</option>
+                        <option value="5">10 points (excellent performance)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="breathHold">Breath Hold Capacity <span class="info-icon"><span class="tooltip">Measure how long you can comfortably hold your breath after a normal inhalation.</span></span></label>
+                    <label for="breathHold">Breath Hold Test <span class="info-icon"><span class="tooltip">Measure the time (in seconds) you can hold your breath after a normal exhalation. Use a stopwatch and take your best, safe attempt.</span></span></label>
                     <select id="breathHold" name="breathHold">
                         <option value="">Select Breath Hold Duration</option>
-                        <option value="0">Under 10 seconds</option>
-                        <option value="1">10-20 seconds</option>
-                        <option value="2">20-30 seconds</option>
-                        <option value="3" selected>30-45 seconds</option>
-                        <option value="4">45-60 seconds</option>
-                        <option value="5">Over 60 seconds</option>
+                        <option value="0">Less than 15 seconds (very short duration)</option>
+                        <option value="1">15-29 seconds (short duration)</option>
+                        <option value="2">30-45 seconds (moderate duration)</option>
+                        <option value="3" selected>46-60 seconds (good duration)</option>
+                        <option value="4">61-90 seconds (long duration)</option>
+                        <option value="5">More than 90 seconds (very long duration)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="balance">Balance Ability <span class="info-icon"><span class="tooltip">Evaluate your ability to maintain balance on one leg with eyes open.</span></span></label>
+                    <label for="balance">Balance Test <span class="info-icon"><span class="tooltip">Record how long (in seconds) you can maintain balance on one leg without support. Use a stopwatch and repeat if needed to confirm your best time.</span></span></label>
                     <select id="balance" name="balance">
                         <option value="">Select Balance Level</option>
-                        <option value="0">Very poor</option>
-                        <option value="1">Poor</option>
-                        <option value="2">Below average</option>
-                        <option value="3" selected>Average</option>
-                        <option value="4">Good</option>
-                        <option value="5">Excellent</option>
+                        <option value="0">Less than 10 seconds (poor balance)</option>
+                        <option value="1">10-19 seconds (below average balance)</option>
+                        <option value="2">20-29 seconds (moderate balance)</option>
+                        <option value="3" selected>30-39 seconds (good balance)</option>
+                        <option value="4">40-59 seconds (very good balance)</option>
+                        <option value="5">More than 60 seconds (excellent balance)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="skinElasticity">Skin Elasticity <span class="info-icon"><span class="tooltip">Assess your skin's ability to return to normal after being gently pinched.</span></span></label>
+                    <label for="skinElasticity">Skin Elasticity <span class="info-icon"><span class="tooltip">After gently pinching and releasing your skin (e.g. on the back of your hand), record the time in seconds it takes to return to normal. Use a stopwatch for accuracy.</span></span></label>
                     <select id="skinElasticity" name="skinElasticity">
                         <option value="">Select Skin Elasticity Level</option>
-                        <option value="0">Very poor</option>
-                        <option value="1">Poor</option>
-                        <option value="2">Below average</option>
-                        <option value="3" selected>Average</option>
-                        <option value="4">Good</option>
-                        <option value="5">Excellent</option>
+                        <option value="0">More than 30 seconds (very low elasticity)</option>
+                        <option value="1">16-30 seconds (low elasticity)</option>
+                        <option value="2">10-15 seconds (below average elasticity)</option>
+                        <option value="3" selected>5-9 seconds (moderate elasticity)</option>
+                        <option value="4">3-4 seconds (good elasticity)</option>
+                        <option value="5">1-2 seconds (excellent elasticity)</option>
                     </select>
                 </div>
             </div>
@@ -633,63 +637,68 @@ function longevity_assessment_form() {
         /* Premium Form Styling following Apple Design Guidelines */
         .longevity-form-container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
+            margin: 3rem auto; /* Adjusted margin for slightly more space top/bottom */
+            padding: 2.5rem 2rem; /* Adjusted padding */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             color: #1d1d1f;
             border: 1px solid #e5e5e5;
             border-radius: 16px;
+            background-color: #fdfdfd; /* Slightly off-white background */
         }
 
         /* Form Sections */
         .form-section {
             padding: 2.5rem;
-            margin-bottom: 1rem;
-            border-radius: 16px;
+            margin-bottom: 2rem; /* Consistent bottom margin for sections */
+            border-radius: 16px; /* Existing */
+            /* Removed background/border from individual sections for a cleaner look within the main container */
         }
 
         .form-section h2 {
             color: #1d1d1f;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem; /* Increased space below section titles */
             font-size: 1.75rem;
             font-weight: 600;
             letter-spacing: -0.02em;
+            text-align: left; /* Ensure alignment */
         }
 
         .form-group {
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem; /* Slightly adjusted spacing between form fields */
+            position: relative; /* Keep for tooltip positioning */
         }
 
         label {
             display: block;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.75rem; /* Consistent space below label */
             font-weight: 500;
             color: #1d1d1f;
-            font-size: 1rem;
+            font-size: 1rem; /* Meets 11pt minimum */
             letter-spacing: -0.01em;
         }
 
         input, select {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid #e5e5e5;
+            border: 1px solid #d1d1d6; /* Slightly softer border color */
             border-radius: 12px;
             font-size: 1rem;
             transition: all 0.2s ease;
             background-color: #ffffff;
             color: #1d1d1f;
             min-height: 44px; /* Apple's minimum touch target size */
+            box-sizing: border-box; /* Ensure padding doesn't increase size */
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: #007AFF;
-            box-shadow: 0 0 0 4px rgba(0,122,255,0.1);
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.15); /* Adjusted focus shadow */
         }
 
         select {
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); /* Subtler chevron color */
             background-repeat: no-repeat;
             background-position: right 16px center;
             background-size: 16px;
@@ -701,19 +710,20 @@ function longevity_assessment_form() {
             display: flex;
             justify-content: center;
             margin-top: 3rem;
+            padding-top: 1rem; /* Add some space above the button */
         }
 
         .submit-btn {
-            padding: 18px 36px;
+            padding: 16px 32px; /* Slightly adjusted padding */
             border-radius: 12px;
             border: none;
-            font-size: 1.125rem;
+            font-size: 1.05rem; /* Adjusted font size */
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             background: #007AFF;
             color: white;
-            min-width: 240px;
+            min-width: 220px; /* Adjusted min-width */
             min-height: 44px; /* Apple's minimum touch target size */
             letter-spacing: -0.01em;
         }
@@ -823,52 +833,60 @@ function longevity_assessment_form() {
             position: absolute;
             left: 100%;
             top: 50%;
-            transform: translateY(-50%);
-            background: #1d1d1f;
+            transform: translateY(-50%) translateX(12px); /* Adjusted transform for spacing */
+            background: rgba(29, 29, 31, 0.95); /* Slightly transparent dark background */
             color: white;
-            padding: 12px 16px;
+            padding: 10px 14px; /* Adjusted padding */
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 0.875rem; /* Ensure this meets ~11pt legibility */
+            line-height: 1.4; /* Improved line spacing */
             width: 240px;
             z-index: 100;
             opacity: 0;
-            transition: opacity 0.2s ease;
-            margin-left: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            margin-left: 0; /* Removed margin, using transform now */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Slightly stronger shadow */
+            pointer-events: none; /* Prevent tooltip from blocking interaction */
         }
 
         .info-icon:hover .tooltip {
             visibility: visible;
             opacity: 1;
+            transform: translateY(-50%) translateX(16px); /* Move slightly further on hover */
         }
 
         .tooltip::before {
             content: "";
             position: absolute;
-            left: -6px;
+            left: -5px; /* Adjusted arrow position */
             top: 50%;
             transform: translateY(-50%);
             border-width: 6px 6px 6px 0;
             border-style: solid;
-            border-color: transparent #1d1d1f transparent transparent;
+            border-color: transparent rgba(29, 29, 31, 0.95) transparent transparent; /* Match background */
         }
 
         @media (max-width: 768px) {
             .tooltip {
                 left: 0;
-                top: 100%;
-                transform: none;
+                top: calc(100% + 8px); /* Position below the icon with margin */
+                transform: translateX(0); /* Reset horizontal transform */
                 margin-left: 0;
-                margin-top: 8px;
-                width: 100%;
+                margin-top: 0; /* Reset margin-top */
+                width: calc(100% - 10px); /* Adjust width for small screens */
+                transform: translateX(5px); /* Center slightly */
+            }
+
+            .info-icon:hover .tooltip {
+                 transform: translateX(5px); /* Keep transform consistent on hover */
             }
 
             .tooltip::before {
                 left: 20px;
                 top: -6px;
-                transform: none;
+                transform: translateX(0); /* Reset transform */
                 border-width: 0 6px 6px 6px;
-                border-color: transparent transparent #1d1d1f transparent;
+                border-color: transparent transparent rgba(29, 29, 31, 0.95) transparent; /* Match background */
             }
         }
 
@@ -889,8 +907,8 @@ function longevity_assessment_form() {
          .full-width-section h3 {
              /* Style title similar to card titles but maybe centered or different border */
              color: #1d1d1f;
-             margin-bottom: 1.5rem;
-             font-size: 1.25rem;
+             margin-bottom: 2rem; /* Increased space below title */
+             font-size: 1.35rem; /* Adjusted size */
              font-weight: 600;
              letter-spacing: -0.02em;
              text-align: center; /* Center title like Image 1 */
@@ -899,6 +917,8 @@ function longevity_assessment_form() {
          }
          .full-width-section h3::before {
              display: none; /* Remove the blue line from card titles */
+             background: #007AFF;
+             border-radius: 2px;
          }
 
         /* Results Section Styling */
@@ -957,18 +977,19 @@ function longevity_assessment_form() {
         }
 
         .metric-value {
-            font-size: 2.5rem;
+            font-size: 2.25rem; /* Slightly smaller */
             font-weight: 700;
             color: #007AFF;
-            margin: 1rem 0;
+            margin: 0.5rem 0; /* Reduced margin */
             text-align: center;
+            line-height: 1.2;
         }
 
         .metric-label {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.85rem; /* Slightly smaller */
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem; /* Reduced margin */
         }
 
         .score-bar {
@@ -977,6 +998,10 @@ function longevity_assessment_form() {
             border-radius: 4px;
             margin: 1rem 0;
             overflow: hidden;
+            padding: 1rem;
+            background: #f8f8f8;
+            border-radius: 12px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); /* Subtle inner shadow */
         }
 
         .score-fill {
@@ -1019,10 +1044,11 @@ function longevity_assessment_form() {
 
         .age-value {
             text-align: center;
+            flex: 1; /* Allow flex items to grow/shrink */
         }
 
         .age-value .value {
-            font-size: 2rem;
+            font-size: 1.8rem; /* Adjusted size */
             font-weight: 700;
             color: #1d1d1f;
         }
@@ -1042,6 +1068,7 @@ function longevity_assessment_form() {
         @media (max-width: 768px) {
             .results-container {
                 grid-template-columns: 1fr;
+                gap: 1.5rem; /* Reduced gap on mobile */
             }
 
             .metric-value {
@@ -1051,6 +1078,7 @@ function longevity_assessment_form() {
             .age-comparison {
                 flex-direction: column;
                 gap: 1rem;
+                padding: 0.8rem; /* Adjusted padding */
             }
         }
 
@@ -1076,7 +1104,8 @@ function longevity_assessment_form() {
             font-weight: 600;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline; /* Align baselines */
+            letter-spacing: -0.01em; /* Apple-like tight letter spacing */
         }
 
         .gauge-container {
@@ -1092,13 +1121,12 @@ function longevity_assessment_form() {
             border-radius: 20px; /* More rounded ends */
             /* Adjusted gradient to align with BMI categories on the 15-40 scale */
             /* BMI scale points at: 15, 18.5, 25, 30, 40 */
-            /* For a 15-40 scale (25 point range), percentages are:
-               15 = 0%, 18.5 = 14%, 25 = 40%, 30 = 60%, 40 = 100% */
+            /* For a 15-40 scale (25 point range), percentages are: 15=0%, 18.5=14%, 25=40%, 30=60%, 40=100% */
             background: linear-gradient(to right,
-                #FF3B30 0%, #FF3B30 14%, /* Apple red (Underweight <18.5) */
-                #34C759 14%, #34C759 40%, /* Apple green (Healthy 18.5-24.9) */
-                #FF9500 40%, #FF9500 60%, /* Apple orange (Overweight 25-29.9) */
-                #FF3B30 60%, #FF3B30 100% /* Apple red (Obese ≥30) */
+                #FF3B30 0%, #FF3B30 14%, /* Red (Underweight <18.5) */
+                #34C759 14%, #34C759 40%, /* Green (Healthy 18.5-24.9) */
+                #FF9500 40%, #FF9500 60%, /* Orange (Overweight 25-29.9) */
+                #FF3B30 60%, #FF3B30 100% /* Red (Obese ≥30) */
             );
             box-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
@@ -1150,43 +1178,48 @@ function longevity_assessment_form() {
 
         /* Improve the Body Composition section container with Apple-like styling */
         #bodyMeasurementsSection {
-            padding: 2rem;
+            padding: 2rem 1.5rem; /* Adjusted padding */
             margin-top: 2rem;
             margin-bottom: 2rem;
-            background: linear-gradient(to bottom, #ffffff, #f8f8f8); /* Subtle gradient background */
+            background: #f9f9f9; /* Simpler light background */
             border-radius: 16px; /* More rounded corners */
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Subtle elevated shadow */
+            box-shadow: none; /* Removed shadow for flatter design */
+            border: 1px solid #e5e5e5; /* Add subtle border */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", sans-serif; /* Apple system fonts */
         }
 
         #bodyMeasurementsSection:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+            /* Keep shadow subtle on hover */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         }
 
         #bodyMeasurementsSection h3 {
             color: #1d1d1f; /* Apple-like dark gray */
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem; /* Increased space */
             font-weight: 600;
             letter-spacing: -0.01em; /* Slightly tighter letter spacing */
             font-size: 1.5rem;
             text-align: center;
+            border-bottom: none; /* Removed border for cleaner title */
+            padding-bottom: 0; /* Removed padding */
         }
 
         #bodyMeasurements {
             max-width: 700px; /* Limit width for better readability */
             margin: 0 auto; /* Center content */
+            padding: 0 0.5rem; /* Add slight horizontal padding for content */
         }
 
         /* Enhanced gauge styling with Apple design cues */
         .gauge-outer {
             background: #ffffff;
             border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-            border: 1px solid rgba(0,0,0,0.04);
+            padding: 18px 20px; /* Adjusted padding */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); /* Adjusted shadow */
+            margin-bottom: 1.5rem; /* Adjusted spacing */
+            border: 1px solid #e5e5e5; /* Consistent border */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             animation: fadeInUp 0.6s ease forwards;
             opacity: 0; /* Start invisible and fade in */
@@ -1208,13 +1241,13 @@ function longevity_assessment_form() {
         }
 
         .gauge-label {
-            font-size: 1.1em;
+            font-size: 1.05em; /* Adjusted size */
             color: #1d1d1f;
             margin-bottom: 12px;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline; /* Align baselines */
             letter-spacing: -0.01em; /* Apple-like tight letter spacing */
         }
 
@@ -1223,14 +1256,13 @@ function longevity_assessment_form() {
             font-weight: 500;
             color: #666;
             letter-spacing: 0;
-            font-size: 0.9em;
+            font-size: 0.85em; /* Adjusted size */
         }
 
         .gauge-container {
             position: relative;
             width: 100%;
-            margin-bottom: 10px;
-            padding: 8px 0;
+            margin-bottom: 6px; /* Reduced padding */
         }
 
         .gauge-bar {
@@ -1267,14 +1299,14 @@ function longevity_assessment_form() {
             display: flex;
             justify-content: space-between;
             margin-top: 4px;
-            padding: 0 2px;
+            padding: 0 4px; /* Adjusted padding */
             font-size: 0.75em;
             color: #86868b; /* Apple secondary text color */
             font-weight: 500;
         }
 
         .gauge-interpretation {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #86868b; /* Apple secondary text color */
             margin-top: 12px;
             font-weight: 400;
@@ -1296,14 +1328,14 @@ function longevity_assessment_form() {
             background: #ffffff;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); /* Adjusted shadow */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid #e5e5e5;
+            border: 1px solid #e5e5e5; /* Consistent border */
         }
         
         .impact-column:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.07); /* Adjusted hover shadow */
         }
 
         .impact-column-header {
@@ -1344,11 +1376,12 @@ function longevity_assessment_form() {
 
         .impact-factor {
             display: flex;
-            padding: 12px 0;
+            padding: 14px 0; /* Increased vertical padding */
             border-bottom: 1px solid #f5f5f5;
             min-height: 44px; /* Apple's minimum touch target size */
             align-items: flex-start;
             transition: background-color 0.15s ease;
+            position: relative; /* For potential future absolute elements if needed */
         }
 
         .impact-factor:hover {
@@ -1365,31 +1398,35 @@ function longevity_assessment_form() {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            color: #555;
+            margin-right: 14px; /* Increased spacing */
+            color: #86868b; /* Softer icon color */
         }
 
         .factor-content {
             flex: 1;
+            padding-right: 5px; /* Ensure space for impact value */
         }
 
         .factor-name {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem; /* Slightly larger */
             color: #1d1d1f;
             margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline; /* Keep space-between */
+            flex-wrap: wrap; /* Allow wrapping if name is long */
         }
 
         .factor-impact {
-            display: inline-block;
             font-weight: 700;
             padding: 4px 10px;
             border-radius: 12px;
-            font-size: 0.85rem;
+            font-size: 0.8rem; /* Slightly smaller impact text */
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-left: 8px; /* Add space between name and impact */
+            white-space: nowrap; /* Prevent impact value wrapping */
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         .impact-negative .factor-impact {
@@ -1404,16 +1441,17 @@ function longevity_assessment_form() {
 
         .factor-description {
             font-size: 0.85rem;
-            color: #666;
+            color: #86868b; /* Consistent secondary text color */
             line-height: 1.5;
         }
 
         #ageImpactSection {
-            background: #fafafa;
+            background: #f9f9f9; /* Consistent light background */
             border-radius: 16px;
             padding: 2rem;
             margin: 2rem 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            box-shadow: none; /* Remove shadow for flatter look */
+            border: 1px solid #e5e5e5; /* Add border */
         }
         
         #ageImpactSection h3 {
@@ -1450,33 +1488,35 @@ function longevity_assessment_form() {
         /* --- AI Analysis Section --- */
         .ai-analysis-container {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 12px; /* Slightly less rounded */
             padding: 2rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             border: 1px solid #e5e5e5;
+            margin-top: 1rem; /* Add space below section title */
         }
 
         .ai-status {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+            /* Combined loading/error/content display logic, so status div might not be needed */
+            display: none; /* Hide if not actively used */
         }
 
         .ai-loading {
             display: flex;
             align-items: center;
+            justify-content: center; /* Center loading indicator */
             gap: 1rem;
+            padding: 2rem 0; /* Add padding when loading */
+            color: #86868b;
         }
 
         .ai-loading-icon {
-            font-size: 2rem;
+            font-size: 1.8rem; /* Slightly smaller */
             color: #007AFF;
         }
 
         .ai-content {
-            display: none;
+            display: none; /* Keep hidden initially */
         }
 
         .ai-header {
@@ -1507,144 +1547,94 @@ function longevity_assessment_form() {
         }
 
         .ai-section {
-            background: #fafafa;
-            border-radius: 8px;
+            background: #f9f9f9; /* Consistent light background */
+            border-radius: 10px;
             padding: 1rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: none; /* Remove inner shadow */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid #e5e5e5;
+            border: 1px solid #ededed; /* Softer border */
         }
 
         .ai-section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: none; /* Remove hover effect */
+            box-shadow: none;
         }
 
         .ai-columns {
             display: flex;
+            gap: 1rem; /* Add gap between columns */
             justify-content: space-between;
         }
 
         .ai-column {
             flex: 1;
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid #e5e5e5;
+            background: #f9f9f9; /* Consistent light background */
+            border-radius: 10px;
+            padding: 1.25rem; /* Adjusted padding */
+            box-shadow: none; /* Remove inner shadow */
+            transition: none; /* Remove hover effect */
+            border: 1px solid #ededed; /* Softer border */
         }
 
         .ai-column:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: none;
+            box-shadow: none;
         }
 
         .ai-summary, .ai-strengths, .ai-priorities, .ai-recommendations {
-            padding: 1rem;
-            border-radius: 8px;
-            background: #fafafa;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid #e5e5e5;
+            /* These are now divs within ai-section or ai-column, remove extra styling */
+            padding: 0;
+            border-radius: 0;
+            background: none;
+            box-shadow: none;
+            transition: none;
+            border: none;
         }
 
         .ai-summary:hover, .ai-strengths:hover, .ai-priorities:hover, .ai-recommendations:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: none;
+            box-shadow: none;
         }
 
-        .ai-summary h5, .ai-strengths h5, .ai-priorities h5, .ai-recommendations h5 {
+        .ai-section h5, .ai-column h5 {
             font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem; /* Reduced margin below sub-headers */
+            color: #1d1d1f; /* Ensure consistent header color */
         }
 
-        .ai-summary p, .ai-strengths p, .ai-priorities p, .ai-recommendations p {
-            font-size: 0.9rem;
-            color: #666;
+        .ai-summary p,
+        .ai-strengths ul, .ai-priorities ul, .ai-recommendations ul {
+            font-size: 0.95rem; /* Slightly larger text */
+            color: #3c3c43; /* Slightly darker secondary text */
+            line-height: 1.5;
+            margin: 0; /* Reset margin */
+            padding-left: 0; /* Reset padding for lists */
+            list-style-position: inside; /* Keep bullets inside */
         }
 
-        .ai-summary .metric-value, .ai-strengths .metric-value, .ai-priorities .metric-value, .ai-recommendations .metric-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #007AFF;
-            margin-bottom: 0.5rem;
+        .ai-strengths ul li, .ai-priorities ul li, .ai-recommendations ul li {
+            margin-bottom: 0.5rem; /* Space between list items */
         }
 
-        .ai-summary .metric-label, .ai-strengths .metric-label, .ai-priorities .metric-label, .ai-recommendations .metric-label {
-            color: #666;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .ai-summary .score-bar, .ai-strengths .score-bar, .ai-priorities .score-bar, .ai-recommendations .score-bar {
-            height: 8px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            margin: 1rem 0;
-            overflow: hidden;
-        }
-
-        .ai-summary .score-fill, .ai-strengths .score-fill, .ai-priorities .score-fill, .ai-recommendations .score-fill {
-            height: 100%;
-            background: #007AFF;
-            transition: width 0.5s ease;
-        }
-
-        .ai-summary .breakdown-item, .ai-strengths .breakdown-item, .ai-priorities .breakdown-item, .ai-recommendations .breakdown-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f1f1f1;
-            font-size: 0.95em;
-        }
-
-        .ai-summary .breakdown-item:last-child, .ai-strengths .breakdown-item:last-child, .ai-priorities .breakdown-item:last-child, .ai-recommendations .breakdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .ai-summary .breakdown-label, .ai-strengths .breakdown-label, .ai-priorities .breakdown-label, .ai-recommendations .breakdown-label {
-            font-weight: 500;
-            color: #1d1d1f;
-        }
-
-        .ai-summary .breakdown-value, .ai-strengths .breakdown-value, .ai-priorities .breakdown-value, .ai-recommendations .breakdown-value {
-            color: #007AFF;
-            font-weight: 600;
-        }
-
-        .ai-summary .age-comparison, .ai-strengths .age-comparison, .ai-priorities .age-comparison, .ai-recommendations .age-comparison {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: #f8f8f8;
-            border-radius: 12px;
-        }
-
-        .ai-summary .age-value, .ai-strengths .age-value, .ai-priorities .age-value, .ai-recommendations .age-value {
-            text-align: center;
-        }
-
-        .ai-summary .age-value .value, .ai-strengths .age-value .value, .ai-priorities .age-value .value, .ai-recommendations .age-value .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1d1d1f;
-        }
-
-        .ai-summary .age-value .label, .ai-strengths .age-value .label, .ai-priorities .age-value .label, .ai-recommendations .age-value .label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 0.5rem;
-        }
-
+        /* Remove redundant styling inherited from general result elements */
+        .ai-summary .metric-value, .ai-strengths .metric-value, .ai-priorities .metric-value, .ai-recommendations .metric-value,
+        .ai-summary .metric-label, .ai-strengths .metric-label, .ai-priorities .metric-label, .ai-recommendations .metric-label,
+        .ai-summary .score-bar, .ai-strengths .score-bar, .ai-priorities .score-bar, .ai-recommendations .score-bar,
+        .ai-summary .score-fill, .ai-strengths .score-fill, .ai-priorities .score-fill, .ai-recommendations .score-fill,
+        .ai-summary .breakdown-item, .ai-strengths .breakdown-item, .ai-priorities .breakdown-item, .ai-recommendations .breakdown-item,
+        .ai-summary .breakdown-label, .ai-strengths .breakdown-label, .ai-priorities .breakdown-label, .ai-recommendations .breakdown-label,
+        .ai-summary .breakdown-value, .ai-strengths .breakdown-value, .ai-priorities .breakdown-value, .ai-recommendations .breakdown-value,
+        .ai-summary .age-comparison, .ai-strengths .age-comparison, .ai-priorities .age-comparison, .ai-recommendations .age-comparison,
+        .ai-summary .age-value, .ai-strengths .age-value, .ai-priorities .age-value, .ai-recommendations .age-value,
+        .ai-summary .age-value .value, .ai-strengths .age-value .value, .ai-priorities .age-value .value, .ai-recommendations .age-value .value,
+        .ai-summary .age-value .label, .ai-strengths .age-value .label, .ai-priorities .age-value .label, .ai-recommendations .age-value .label,
         .ai-summary .age-difference, .ai-strengths .age-difference, .ai-priorities .age-difference, .ai-recommendations .age-difference {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #007AFF;
+           /* Remove potentially conflicting styles if not used directly in AI section */
+           /* If any ARE used, style them specifically within .ai-* context */
+           all: unset; /* Reset inherited styles - use with caution */
+           /* Re-apply necessary display styles if needed */
+           display: block; /* Or inline, flex etc. as needed */
         }
 
         @media (max-width: 768px) {
@@ -1692,11 +1682,13 @@ function longevity_assessment_form() {
             color: #1d1d1f;
             font-size: 13px; /* Slightly smaller than labels, typical for controls */
             font-weight: 500;
-            cursor: pointer;
-            border-radius: 7px; /* Slightly less than container */
-            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-            min-height: 32px; /* Ensure adequate touch height */
-            line-height: 1; /* Adjust for vertical alignment */
+            cursor: pointer; /* Existing */
+            border-radius: 7px; /* Slightly less than container - Existing */
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; /* Existing */
+            min-height: 36px; /* Increased min-height slightly */
+            line-height: 1.4; /* Adjusted line height */
+            display: inline-flex; /* Ensure flex alignment works */
+            align-items: center; /* Vertically center text */
         }
 
         .segmented-control button.active {
@@ -1712,11 +1704,12 @@ function longevity_assessment_form() {
         .chart-container {
             background: #ffffff;
             border-radius: 16px;
-            padding: 32px 16px; /* Reduced horizontal padding */
+            padding: 24px; /* Adjusted padding */
             margin: 24px auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); /* Adjusted shadow */
+            border: 1px solid #e5e5e5; /* Add border */
             transition: opacity 0.3s ease, transform 0.3s ease;
-            min-height: 450px;
+            min-height: 400px; /* Adjusted min height */
             width: 95%; /* Made slightly wider */
             max-width: 750px; /* Increased max width */
         }
@@ -1735,12 +1728,12 @@ function longevity_assessment_form() {
         .chart-title {
             color: #1d1d1f;
             font-size: 1.25rem; /* Larger title */
-            font-weight: 600;
+            font-weight: 600; /* Existing */
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
+            margin-bottom: 24px; /* Adjusted margin */
+            padding-bottom: 0; /* Remove padding */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: none; /* Removed border */
         }
         /* --- End Detailed Breakdown Chart Section --- */
 
@@ -1839,18 +1832,19 @@ function longevity_assessment_form() {
 
         /* Add focus styles for accessibility */
         .gauge-outer:focus-within {
-            box-shadow: 0 0 0 3px rgba(0,122,255,0.3);
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.15); /* Consistent focus shadow */
             outline: none;
         }
 
         /* Improve the Body Composition section container with Apple-like styling */
         #bodyMeasurementsSection {
-            padding: 2rem;
+            padding: 2rem 1.5rem; /* Adjusted padding */
             margin-top: 2rem;
             margin-bottom: 2rem;
-            background: linear-gradient(to bottom, #ffffff, #f8f8f8); /* Subtle gradient background */
+            background: #f9f9f9; /* Simpler light background */
             border-radius: 16px; /* More rounded corners */
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Subtle elevated shadow */
+            box-shadow: none; /* Removed shadow for flatter design */
+            border: 1px solid #e5e5e5; /* Add subtle border */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", sans-serif; /* Apple system fonts */
         }
@@ -3079,6 +3073,7 @@ function longevity_assessment_form() {
                     weight: parseFloat(formData.get('weight')) || 0, // Get 'weight' field
                     waist: parseFloat(formData.get('waist')) || 0,   // Get 'waist' field
                     hip: parseFloat(formData.get('hip')) || 0,     // Get 'hip' field
+                    overallHealthPercent: parseFloat(formData.get('overallHealthPercent')) || null, // Get 'overallHealthPercent' field, null if empty/invalid
                     gender: formData.get('gender'),                 // Get 'gender' field (string)
                     age: parseInt(formData.get('age'), 10) || 0      // Get 'age' field, convert to integer (base 10), default 0
                 };
