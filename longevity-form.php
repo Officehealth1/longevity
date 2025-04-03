@@ -278,11 +278,11 @@ function longevity_assessment_form() {
                 <h2>Personal Information</h2>
                 <div class="form-group">
                     <label for="fullName">Full Name <span class="info-icon"><span class="tooltip">Please enter your full legal name as it appears on official documents.</span></span></label>
-                    <input type="text" id="fullName" name="fullName" required>
+                    <input type="text" id="fullName" name="fullName">
                 </div>
                 <div class="form-group">
                     <label for="gender">Gender <span class="info-icon"><span class="tooltip">This information helps us provide more accurate health assessments and recommendations.</span></span></label>
-                    <select id="gender" name="gender" required>
+                    <select id="gender" name="gender">
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -291,11 +291,11 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="email">Email Address <span class="info-icon"><span class="tooltip">We'll send your assessment results and recommendations to this email address.</span></span></label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email">
                 </div>
                 <div class="form-group">
                     <label for="age">Age <span class="info-icon"><span class="tooltip">Enter your current age in years.</span></span></label>
-                    <input type="number" id="age" name="age" required min="18" max="120">
+                    <input type="number" id="age" name="age" min="18" max="120">
                 </div>
             </div>
 
@@ -304,19 +304,19 @@ function longevity_assessment_form() {
                 <h2>Body Measurements</h2>
                 <div class="form-group">
                     <label for="height">Height (cm) <span class="info-icon"><span class="tooltip">Measure your height in centimeters. Stand straight against a wall with your heels together.</span></span></label>
-                    <input type="number" id="height" name="height" required>
+                    <input type="number" id="height" name="height">
                 </div>
                 <div class="form-group">
                     <label for="weight">Weight (kg) <span class="info-icon"><span class="tooltip">Enter your current weight in kilograms. Use a digital scale for accuracy.</span></span></label>
-                    <input type="number" id="weight" name="weight" required>
+                    <input type="number" id="weight" name="weight">
                 </div>
                 <div class="form-group">
                     <label for="waist">Waist Circumference (cm) <span class="info-icon"><span class="tooltip">Measure around your waist at the level of your belly button. Keep the tape measure horizontal.</span></span></label>
-                    <input type="number" id="waist" name="waist" required>
+                    <input type="number" id="waist" name="waist">
                 </div>
                 <div class="form-group">
                     <label for="hip">Hip Circumference (cm) <span class="info-icon"><span class="tooltip">Measure around the widest part of your hips. Keep the tape measure horizontal.</span></span></label>
-                    <input type="number" id="hip" name="hip" required>
+                    <input type="number" id="hip" name="hip">
                 </div>
             </div>
 
@@ -325,7 +325,7 @@ function longevity_assessment_form() {
                 <h2>Lifestyle Factors</h2>
                 <div class="form-group">
                     <label for="activity">Physical Activity Level <span class="info-icon"><span class="tooltip">Select the intensity level that best describes your regular physical activity. Consider both exercise and daily activities.</span></span></label>
-                    <select id="activity" name="activity" required>
+                    <select id="activity" name="activity">
                         <option value="">Select Activity Level</option>
                         <option value="0">Sedentary</option>
                         <option value="1">Very low intensity</option>
@@ -337,7 +337,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="sleepDuration">Sleep Duration <span class="info-icon"><span class="tooltip">Enter your average sleep duration per night. Include both deep and light sleep periods.</span></span></label>
-                    <select id="sleepDuration" name="sleepDuration" required>
+                    <select id="sleepDuration" name="sleepDuration">
                         <option value="">Select Sleep Duration</option>
                         <option value="0">Less than 4 hours</option>
                         <option value="1">4 to 5 hours</option>
@@ -349,7 +349,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="sleepQuality">Sleep Quality <span class="info-icon"><span class="tooltip">Rate how well you typically sleep, considering factors like restfulness and interruptions.</span></span></label>
-                    <select id="sleepQuality" name="sleepQuality" required>
+                    <select id="sleepQuality" name="sleepQuality">
                         <option value="">Select Sleep Quality</option>
                         <option value="0">Very poor</option>
                         <option value="1">Poor</option>
@@ -361,7 +361,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="stressLevels">Stress Levels <span class="info-icon"><span class="tooltip">Assess your overall stress levels, including both physical and emotional stress factors.</span></span></label>
-                    <select id="stressLevels" name="stressLevels" required>
+                    <select id="stressLevels" name="stressLevels">
                         <option value="">Select Stress Level</option>
                         <option value="0">Extreme stress</option>
                         <option value="1">High stress</option>
@@ -373,7 +373,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="socialConnections">Social Connections <span class="info-icon"><span class="tooltip">Evaluate your social support network and frequency of meaningful social interactions.</span></span></label>
-                    <select id="socialConnections" name="socialConnections" required>
+                    <select id="socialConnections" name="socialConnections">
                         <option value="">Select Social Connection Level</option>
                         <option value="0">Completely isolated</option>
                         <option value="1">Very few connections</option>
@@ -385,7 +385,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="dietQuality">Diet Quality <span class="info-icon"><span class="tooltip">Rate your overall diet quality, considering variety, balance, and nutritional value.</span></span></label>
-                    <select id="dietQuality" name="dietQuality" required>
+                    <select id="dietQuality" name="dietQuality">
                         <option value="">Select Diet Quality</option>
                         <option value="0">Very poor</option>
                         <option value="1">Poor</option>
@@ -397,7 +397,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="alcoholConsumption">Alcohol Consumption <span class="info-icon"><span class="tooltip">Select the option that best describes your typical alcohol consumption patterns.</span></span></label>
-                    <select id="alcoholConsumption" name="alcoholConsumption" required>
+                    <select id="alcoholConsumption" name="alcoholConsumption">
                         <option value="">Select Alcohol Consumption</option>
                         <option value="0">Excessive daily intake</option>
                         <option value="1">Regular heavy intake</option>
@@ -409,7 +409,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="smokingStatus">Smoking Status <span class="info-icon"><span class="tooltip">Indicate your current smoking status, including any history of smoking.</span></span></label>
-                    <select id="smokingStatus" name="smokingStatus" required>
+                    <select id="smokingStatus" name="smokingStatus">
                         <option value="">Select Smoking Status</option>
                         <option value="0">Heavy smoker</option>
                         <option value="1">Regular smoker</option>
@@ -421,7 +421,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="cognitiveActivity">Cognitive Activity <span class="info-icon"><span class="tooltip">Rate your engagement in mentally stimulating activities like reading, puzzles, or learning new skills.</span></span></label>
-                    <select id="cognitiveActivity" name="cognitiveActivity" required>
+                    <select id="cognitiveActivity" name="cognitiveActivity">
                         <option value="">Select Cognitive Activity Level</option>
                         <option value="0">Very low mental activity</option>
                         <option value="1">Low mental activity</option>
@@ -433,7 +433,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="sunlightExposure">Sunlight Exposure <span class="info-icon"><span class="tooltip">Consider your daily exposure to natural sunlight, including both direct and indirect exposure.</span></span></label>
-                    <select id="sunlightExposure" name="sunlightExposure" required>
+                    <select id="sunlightExposure" name="sunlightExposure">
                         <option value="">Select Sunlight Exposure</option>
                         <option value="0">Almost no exposure</option>
                         <option value="1">Rare exposure</option>
@@ -445,7 +445,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="supplementIntake">Supplement Intake <span class="info-icon"><span class="tooltip">Rate your regular use of dietary supplements, vitamins, or minerals.</span></span></label>
-                    <select id="supplementIntake" name="supplementIntake" required>
+                    <select id="supplementIntake" name="supplementIntake">
                         <option value="">Select Supplement Intake</option>
                         <option value="0">None</option>
                         <option value="1">Rarely</option>
@@ -462,7 +462,7 @@ function longevity_assessment_form() {
                 <h2>Physical Performance Metrics</h2>
                 <div class="form-group">
                     <label for="sitStand">Sit-to-Stand Capability <span class="info-icon"><span class="tooltip">Assess your ability to perform sit-to-stand movements from a chair without assistance.</span></span></label>
-                    <select id="sitStand" name="sitStand" required>
+                    <select id="sitStand" name="sitStand">
                         <option value="">Select Capability Level</option>
                         <option value="0">Unable</option>
                         <option value="1">Very difficult</option>
@@ -474,7 +474,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="breathHold">Breath Hold Capacity <span class="info-icon"><span class="tooltip">Measure how long you can comfortably hold your breath after a normal inhalation.</span></span></label>
-                    <select id="breathHold" name="breathHold" required>
+                    <select id="breathHold" name="breathHold">
                         <option value="">Select Breath Hold Duration</option>
                         <option value="0">Under 10 seconds</option>
                         <option value="1">10-20 seconds</option>
@@ -486,7 +486,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="balance">Balance Ability <span class="info-icon"><span class="tooltip">Evaluate your ability to maintain balance on one leg with eyes open.</span></span></label>
-                    <select id="balance" name="balance" required>
+                    <select id="balance" name="balance">
                         <option value="">Select Balance Level</option>
                         <option value="0">Very poor</option>
                         <option value="1">Poor</option>
@@ -498,7 +498,7 @@ function longevity_assessment_form() {
                 </div>
                 <div class="form-group">
                     <label for="skinElasticity">Skin Elasticity <span class="info-icon"><span class="tooltip">Assess your skin's ability to return to normal after being gently pinched.</span></span></label>
-                    <select id="skinElasticity" name="skinElasticity" required>
+                    <select id="skinElasticity" name="skinElasticity">
                         <option value="">Select Skin Elasticity Level</option>
                         <option value="0">Very poor</option>
                         <option value="1">Poor</option>
@@ -2494,10 +2494,37 @@ function longevity_assessment_form() {
                 for (let factor in scores) {
                     if (factor in weights && factor in factorDetails) {
                         const score = scores[factor];
-                        // Calculate impact (negative values mean they're adding age, positive values mean reducing age)
-                        // This is because higher scores are better, and we want to show how much they add/subtract from age
-                        impactValues[factor] = weights[factor] * (score - 3);
+                        // Only calculate impact for factors that have a score provided by the user
+                        if (typeof score === 'number' && !isNaN(score)) {
+                            // Calculate impact (negative values mean they're adding age, positive values mean reducing age)
+                            // This is because higher scores are better, and we want to show how much they add/subtract from age
+                            impactValues[factor] = weights[factor] * (score - 3);
+                        }
                     }
+                }
+                
+                // If no impact values calculated, show a message
+                if (Object.keys(impactValues).length === 0) {
+                    return {
+                        positive: `
+                            <div class="impact-factor">
+                                <div class="factor-content">
+                                    <div class="factor-description" style="text-align: center; padding: 20px 0;">
+                                        No data available. Please answer some questions to see impact factors.
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        negative: `
+                            <div class="impact-factor">
+                                <div class="factor-content">
+                                    <div class="factor-description" style="text-align: center; padding: 20px 0;">
+                                        No data available. Please answer some questions to see impact factors.
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    };
                 }
                 
                 // Sort factors by impact (absolute value)
@@ -2862,7 +2889,7 @@ function longevity_assessment_form() {
                 };
 
                 // Extract score values from select dropdowns, converting to numbers
-                // Provides a default value of 3 (average) if a field is missing or not a number.
+                // MODIFIED: Don't provide a default, only add answered questions to scores object
                 const scoreKeys = [
                     'activity', 'sleepDuration', 'sleepQuality', 'stressLevels',
                     'socialConnections', 'dietQuality', 'alcoholConsumption', 'smokingStatus',
@@ -2872,18 +2899,24 @@ function longevity_assessment_form() {
                 const scores = {};
                 scoreKeys.forEach(key => {
                     // Assumes the input field's `name` attribute matches the key.
-                    // If names differ (like 'sitStand' vs 'sitStandInput'), adjust here.
-                    const inputName = key; // Example: const inputName = (key === 'sitStand') ? 'sitStandCapability' : key;
+                    const inputName = key;
                     const rawValue = formData.get(inputName);
-                    const value = parseInt(rawValue, 10); // Get value, convert to integer
                     
-                    // --- Specific Debugging Added ---
-                    if (inputName === 'activity' || inputName === 'sitStand') {
-                        debug(`Value retrieved for ${inputName}:`, { raw: rawValue, parsed: value });
+                    // Only include values that were actually selected by the user
+                    if (rawValue && rawValue.trim() !== '') {
+                        const value = parseInt(rawValue, 10); // Get value, convert to integer
+                        
+                        // --- Specific Debugging Added ---
+                        if (inputName === 'activity' || inputName === 'sitStand') {
+                            debug(`Value retrieved for ${inputName}:`, { raw: rawValue, parsed: value });
+                        }
+                        // --- End Specific Debugging ---
+                        
+                        // Only add if it's a valid number
+                        if (!isNaN(value)) {
+                            scores[key] = value;
+                        }
                     }
-                    // --- End Specific Debugging ---
-                    
-                    scores[key] = !isNaN(value) ? value : 3; // Use parsed value or default to 3
                 });
 
                 debug("Collected Measurements:", measurements);
@@ -2978,6 +3011,17 @@ function longevity_assessment_form() {
                 return;
             }
 
+            // Filter breakdownKeys to only include metrics that have values in the scores object
+            const filteredBreakdownKeys = breakdownKeys.filter(key => 
+                scores[key] !== undefined && scores[key] !== null
+            );
+            
+            // Only proceed if we have metrics to display
+            if (filteredBreakdownKeys.length === 0) {
+                containerElement.innerHTML = '<p style="text-align:center;">No data available for visualization. Please fill out at least one question.</p>';
+                return;
+            }
+
             const canvas = document.createElement('canvas');
             canvas.id = 'scoreRadarChart';
             // Set minimum height for better visibility
@@ -3001,15 +3045,11 @@ function longevity_assessment_form() {
                 return formattedLabel;
             };
 
-            // Prepare data with custom point colors based on scores
-            const rawScores = breakdownKeys.map(metric => {
-                const score = scores[metric];
-                return typeof score === 'number' && !isNaN(score) ? score : null; // Use null for missing data
-            });
+            // Prepare data with custom point colors based on scores - using filtered keys
+            const rawScores = filteredBreakdownKeys.map(metric => scores[metric]);
 
             // Enhanced color gradient for points based on scores
             const pointColors = rawScores.map(val => {
-                if (val === null) return 'rgba(150, 150, 150, 1)'; // Gray for missing data
                 if (val >= 4.5) return 'rgba(0, 180, 0, 1)';       // Excellent - Darker Green
                 else if (val >= 3.5) return 'rgba(100, 200, 0, 1)'; // Good - Light Green
                 else if (val >= 3.0) return 'rgba(200, 200, 0, 1)'; // Above Average - Yellow-Green
@@ -3019,9 +3059,9 @@ function longevity_assessment_form() {
                 else return 'rgba(200, 0, 0, 1)';                   // Very Poor - Red
             });
 
-            // Prepare data
+            // Prepare data with filtered keys
             const data = {
-                labels: breakdownKeys.map(metric => formatLabel(metric)),
+                labels: filteredBreakdownKeys.map(metric => formatLabel(metric)),
                 datasets: [{
                     label: 'Health Metrics (0–5)',
                     data: rawScores,
@@ -3132,7 +3172,7 @@ function longevity_assessment_form() {
                                 },
                                 title: function(tooltipItems) {
                                     const dataIndex = tooltipItems[0].dataIndex;
-                                    const originalMetric = breakdownKeys[dataIndex];
+                                    const originalMetric = filteredBreakdownKeys[dataIndex];
                                     return originalMetric
                                         .replace(/([A-Z])/g, ' $1')
                                         .replace(/^./, str => str.toUpperCase())
@@ -3192,49 +3232,34 @@ function longevity_assessment_form() {
                  return;
              }
 
+             // Filter breakdownKeys to only include metrics that have values in the scores object
+             const filteredBreakdownKeys = breakdownKeys.filter(key => 
+                 scores[key] !== undefined && scores[key] !== null
+             );
+             
+             // Only proceed if we have metrics to display
+             if (filteredBreakdownKeys.length === 0) {
+                 containerElement.innerHTML = '<p style="text-align:center;">No data available for visualization. Please fill out at least one question.</p>';
+                 return;
+             }
+
              const canvas = document.createElement('canvas');
              canvas.id = 'impactBarChart';
              canvas.style.maxHeight = '450px'; // Adjust height for bar chart
 
              // Calculate impact values (difference from baseline 3)
-             const diffs = breakdownKeys.map(key => {
+             const diffs = filteredBreakdownKeys.map(key => {
                  const score = scores[key];
                  const weight = weights[key];
                  if (typeof score === 'number' && !isNaN(score) && typeof weight === 'number') {
                      // Impact = weight * (score - 3). Positive impact means better than average (reduces age).
                      return weight * (score - 3);
                  }
-                 return null; // Use null for missing data
-             });
-
-             // Enhanced gradient for bar chart with distinct average color
-             const barColors = diffs.map(d => {
-                 if (d === null) return 'rgba(150, 150, 150, 0.7)'; // Gray for missing data
-                 if (d >= 1.5) return 'rgba(0, 180, 0, 0.9)';         // Excellent - Dark Green
-                 else if (d >= 0.5) return 'rgba(100, 200, 0, 0.9)';  // Good - Light Green
-                 else if (d > 0) return 'rgba(144, 238, 144, 0.9)';   // Above Average - Pale Green
-                 else if (d === 0) return 'rgba(75, 0, 130, 0.9)';    // Average - Royal Purple
-                 else if (d >= -0.5) return 'rgba(147, 112, 219, 0.9)'; // Slightly Below Average - Light Purple
-                 else if (d >= -1) return 'rgba(255, 165, 0, 0.9)';    // Below Average - Orange
-                 else if (d >= -1.5) return 'rgba(255, 99, 71, 0.9)';  // Poor - Light Red
-                 else return 'rgba(200, 0, 0, 0.9)';                   // Very Poor - Dark Red
-             });
-
-             // Dynamic border colors with distinct average color
-             const borderColors = diffs.map(d => {
-                 if (d === null) return 'rgba(120, 120, 120, 1)'; // Gray border for missing data
-                 if (d >= 1.5) return 'rgba(0, 100, 0, 1)';          // Dark Green border
-                 else if (d >= 0.5) return 'rgba(34, 139, 34, 1)';   // Forest Green border
-                 else if (d > 0) return 'rgba(0, 128, 0, 1)';        // Green border
-                 else if (d === 0) return 'rgba(50, 0, 90, 1)';      // Deep Purple border for average
-                 else if (d >= -0.5) return 'rgba(75, 0, 130, 1)';   // Indigo border
-                 else if (d >= -1) return 'rgba(255, 140, 0, 1)';    // Dark Orange border
-                 else if (d >= -1.5) return 'rgba(220, 20, 60, 1)';  // Crimson border
-                 else return 'rgba(139, 0, 0, 1)';                   // Dark Red border
+                 return 0; // Use 0 for missing weights (shouldn't happen with filtered keys)
              });
 
              // Format labels for better display
-             const labels = breakdownKeys.map(metric =>
+             const labels = filteredBreakdownKeys.map(metric =>
                  (metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()))
                  .replace(' Score', '')
                  .replace('Bmi', 'BMI')
@@ -3244,29 +3269,25 @@ function longevity_assessment_form() {
              // Determine optimal Y axis range
              let minVal = Math.min(...diffs.filter(d => d !== null));
              let maxVal = Math.max(...diffs.filter(d => d !== null));
-             let yMin = Math.min(-2, (minVal < -3) ? minVal - 0.5 : -3);
-             let yMax = Math.max(2, (maxVal > 2) ? maxVal + 0.5 : 2);
+             let yMin = Math.min(-4, (minVal < -4) ? minVal - 0.5 : -4);
+             let yMax = Math.max(6, (maxVal > 6) ? maxVal + 0.5 : 6);
 
-             // Prepare data
+             // Prepare data with uniform blue bars
              const data = {
                  labels: labels,
                  datasets: [{
                      label: 'Health Score Deviation',
                      data: diffs,
-                     backgroundColor: barColors,
-                     borderColor: borderColors,
+                     backgroundColor: 'rgba(54, 162, 235, 0.8)', // Uniform blue color for all bars
+                     borderColor: 'rgba(54, 162, 235, 1)',
                      borderWidth: 1,
-                     borderRadius: 4,
+                     borderRadius: 0, // No rounded corners
                      barPercentage: 0.7,
-                     categoryPercentage: 0.8,
-                     hoverBackgroundColor: diffs.map(d => {
-                         if (d === null) return 'rgba(150, 150, 150, 1)';
-                         return d >= 0 ? 'rgba(0, 200, 0, 1)' : 'rgba(255, 0, 0, 1)';
-                     })
+                     categoryPercentage: 0.85
                  }]
              };
 
-             // Prepare config with zone highlighting
+             // Prepare simplified config
              const config = {
                  type: 'bar',
                  data: data,
@@ -3288,66 +3309,11 @@ function longevity_assessment_form() {
                                  },
                                  color: '#86868b',
                                  callback: function(value) {
-                                     return value.toFixed(1) + ' yrs'; // Format Y-axis ticks
+                                     return value.toFixed(0); // Simplified tick format
                                  }
                              },
                              title: {
-                                 display: true,
-                                 text: 'Estimated Age Impact',
-                                 font: { 
-                                     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
-                                     size: 12, 
-                                     weight: '500' 
-                                 },
-                                 color: '#1d1d1f',
-                                 padding: { top: 0, bottom: 10 }
-                             },
-                             afterDraw: function(chart) {
-                                 const ctx = chart.ctx;
-                                 const yAxis = chart.scales.y;
-                                 const chartArea = chart.chartArea;
-                                 
-                                 // Reference line at 0
-                                 ctx.save();
-                                 ctx.beginPath();
-                                 ctx.moveTo(chartArea.left, yAxis.getPixelForValue(0));
-                                 ctx.lineTo(chartArea.right, yAxis.getPixelForValue(0));
-                                 ctx.lineWidth = 1.5;
-                                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-                                 ctx.stroke();
-                                 
-                                 // Enhanced zone coloring
-                                 // Excellent zone (> 1.5)
-                                 const excellentZoneTop = yAxis.getPixelForValue(yMax);
-                                 const excellentZoneBottom = yAxis.getPixelForValue(1.5);
-                                 ctx.fillStyle = 'rgba(0, 180, 0, 0.1)';
-                                 ctx.fillRect(chartArea.left, excellentZoneTop, chartArea.right - chartArea.left, excellentZoneBottom - excellentZoneTop);
-                                 
-                                 // Good zone (0.5 to 1.5)
-                                 const goodZoneTop = yAxis.getPixelForValue(1.5);
-                                 const goodZoneBottom = yAxis.getPixelForValue(0.5);
-                                 ctx.fillStyle = 'rgba(100, 200, 0, 0.1)';
-                                 ctx.fillRect(chartArea.left, goodZoneTop, chartArea.right - chartArea.left, goodZoneBottom - goodZoneTop);
-                                 
-                                 // Average zone (-0.5 to 0.5)
-                                 const avgZoneTop = yAxis.getPixelForValue(0.5);
-                                 const avgZoneBottom = yAxis.getPixelForValue(-0.5);
-                                 ctx.fillStyle = 'rgba(75, 0, 130, 0.1)';
-                                 ctx.fillRect(chartArea.left, avgZoneTop, chartArea.right - chartArea.left, avgZoneBottom - avgZoneTop);
-                                 
-                                 // Below average zone (-1.5 to -0.5)
-                                 const belowAvgZoneTop = yAxis.getPixelForValue(-0.5);
-                                 const belowAvgZoneBottom = yAxis.getPixelForValue(-1.5);
-                                 ctx.fillStyle = 'rgba(255, 165, 0, 0.1)';
-                                 ctx.fillRect(chartArea.left, belowAvgZoneTop, chartArea.right - chartArea.left, belowAvgZoneBottom - belowAvgZoneTop);
-                                 
-                                 // Poor zone (< -1.5)
-                                 const poorZoneTop = yAxis.getPixelForValue(-1.5);
-                                 const poorZoneBottom = yAxis.getPixelForValue(yMin);
-                                 ctx.fillStyle = 'rgba(200, 0, 0, 0.1)';
-                                 ctx.fillRect(chartArea.left, poorZoneTop, chartArea.right - chartArea.left, poorZoneBottom - poorZoneTop);
-                                 
-                                 ctx.restore();
+                                 display: false // Hide axis title
                              }
                          },
                          x: {
@@ -3358,7 +3324,7 @@ function longevity_assessment_form() {
                                      size: window.innerWidth <= 480 ? 9 : 11
                                  },
                                  color: '#1d1d1f',
-                                 maxRotation: 45, // Always allow rotation to prevent overlap
+                                 maxRotation: 45, // Allow rotation to prevent overlap
                                  minRotation: window.innerWidth <= 480 ? 45 : 0,
                                  autoSkip: true,
                                  maxTicksLimit: window.innerWidth <= 480 ? 8 : 12
@@ -3367,41 +3333,24 @@ function longevity_assessment_form() {
                      },
                      plugins: {
                          legend: { 
-                             display: true,
-                             position: 'bottom',
-                             labels: {
-                                 boxWidth: 20,
-                                 padding: window.innerWidth <= 480 ? 10 : 15,
-                                 font: {
-                                     size: window.innerWidth <= 480 ? 11 : 13
-                                 }
-                             }
+                             display: false // Hide legend
                          },
                          tooltip: {
                              enabled: true,
-                             backgroundColor: 'rgba(44, 62, 80, 0.8)',
-                             titleColor: '#ffffff',
-                             titleFont: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', size: 13, weight: '600' },
-                             bodyColor: '#ffffff',
-                             bodyFont: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', size: 12 },
-                             padding: 10,
-                             boxPadding: 5,
-                             cornerRadius: 6,
-                             borderColor: 'rgba(255, 255, 255, 0.1)',
-                             borderWidth: 1,
+                             backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                             titleFont: { 
+                                 family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                 size: window.innerWidth <= 480 ? 12 : 13 
+                             },
+                             bodyFont: { 
+                                 family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
+                                 size: window.innerWidth <= 480 ? 11 : 12 
+                             },
+                             padding: 8,
                              callbacks: {
                                  label: function(context) {
                                      const value = context.raw;
-                                     if (value === null) return 'No data';
-                                     
-                                     let status = '';
-                                     if (value >= 1.5) status = ' (Excellent)';
-                                     else if (value >= 0.5) status = ' (Good)';
-                                     else if (value > -0.5) status = ' (Average)';
-                                     else if (value > -1.5) status = ' (Below Average)';
-                                     else status = ' (Poor)';
-                                     
-                                     return `Difference: ${value.toFixed(1)}${status}`;
+                                     return value === null ? 'No data' : `Value: ${value.toFixed(1)}`;
                                  }
                              }
                          }
@@ -3412,7 +3361,7 @@ function longevity_assessment_form() {
              // Add title and render chart
              const title = document.createElement('h4');
              title.className = 'chart-title';
-             title.textContent = 'Factor Impact Visualization';
+             title.textContent = 'Factor Impact';
              containerElement.innerHTML = ''; // Clear previous content
              containerElement.appendChild(title);
              containerElement.appendChild(canvas);
