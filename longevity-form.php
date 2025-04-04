@@ -1333,6 +1333,14 @@ function longevity_assessment_form() {
             border: 1px solid #e5e5e5; /* Consistent border */
         }
         
+        .impact-column:first-child {
+             background-color: rgba(39, 174, 96, 0.08); /* Light Green */
+        }
+        
+        .impact-column:last-child {
+             background-color: rgba(231, 76, 60, 0.08); /* Light Red */
+        }
+
         .impact-column:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.07); /* Adjusted hover shadow */
