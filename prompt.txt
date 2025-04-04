@@ -1,0 +1,93 @@
+## Expertly Crafted AI Prompts per Section
+
+Below are carefully engineered, high-quality AI prompts for each section. These prompts assume the AI has access to all the questionnaire data:
+
+---
+
+### Section 1: Introduction & Summary
+
+**Prompt:**
+
+> "You are writing the introductory summary for a premium longevity health assessment report targeted at a wealthy, discerning clientele. Using a warm, confident, and professional tone, summarise the client's overall health status, highlighting their biological age versus chronological age, and their lifestyle strengths. Keep it concise (50-70 words) and encouraging."
+> 
+
+---
+
+### Section 2: Biological Age & Ageing Rate
+
+**Prompt:**
+
+> "Clearly explain the client's biological age, chronological age, and rate of ageing in simple, positive terms suitable for a premium health report. Highlight positively if biological age is lower or gently indicate the need for improvement if higher. Encourage continuing good habits or initiating improvements as needed (max 60 words)."
+> 
+
+---
+
+### Section 3: Overall Lifestyle Score
+
+**Prompt:**
+
+> "Provide a concise yet insightful analysis of the client's lifestyle score (0-5), clearly stating their current level, briefly explaining what this indicates about their overall health habits, and encouraging them towards maintaining or improving this score (max 50 words)."
+> 
+
+---
+
+### Section 4: Body Composition (BMI and WHR)
+
+**Prompt:**
+
+> "Generate a clear, concise interpretation of the client's BMI and waist-to-hip ratio, specifically mentioning their health risk category. Explain briefly the health implications of these scores. If scores indicate moderate/high risk, provide encouraging and gentle language prompting actionable improvements (max 70 words)."
+> 
+
+---
+
+### Section 5: Strengths & Areas for Improvement (Radar/Polar Chart)
+
+**Prompt:**
+
+> "Analyse and summarise clearly and positively the client’s health data, listing 3-4 clear strengths first, followed by up to three primary areas for improvement. Use brief bullet points for clarity and easy readability, suitable for a premium client. Tone should be supportive and empowering."
+> 
+
+---
+
+### Section 6: AI Personalised Health Insights
+
+**Prompt:**
+
+> "Provide a premium, personalised health insight summary based on all the collected data. Emphasise the positive aspects of the client's current health and lifestyle while also addressing 2-3 specific priority areas for improvement. Keep it optimistic, actionable, concise, and supportive (max 80 words)."
+> 
+
+---
+
+### Section 7: Personalised Recommendations & Strategies
+
+**Prompt:**
+
+> "Generate specific, concise, and actionable health recommendations tailored explicitly for this client. Group recommendations into three clear categories: immediate actions (short-term), ongoing habits (long-term), and expert consultations or screenings. Each recommendation should include a brief (one-sentence) rationale and be presented positively and clearly."
+> 
+
+---
+
+### Section 8: Optional Iridology Insights
+
+**Prompt:**
+
+> "Provide a concise, intriguing, and professionally presented interpretation of iridology findings for this client, including strengths and areas of attention revealed by the iris analysis. Use premium, respectful language acknowledging that this is complementary holistic information that can support their longevity strategies (max 70 words)."
+> 
+
+---
+
+### Section 9: Closing Inspiration and Next Steps
+
+**Prompt:**
+
+> "End the longevity report on an empowering and motivating note. Emphasise the powerful ability of the body to regenerate and improve at any age. Encourage the client to adopt the identity of someone who naturally prioritises health, fitness, and wellbeing, using inspiring yet authentic language suitable for an upscale client (max 50 words)."
+> 
+
+---
+
+### Section 10: Premium Call-to-Action (CTA)
+
+**Prompt:**
+
+> "Write two short, premium-style CTA recommendations: One inviting the client to schedule a personalised follow-up consultation, and the other suggesting exploring advanced, exclusive longevity and wellbeing programmes. Use clear, concise, attractive language."
+>

@@ -1,4 +1,3 @@
-<?php
 // OpenAI API Integration for Longevity Analysis
 add_action('wp_ajax_longevity_ai_analysis', 'longevity_ai_analysis_callback');
 add_action('wp_ajax_nopriv_longevity_ai_analysis', 'longevity_ai_analysis_callback');
@@ -126,11 +125,14 @@ function longevity_ai_analysis_callback() {
         $prompt .= "- " . $factor['name'] . " (impact: +" . abs($factor['impact']) . " years)\n";
     }
     
-    $prompt .= "\nBased on this data, please provide:\n";
-    $prompt .= "1. A brief summary of their overall longevity profile (2-3 sentences)\n";
-    $prompt .= "2. 2-3 key strengths they should maintain\n";
-    $prompt .= "3. 2-3 priority areas where improvement would have the biggest impact\n";
-    $prompt .= "4. 3-5 specific, actionable recommendations tailored to their data\n";
+    $prompt .= "\nBased on this comprehensive health data, please provide:\n";
+    $prompt .= "1. A personalized summary of their overall longevity profile, highlighting the connection between their lifestyle choices and biological aging (2-3 sentences)\n";
+    $prompt .= "2. 2-3 key health strengths they should maintain, explaining specifically why these are beneficial for their longevity\n";
+    $prompt .= "3. 2-3 priority improvement areas where changes would have the biggest impact on reducing their biological age, with an explanation of why these are critical\n";
+    $prompt .= "4. 3-5 specific, actionable, evidence-based recommendations tailored to their unique health profile. Each recommendation should include:\n";
+    $prompt .= "   - What exact change to make\n";
+    $prompt .= "   - How to implement it (specific steps)\n";
+    $prompt .= "   - The expected health benefit\n";
     $prompt .= "\nFormat your response in JSON with these fields: summary, strengths (array), priorities (array), and recommendations (array).";
     
     // Set up the request to OpenAI API
@@ -140,19 +142,19 @@ function longevity_ai_analysis_callback() {
             'Content-Type' => 'application/json'
         ),
         'body' => json_encode(array(
-            'model' => 'gpt-3.5-turbo',
+            'model' => 'gpt-4o',
             'messages' => array(
                 array(
                     'role' => 'system',
-                    'content' => 'You are a helpful assistant that provides concise, actionable advice about health and longevity.'
+                    'content' => 'You are an expert health and longevity analysis assistant that provides evidence-based, personalized health insights. Analyze the user\'s health metrics carefully and provide actionable recommendations tailored to their specific situation. Focus on holistic health optimization and prioritize the most impactful interventions first. Be concise, specific, and practical in your advice.'
                 ),
                 array(
                     'role' => 'user',
                     'content' => $prompt
                 )
             ),
-            'max_tokens' => 600,
-            'temperature' => 0.7
+            'max_tokens' => 800,
+            'temperature' => 0.5
         )),
         'timeout' => 30
     );
@@ -207,44 +209,90 @@ function longevity_ai_analysis_callback() {
     $decoded_body = json_decode($body, true);
     
     // Check if we got a valid response
-    if (!isset($decoded_body['choices'][0]['message']['content'])) {
+    if (!$decoded_body || !isset($decoded_body['choices']) || empty($decoded_body['choices'])) {
         wp_send_json_error(array('message' => 'Invalid response from AI service.'));
         return;
     }
     
-    // Extract the AI's response content
-    $ai_content = $decoded_body['choices'][0]['message']['content'];
+    // Get the response content
+    $ai_response = $decoded_body['choices'][0]['message']['content'];
     
-    // Try to parse JSON response from the AI
-    $ai_response = json_decode($ai_content, true);
-    
-    // Check if JSON parsing succeeded
-    if (!$ai_response || !isset($ai_response['summary'])) {
-        // If JSON parsing failed, try to extract sections manually
-        $summary = preg_match('/summary[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $summary_match) ? trim($summary_match[1]) : '';
+    // Try to parse the JSON response
+    try {
+        // First, try to directly parse the response as JSON
+        $analysis_results = json_decode($ai_response, true);
         
-        preg_match_all('/strengths[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $strengths_match);
-        preg_match_all('/- ([^\n]+)/i', isset($strengths_match[1][0]) ? $strengths_match[1][0] : '', $strengths_items);
-        $strengths = isset($strengths_items[1]) ? array_map('trim', $strengths_items[1]) : [];
+        // If direct parsing fails, try to extract JSON from the response text
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Look for a JSON block in the response using regex
+            preg_match('/(\{.*\})/s', $ai_response, $matches);
+            
+            if (!empty($matches[0])) {
+                $analysis_results = json_decode($matches[0], true);
+            }
+        }
         
-        preg_match_all('/priorities[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $priorities_match);
-        preg_match_all('/- ([^\n]+)/i', isset($priorities_match[1][0]) ? $priorities_match[1][0] : '', $priorities_items);
-        $priorities = isset($priorities_items[1]) ? array_map('trim', $priorities_items[1]) : [];
+        // If we still don't have valid JSON, attempt to parse it in a different way
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            // Fallback to manual extraction of key sections
+            $analysis_results = array(
+                'summary' => '',
+                'strengths' => array(),
+                'priorities' => array(),
+                'recommendations' => array()
+            );
+            
+            // Extract summary
+            if (preg_match('/summary.*?:(.+?)(?=strengths|priorities|recommendations|\Z)/is', $ai_response, $matches)) {
+                $analysis_results['summary'] = trim($matches[1]);
+            }
+            
+            // Extract strengths
+            if (preg_match('/strengths.*?:(.*?)(?=priorities|recommendations|\Z)/is', $ai_response, $matches)) {
+                $strengths_text = $matches[1];
+                preg_match_all('/[\-\*]\s*(.+?)(?=[\-\*]|\Z)/s', $strengths_text, $strength_matches);
+                if (!empty($strength_matches[1])) {
+                    $analysis_results['strengths'] = array_map('trim', $strength_matches[1]);
+                }
+            }
+            
+            // Extract priorities
+            if (preg_match('/priorities.*?:(.*?)(?=recommendations|\Z)/is', $ai_response, $matches)) {
+                $priorities_text = $matches[1];
+                preg_match_all('/[\-\*]\s*(.+?)(?=[\-\*]|\Z)/s', $priorities_text, $priority_matches);
+                if (!empty($priority_matches[1])) {
+                    $analysis_results['priorities'] = array_map('trim', $priority_matches[1]);
+                }
+            }
+            
+            // Extract recommendations
+            if (preg_match('/recommendations.*?:(.*?)(?=\Z)/is', $ai_response, $matches)) {
+                $recommendations_text = $matches[1];
+                preg_match_all('/[\-\*]\s*(.+?)(?=[\-\*]|\Z)/s', $recommendations_text, $recommendation_matches);
+                if (!empty($recommendation_matches[1])) {
+                    $analysis_results['recommendations'] = array_map('trim', $recommendation_matches[1]);
+                }
+            }
+        }
         
-        preg_match_all('/recommendations[:\s]+(.*?)(?:\n\n|$)/is', $ai_content, $recommendations_match);
-        preg_match_all('/- ([^\n]+)/i', isset($recommendations_match[1][0]) ? $recommendations_match[1][0] : '', $recommendations_items);
-        $recommendations = isset($recommendations_items[1]) ? array_map('trim', $recommendations_items[1]) : [];
-        
-        $ai_response = array(
-            'summary' => $summary,
-            'strengths' => $strengths,
-            'priorities' => $priorities,
-            'recommendations' => $recommendations
+        // Format and validate the analysis results
+        $formatted_results = array(
+            'summary' => isset($analysis_results['summary']) ? $analysis_results['summary'] : 'No summary available.',
+            'strengths' => isset($analysis_results['strengths']) ? $analysis_results['strengths'] : array(),
+            'priorities' => isset($analysis_results['priorities']) ? $analysis_results['priorities'] : array(),
+            'recommendations' => isset($analysis_results['recommendations']) ? $analysis_results['recommendations'] : array()
         );
+        
+        // Log success
+        error_log('AI analysis successfully parsed.');
+        
+        // Send the results back to the client
+        wp_send_json_success($formatted_results);
+    } catch (Exception $e) {
+        error_log('Error parsing AI response: ' . $e->getMessage());
+        error_log('AI response: ' . $ai_response);
+        wp_send_json_error(array('message' => 'Error parsing AI response: ' . $e->getMessage()));
     }
-    
-    // Send the AI analysis back to the client
-    wp_send_json_success($ai_response);
 }
 
 // Register shortcode
@@ -257,6 +305,9 @@ function longevity_assessment_form() {
     
     // Include Chart.js Annotation plugin
     wp_enqueue_script('chart-js-annotation', 'https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation', array('chart-js'), null, true);
+    
+    // *** NEW: Include ZingChart library ***
+    wp_enqueue_script('zingchart', 'https://cdn.zingchart.com/zingchart.min.js', array(), null, true);
     
     // Register our form's JavaScript inline
     $inline_script = "var longevity_form_data = " . json_encode(array(
@@ -295,6 +346,10 @@ function longevity_assessment_form() {
                 <div class="form-group">
                     <label for="email">Email Address <span class="info-icon"><span class="tooltip">We'll send your assessment results and recommendations to this email address.</span></span></label>
                     <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="practitionerEmail">Practitioner's Email <span class="info-icon"><span class="tooltip">If applicable, enter the email address of your health practitioner to share the results.</span></span></label>
+                    <input type="email" id="practitionerEmail" name="practitionerEmail">
                 </div>
                 <div class="form-group">
                     <label for="age">Age <span class="info-icon"><span class="tooltip">Enter your current age in years.</span></span></label>
@@ -539,11 +594,13 @@ function longevity_assessment_form() {
                         <div id="lifestyleScore"></div> <!-- Existing content div -->
                     </div>
 
-                    <!-- Row 2: Aging Rate -->
+                    <!-- Row 2: Aging Rate - REPLACED WITH ZINGCHART -->
                     <div class="result-card full-width-card" id="agingRateCard">
                         <h3>Aging Rate</h3>
-                         <!-- Populated by JS: Shows calculated aging rate -->
-                        <div id="agingRateDisplay"></div>
+                         <!-- ZingChart will display the value and interpretation -->
+                         <!-- *** NEW: Container for ZingChart Gauge *** -->
+                         <div id="zingChartAgingRateGaugeContainer" style="width:100%; min-height:300px;"></div>
+                         <!-- *** REMOVED old agingRateDisplay and SVG wrapper *** -->
                     </div>
 
                     <!-- Section: Body Measurements (Full Width) -->
@@ -987,18 +1044,29 @@ function longevity_assessment_form() {
 
         .metric-label {
             color: #666;
-            font-size: 0.85rem; /* Slightly smaller */
+            font-size: 0.95rem; /* Increased from 0.85rem */
             text-align: center;
             margin-bottom: 1rem; /* Reduced margin */
+        }
+        
+        /* Classes for age shift color coding */
+        .age-shift-value {
+            font-weight: 500; /* Slightly bolder */
+        }
+        .age-shift-positive {
+            color: #e64c3c; /* Subtle red */
+        }
+        .age-shift-negative {
+            color: #27ae60; /* Subtle green */
         }
 
         .score-bar {
             height: 8px;
-            background: #f5f5f5;
-            border-radius: 4px;
+            /* background: #f5f5f5; */ /* Keep overridden value below */
+            /* border-radius: 4px; */ /* Keep overridden value below */
             margin: 1rem 0;
             overflow: hidden;
-            padding: 1rem;
+            /* padding: 1rem; */ /* Removed padding causing extra space */
             background: #f8f8f8;
             border-radius: 12px;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); /* Subtle inner shadow */
@@ -1008,6 +1076,7 @@ function longevity_assessment_form() {
             height: 100%;
             background: #007AFF;
             transition: width 0.5s ease;
+            border-radius: 12px; /* Added matching border-radius */
         }
 
         .breakdown-item {
@@ -1856,6 +1925,188 @@ function longevity_assessment_form() {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", sans-serif; /* Apple system fonts */
         }
+
+        /* Specific styling for Aging Rate card */
+        #agingRateCard h3 {
+            text-align: center; /* Center the title */
+            justify-content: center; /* Center flex items (though ::before is removed) */
+            display: block; /* Override flex display from .result-card h3 */
+        }
+
+        #agingRateCard h3::before {
+            display: none; /* Remove the blue vertical bar */
+        }
+
+        #agingRateDisplay {
+            text-align: center; /* Center the value and label */
+            padding: 1rem 0; /* Add some padding around the value */
+        }
+
+        /* Adjust aging rate value specifically if needed */
+        #agingRateDisplay .metric-value {
+            font-size: 2.75rem; /* Make the aging rate value larger */
+            margin-bottom: 0.25rem; /* Reduce space below value */
+        }
+
+        /* Adjust aging rate label specifically */
+        #agingRateDisplay .metric-label {
+             font-size: 0.9rem; /* Slightly smaller label */
+             color: #86868b; /* Apple secondary text color */
+             margin-top: 0; /* Remove top margin */
+        }
+
+        /* Arc Gauge Styling */
+        .gauge-wrapper {
+            width: 100%;
+            margin: 1rem auto 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #agingRateGaugeWrapper {
+            margin-top: 1.5rem;
+        }
+
+        #agingRateGauge {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #agingRateGauge text {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", sans-serif;
+        }
+
+        #agingRateNeedle {
+            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @media (max-width: 768px) {
+            #agingRateGauge {
+                width: 280px;
+                height: 140px;
+            }
+        }
+
+
+        .metric-value {
+            font-size: 2.25rem; /* Slightly smaller */
+            font-weight: 700;
+        }
+
+        /* Premium Styling for Recommendations Section */
+        .ai-section > h5 + .ai-recommendations {
+            margin-top: 1.5rem; /* Add space below the section title */
+        }
+        .ai-recommendations {
+             /* Apply card styling to the container if needed, or keep it section-based */
+        }
+        .recommendations-list {
+            margin-top: 0; /* Reset margin if container has padding */
+            padding: 0.5rem 0; /* Add some vertical padding */
+        }
+        .recommendation-item {
+            display: flex;
+            margin-bottom: 1.5rem; /* Spacing between items */
+            padding: 1.25rem; /* Increased padding within item */
+            background-color: #ffffff; /* White background for card effect */
+            border: 1px solid #e5e5e5; /* Softer border */
+            border-radius: 12px; /* More rounded corners */
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03); /* Subtle shadow */
+        }
+        .recommendation-item:hover {
+            background-color: #f8f9fa; /* Slight hover effect */
+            transform: translateY(-1px);
+        }
+        .recommendation-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #007AFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+        .recommendation-content {
+            flex: 1;
+            line-height: 1.5;
+        }
+        .recommendation-content strong {
+            color: #1d1d1f;
+            font-weight: 600; /* Slightly bolder title */
+        }
+        .recommendation-steps, .recommendation-benefit {
+            margin-top: 0.85rem; /* Increased spacing */
+            font-size: 0.9rem; /* Ensured >= 11pt */
+            color: #545457;
+        }
+        .recommendation-steps strong, .recommendation-benefit strong {
+            color: #333;
+            font-weight: 600;
+        }
+        .recommendation-steps ol {
+            padding-left: 1.5rem;
+            margin-top: 0.4rem; /* Space above list items */
+        }
+         .recommendation-steps ol li {
+            margin-bottom: 0.35rem; /* Space between list items */
+            line-height: 1.45;
+         }
+        .explanation {
+            font-size: 0.9rem; /* Ensured >= 11pt */
+            margin-top: 0.4rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        /* Styling for Strengths/Priorities Lists */
+        .ai-list {
+            list-style: disc; /* Use default disc bullets */
+            padding-left: 25px; /* Restore indentation for bullets */
+            margin-left: 0; /* Reset margin if needed */
+        }
+        .ai-list-item {
+            margin-bottom: 1rem;
+            /* padding-left: 0; Removed - Let list-style handle padding */
+            line-height: 1.5;
+            list-style-position: outside; /* Ensure bullet is outside text flow */
+        }
+        /* Ensure icons are hidden */
+        .list-icon { display: none !important; }
+
+        /* Loading Animation Styles */
+        .ai-status {
+            /* Styles for the container holding loading/error */
+            text-align: center;
+            padding: 2rem 0;
+        }
+        .ai-loading {
+             /* Styles are likely already applied via inline JS - display: flex */
+             align-items: center;
+             justify-content: center;
+             gap: 1rem;
+             color: #6c757d;
+        }
+        .ai-loading-icon {
+             font-size: 1.8rem;
+             color: #007AFF;
+             /* Animation applied via JS/keyframes */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .ai-error {
+            color: #dc3545; /* Bootstrap danger color */
+        }
+        .ai-error h5 {
+            margin-bottom: 0.5rem;
+        }
     </style>
 
     <!-- JavaScript for Calculations and Form Handling -->
@@ -1889,13 +2140,13 @@ function longevity_assessment_form() {
         // Example: If exercise should be super important, you might change 0.2 to 0.4
         const weights = {
             // Body & Fitness Factors
-            physicalActivity: 0.2,    // How much exercise matters for your health age
-            sitToStand: 0.05,         // How much your ability to get up from a chair matters 
+            physicalActivity: 0.7,    // How much exercise matters for your health age - UPDATED
+            sitToStand: 0.05,         // How much your ability to get up from a chair matters
             breathHold: 0.03,         // How much your breathing strength matters
             balance: 0.05,            // How much your balance matters
             
             // Sleep Factors
-            sleepDuration: 0.15,      // How much sleep time matters
+            sleepDuration: 0.7,      // How much sleep time matters - UPDATED
             sleepQuality: 0.15,       // How much good sleep matters
             
             // Mental & Social Factors
@@ -1911,12 +2162,48 @@ function longevity_assessment_form() {
             sunlightExposure: 0.03,   // How much sunshine matters
             
             // Body Measurements
-            bmiScore: 0.1,            // How much your weight-to-height ratio matters
-            whrScore: 0.1,            // How much your waist-to-hip ratio matters
+            bmiScore: 1.3,            // How much your weight-to-height ratio matters - UPDATED
+            whrScore: 1.2,            // How much your waist-to-hip ratio matters - UPDATED
             skinElasticity: 0.02,     // How much your skin health matters
+            overallHealthScore: 1.0   // ADDED - How much overall self-reported health matters
         };
 
         // --- End Calculation Weights ---
+
+        // --- NEW: Function to calculate Overall Health Score based on percentage ---
+        /**
+         * Gives a health score based on the user's self-reported Overall Health Percentage.
+         * Converts a percentage (0-100) into a score from 0-5.
+         * 
+         * These are the Overall Health Percentage grades:
+         * >= 90%: 5 (Excellent)
+         * >= 75%: 4 (Very Good)
+         * >= 60%: 3 (Good/Average)
+         * >= 45%: 2 (Fair)
+         * >= 30%: 1 (Poor)
+         * < 30%: 0 (Very Poor)
+         * 
+         * @param {number|null} overallHealthPercent - User's reported percentage, or null/undefined if not provided.
+         * @returns {number} - The health score from 0-5 (defaults to 3 if no percentage provided).
+         */
+        function calculateOverallHealthScore(overallHealthPercent) {
+            // If no percentage is provided or it's not a valid number, default to a neutral score of 3.
+            if (overallHealthPercent === null || isNaN(overallHealthPercent)) {
+                debug("Overall Health Percent not provided or invalid, defaulting score to 3.");
+                return 3; 
+            }
+            
+            debug(`Calculating Overall Health Score for percentage: ${overallHealthPercent}`);
+            
+            // Determine score based on percentage ranges
+            if (overallHealthPercent >= 90) return 5;
+            if (overallHealthPercent >= 75) return 4;
+            if (overallHealthPercent >= 60) return 3;
+            if (overallHealthPercent >= 45) return 2;
+            if (overallHealthPercent >= 30) return 1;
+            return 0; // If less than 30
+        }
+        // --- END NEW Function ---
 
         /**
          * Calculates Body Mass Index (BMI).
@@ -2147,29 +2434,23 @@ function longevity_assessment_form() {
             const aiSection = document.getElementById('aiAnalysisSection');
             const loadingDiv = aiSection.querySelector('.ai-loading');
             const contentDiv = aiSection.querySelector('.ai-content');
+            const statusDiv = aiSection.querySelector('.ai-status'); // Get status container
             
-            if (!loadingDiv || !contentDiv) {
+            if (!loadingDiv || !contentDiv || !statusDiv) { // Check for statusDiv too
                 console.error("AI Analysis section elements not found!");
                 return;
             }
             
             // Show loading animation and hide content
+            statusDiv.style.display = 'block'; // Make sure status container is visible
             loadingDiv.style.display = 'flex';
             loadingDiv.querySelector('.ai-loading-icon').style.animation = 'spin 1.5s linear infinite';
-            contentDiv.style.display = 'none';
+            contentDiv.style.display = 'none'; // Hide previous results/errors
             
-            // Add a spinning animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                .ai-loading-icon {
-                    animation: spin 1.5s linear infinite;
-                }
-            `;
-            document.head.appendChild(style);
+            // Add a spinning animation (ensure keyframes are in CSS now)
+            // const style = document.createElement('style');
+            // style.textContent = ` ... keyframes ... `;
+            // document.head.appendChild(style);
             
             // Prepare data for API
             const analysisData = {
@@ -2209,6 +2490,7 @@ function longevity_assessment_form() {
                     debug("AI analysis response received:", response);
                     
                     // Hide loading animation
+                    statusDiv.style.display = 'none'; // Hide the whole status container on success
                     loadingDiv.style.display = 'none';
                     
                     if (response.success && response.data) {
@@ -2229,8 +2511,9 @@ function longevity_assessment_form() {
                 error: function(xhr, status, error) {
                     debug("AI analysis request failed:", {xhr: xhr, status: status, error: error});
                     
-                    // Hide loading animation
-                    loadingDiv.style.display = 'none';
+                    // Hide loading animation, keep status div visible to show error
+                    loadingDiv.style.display = 'none'; 
+                    statusDiv.style.display = 'block'; 
                     
                     // Attempt to parse response for more details
                     let errorMsg = 'Error connecting to the analysis service. Please try again later.';
@@ -2268,36 +2551,34 @@ function longevity_assessment_form() {
                 return;
             }
             
-            // Create structure if it doesn't exist
-            if (!document.querySelector('.ai-summary')) {
-                contentDiv.innerHTML = `
-                    <div class="ai-header">
-                        <span class="material-icons ai-icon">psychology</span>
-                        <div class="ai-branding">
-                            <h4>AI Health Insights</h4>
-                            <p class="ai-subtitle">Personalized analysis based on your assessment</p>
-                        </div>
+            // Clear previous content before adding new structure
+            contentDiv.innerHTML = `
+                <div class="ai-header">
+                    <span class="material-icons ai-icon">psychology</span>
+                    <div class="ai-branding">
+                        <h4>AI Health Insights</h4>
+                        <p class="ai-subtitle">Personalized analysis based on your assessment</p>
                     </div>
-                    <div class="ai-section">
-                        <h5>Summary</h5>
-                        <div class="ai-summary"></div>
+                </div>
+                <div class="ai-section">
+                    <h5>Summary</h5>
+                    <div class="ai-summary"></div>
+                </div>
+                <div class="ai-columns">
+                    <div class="ai-column">
+                        <h5>Key Strengths</h5>
+                        <div class="ai-strengths"></div>
                     </div>
-                    <div class="ai-columns">
-                        <div class="ai-column">
-                            <h5>Key Strengths</h5>
-                            <div class="ai-strengths"></div>
-                        </div>
-                        <div class="ai-column">
-                            <h5>Priority Areas</h5>
-                            <div class="ai-priorities"></div>
-                        </div>
+                    <div class="ai-column">
+                        <h5>Priority Areas</h5>
+                        <div class="ai-priorities"></div>
                     </div>
-                    <div class="ai-section">
-                        <h5>Personalized Recommendations</h5>
-                        <div class="ai-recommendations"></div>
-                    </div>
-                `;
-            }
+                </div>
+                <div class="ai-section">
+                    <h5>Personalized Recommendations</h5>
+                    <div class="ai-recommendations"></div>
+                </div>
+            `;
             
             const summaryDiv = contentDiv.querySelector('.ai-summary');
             const strengthsDiv = contentDiv.querySelector('.ai-strengths');
@@ -2307,44 +2588,244 @@ function longevity_assessment_form() {
             // Display summary
             summaryDiv.innerHTML = `<p>${data.summary || 'No summary available.'}</p>`;
             
+            // Helper function to get text from potential object/string
+            const getText = (item, defaultProp = 'text') => {
+                if (typeof item === 'string') {
+                    return item;
+                }
+                if (typeof item === 'object' && item !== null) {
+                    // Prioritize specific keys, then defaultProp, then fallback
+                    return item.point || item.title || item.name || item.strength || item.area || item.recommendation || item[defaultProp] || 'Processing error: Invalid data format';
+                }
+                return 'Processing error: Invalid data format';
+            };
+
+            const getExplanation = (item) => {
+                if (typeof item === 'object' && item !== null) {
+                    return item.explanation || item.why || '';
+                }
+                return '';
+            };
+
             // Display strengths
             let strengthsHtml = '';
             if (data.strengths && data.strengths.length > 0) {
-                strengthsHtml = '<ul>';
+                strengthsHtml = '<ul class="ai-list">';
                 data.strengths.forEach(strength => {
-                    strengthsHtml += `<li>${strength}</li>`;
+                    const strengthText = getText(strength, 'strength');
+                    const explanation = getExplanation(strength);
+                    
+                    // Removed the manual bullet point (•)
+                    strengthsHtml += `<li class="ai-list-item">
+                        <div>
+                            <strong>${strengthText}</strong>
+                            ${explanation ? `<p class="explanation">${explanation}</p>` : ''}
+                        </div>
+                    </li>`;
                 });
                 strengthsHtml += '</ul>';
             } else {
-                strengthsHtml = '<p>No specific strengths identified.</p>';
+                strengthsHtml = '<p>No key strengths identified.</p>';
             }
             strengthsDiv.innerHTML = strengthsHtml;
             
             // Display priorities
             let prioritiesHtml = '';
             if (data.priorities && data.priorities.length > 0) {
-                prioritiesHtml = '<ul>';
+                prioritiesHtml = '<ul class="ai-list">';
                 data.priorities.forEach(priority => {
-                    prioritiesHtml += `<li>${priority}</li>`;
+                    const priorityText = getText(priority, 'priority');
+                    const explanation = getExplanation(priority);
+                    
+                    // Removed the manual bullet point (•)
+                    prioritiesHtml += `<li class="ai-list-item">
+                        <div>
+                            <strong>${priorityText}</strong>
+                            ${explanation ? `<p class="explanation">${explanation}</p>` : ''}
+                        </div>
+                    </li>`;
                 });
                 prioritiesHtml += '</ul>';
             } else {
-                prioritiesHtml = '<p>No specific priorities identified.</p>';
+                prioritiesHtml = '<p>No priority areas identified.</p>';
             }
             prioritiesDiv.innerHTML = prioritiesHtml;
             
             // Display recommendations
             let recommendationsHtml = '';
             if (data.recommendations && data.recommendations.length > 0) {
-                recommendationsHtml = '<ul>';
-                data.recommendations.forEach(recommendation => {
-                    recommendationsHtml += `<li>${recommendation}</li>`;
+                recommendationsHtml = '<ul class="ai-list recommendations-list">';
+                data.recommendations.forEach((recommendation, index) => {
+                    // --- REMOVED TEMPORARY DEBUGGING ---
+                    
+                    let recommendationContent = '';
+                    if (typeof recommendation === 'string') {
+                        recommendationContent = `<strong>${recommendation}</strong>`; 
+                    } else if (typeof recommendation === 'object' && recommendation !== null) {
+                        // Directly access the properties based on the debugged structure
+                        let what = recommendation.change || 'Recommendation details missing'; // Use 'change'
+                        let how = recommendation.implementation || ''; // Use 'implementation'
+                        let benefit = recommendation.benefit || ''; // Use 'benefit'
+                        
+                        recommendationContent = `<strong>${what}</strong>`;
+                        
+                        if (how) {
+                            if (Array.isArray(how)) {
+                                recommendationContent += '<div class="recommendation-steps"><strong>How:</strong><ol>';
+                                how.forEach(step => {
+                                    recommendationContent += `<li>${step}</li>`;
+                                });
+                                recommendationContent += '</ol></div>';
+                            } else {
+                                recommendationContent += `<div class="recommendation-steps"><strong>How:</strong> ${how}</div>`;
+                            }
+                        }
+                        
+                        if (benefit) {
+                            recommendationContent += `<div class="recommendation-benefit"><strong>Benefit:</strong> ${benefit}</div>`;
+                        }
+                    } else {
+                        recommendationContent = 'Invalid recommendation format';
+                    }
+                    
+                    recommendationsHtml += `
+                        <li class="recommendation-item">
+                            <div class="recommendation-number">${index + 1}</div>
+                            <div class="recommendation-content">${recommendationContent}</div>
+                        </li>`;
                 });
                 recommendationsHtml += '</ul>';
             } else {
-                recommendationsHtml = '<p>No specific recommendations available.</p>';
+                recommendationsHtml = '<p>No recommendations available.</p>';
             }
             recommendationsDiv.innerHTML = recommendationsHtml;
+            
+            // Update or add CSS - ensure previous styles aren't duplicated
+            let styleElement = document.getElementById('ai-analysis-styles');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                styleElement.id = 'ai-analysis-styles'; 
+                document.head.appendChild(styleElement);
+            }
+            styleElement.textContent = `
+                .ai-list {
+                    list-style: disc; /* Use default disc bullets */
+                    padding-left: 25px; /* Restore indentation for bullets */
+                    margin-left: 0; /* Reset margin if needed */
+                }
+                /* Premium Styling for Recommendations Section */
+                .ai-section > h5 + .ai-recommendations {
+                    margin-top: 1.5rem; /* Add space below the section title */
+                }
+                .ai-recommendations {
+                     /* Apply card styling to the container if needed, or keep it section-based */
+                }
+                .recommendations-list {
+                    margin-top: 0; /* Reset margin if container has padding */
+                    padding: 0.5rem 0; /* Add some vertical padding */
+                }
+                .recommendation-item {
+                    display: flex;
+                    margin-bottom: 1.5rem; /* Spacing between items */
+                    padding: 1.25rem; /* Increased padding within item */
+                    background-color: #ffffff; /* White background for card effect */
+                    border: 1px solid #e5e5e5; /* Softer border */
+                    border-radius: 12px; /* More rounded corners */
+                    transition: background-color 0.2s ease, transform 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.03); /* Subtle shadow */
+                }
+                .recommendation-item:hover {
+                    background-color: #f8f9fa; /* Slight hover effect */
+                    transform: translateY(-1px);
+                }
+                .recommendation-number {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    background-color: #007AFF;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    margin-right: 1rem;
+                    flex-shrink: 0;
+                    font-size: 0.9rem;
+                }
+                .recommendation-content {
+                    flex: 1;
+                    line-height: 1.5;
+                }
+                .recommendation-content strong {
+                    color: #1d1d1f;
+                    font-weight: 600; /* Slightly bolder title */
+                }
+                .recommendation-steps, .recommendation-benefit {
+                    margin-top: 0.85rem; /* Increased spacing */
+                    font-size: 0.9rem; /* Ensured >= 11pt */
+                    color: #545457;
+                }
+                .recommendation-steps strong, .recommendation-benefit strong {
+                    color: #333;
+                    font-weight: 600;
+                }
+                .recommendation-steps ol {
+                    padding-left: 1.5rem;
+                    margin-top: 0.4rem; /* Space above list items */
+                }
+                 .recommendation-steps ol li {
+                    margin-bottom: 0.35rem; /* Space between list items */
+                    line-height: 1.45;
+                 }
+                .explanation {
+                    font-size: 0.9rem; /* Ensured >= 11pt */
+                    margin-top: 0.4rem;
+                    color: #6c757d;
+                    line-height: 1.4;
+                }
+                /* Styling for Strengths/Priorities Lists */
+                .ai-list-item {
+                    margin-bottom: 1rem; 
+                    padding-left: 0;
+                    line-height: 1.5;
+                    list-style-position: outside; /* Ensure bullet is outside text flow */
+                }
+                .ai-list-item strong {
+                     color: #1d1d1f;
+                     font-weight: 600;
+                }
+                /* Ensure icons are hidden */
+                .list-icon { display: none !important; }
+
+                /* Loading Animation Styles */
+                .ai-status {
+                    /* Styles for the container holding loading/error */
+                    text-align: center;
+                    padding: 2rem 0;
+                }
+                .ai-loading {
+                     /* Styles are likely already applied via inline JS - display: flex */
+                     align-items: center;
+                     justify-content: center;
+                     gap: 1rem;
+                     color: #6c757d;
+                }
+                .ai-loading-icon {
+                     font-size: 1.8rem;
+                     color: #007AFF;
+                     /* Animation applied via JS/keyframes */
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .ai-error {
+                    color: #dc3545; /* Bootstrap danger color */
+                }
+                .ai-error h5 {
+                    margin-bottom: 0.5rem;
+                }
+            `;
             
             // Show the content
             contentDiv.style.display = 'block';
@@ -2435,10 +2916,23 @@ function longevity_assessment_form() {
             const biologicalAgeDiv = document.getElementById('biologicalAgeDisplay');
             if (biologicalAgeDiv) {
                 // Display Biological Age and the Age Shift in parentheses
-                const ageShiftText = !isNaN(ageShift) ? ` (${ageShift > 0 ? '+' : ''}${ageShift.toFixed(1)} years)` : '';
+                //const ageShiftText = !isNaN(ageShift) ? ` (${ageShift > 0 ? '+' : ''}${ageShift.toFixed(1)} years)` : '';
+                let ageShiftHtml = '';
+                if (!isNaN(ageShift)) {
+                    const shiftValue = ageShift.toFixed(1);
+                    const plusSign = ageShift > 0 ? '+' : '';
+                    let shiftClass = 'age-shift-value';
+                    if (ageShift > 0.05) { // Add a small threshold to avoid coloring for very tiny shifts
+                        shiftClass += ' age-shift-positive';
+                    } else if (ageShift < -0.05) {
+                        shiftClass += ' age-shift-negative';
+                    }
+                    ageShiftHtml = ` (<span class="${shiftClass}">${plusSign}${shiftValue} years</span>)`;
+                }
+                
                 biologicalAgeDiv.innerHTML = `
                     <div class="metric-value">${!isNaN(biologicalAge) ? biologicalAge.toFixed(1) : 'N/A'} years</div>
-                    <div class="metric-label">vs Chronological Age: ${age} ${ageShiftText}</div>
+                    <div class="metric-label">vs Chronological Age: ${age}${ageShiftHtml}</div>
                 `;
                 debug("Biological Age HTML updated.");
             } else {
@@ -2464,23 +2958,94 @@ function longevity_assessment_form() {
             } else { console.error("Element with ID 'lifestyleScore' not found!"); }
 
              // --- Populate Aging Rate Card ---
-             const agingRateDiv = document.getElementById('agingRateDisplay');
-             if(agingRateDiv) {
-                let rateText = 'N/A';
-                let interpretation = '';
-                if (!isNaN(agingRate)) {
-                    rateText = agingRate.toFixed(2);
-                    if (agingRate > 1.05) interpretation = '(Faster than average)';
-                    else if (agingRate < 0.95) interpretation = '(Slower than average)';
-                    else interpretation = '(Average rate)';
-                }
-                 agingRateDiv.innerHTML = `
-                    <div class="metric-value">${rateText}</div>
-                    <div class="metric-label">Aging Rate ${interpretation}</div>
-                `;
-                 debug("Aging Rate HTML updated.");
+             const agingRateDiv = document.getElementById('agingRateDisplay'); // Keep reference for potential future use or remove if completely unused
+             const agingRateContainer = document.getElementById('zingChartAgingRateGaugeContainer'); // Get ZingChart container
+
+             if(agingRateContainer) { // Check if ZingChart container exists
+                 let rateText = 'N/A';
+                 let interpretation = 'Not Calculated';
+                 if (!isNaN(agingRate)) {
+                     rateText = agingRate.toFixed(2);
+                     if (agingRate > 1.05) interpretation = 'Faster'; // Simplified interpretation for rules
+                     else if (agingRate < 0.95) interpretation = 'Slower';
+                     else interpretation = 'Average';
+                 }
+
+                 // *** NEW: ZingChart Configuration for Aging Rate ***
+                 ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"]; // Replace with your license key
+
+                 const agingRateChartConfig = {
+                   type: "gauge",
+                   globals: {
+                     fontSize: 16 // Adjusted base font size
+                   },
+                   plotarea: {
+                     marginTop: 40,
+                     marginBottom: 40 // Add bottom margin
+                   },
+                   plot: {
+                     size: '100%',
+                     valueBox: {
+                       placement: 'center',
+                       text: '%v', // Display the aging rate value
+                       fontSize: 30,
+                       paddingBottom: 30, // Push value up slightly
+                       rules: [ // Rules to add text below the value
+                         { rule: '%v < 0.95', text: '%v<br><span style="font-size:18px;color:#00A99D;">Slower</span>' },
+                         { rule: '%v >= 0.95 && %v <= 1.05', text: '%v<br><span style="font-size:18px;color:#888888;">Average</span>' },
+                         { rule: '%v > 1.05', text: '%v<br><span style="font-size:18px;color:#F58220;">Faster</span>' }
+                       ]
+                     }
+                   },
+                   tooltip: {
+                     borderRadius: 5,
+                     text: "Aging Rate: %v"
+                   },
+                   scaleR: {
+                     aperture: 180, // Half circle
+                     minValue: 0.6,
+                     maxValue: 1.4,
+                     step: 0.1,
+                     center: { visible: false },
+                     tick: { visible: false },
+                     item: { // Label styling
+                       offsetR: 0,
+                       fontSize: 12,
+                       fontColor: '#555'
+                     },
+                     // Labels for the scale markers
+                     labels: ['0.6', '0.7', '0.8', '0.9', '1.0', '1.1', '1.2', '1.3', '1.4'],
+                     ring: { // Colored background segments
+                       size: 35, // Thickness of the ring
+                       rules: [
+                         { rule: '%v < 0.95', backgroundColor: '#00A99D' }, // Teal for Slower
+                         { rule: '%v >= 0.95 && %v <= 1.05', backgroundColor: '#CCCCCC' }, // Grey for Average
+                         { rule: '%v > 1.05', backgroundColor: '#F58220' } // Orange for Faster
+                       ]
+                     }
+                   },
+                   series: [{
+                     values: [isNaN(agingRate) ? 1.0 : parseFloat(rateText)], // Use calculated rate, default to 1.0 if NaN
+                     backgroundColor: '#4A4A4A', // Needle color
+                     indicator: [10, 1, 10, 10, 0.6], // Needle shape/size [width1, width2, length1, length2, alpha]
+                     animation: {
+                       effect: 2, method: 1, sequence: 4, speed: 900
+                     },
+                   }]
+                 };
+
+                 // Render the ZingChart
+                 zingchart.render({
+                   id: 'zingChartAgingRateGaugeContainer',
+                   data: agingRateChartConfig,
+                   height: '100%', // Use container height
+                   width: '100%'
+                 });
+                 // *** END: ZingChart Configuration ***
+
+                 debug("Aging Rate ZingChart rendered.");
              } else {
-                 console.error("Element with ID 'agingRateDisplay' not found!");
+                 console.error("Element with ID 'zingChartAgingRateGaugeContainer' not found!");
              }
 
             // --- Populate Body Measurements Card (with Gauges) ---
@@ -3097,28 +3662,51 @@ function longevity_assessment_form() {
                 const scores = {};
                 scoreKeys.forEach(key => {
                     // Assumes the input field's `name` attribute matches the key.
-                    const inputName = key;
+                    const inputName = key; 
+                    // Map form field names to weights property names defined in the 'weights' object
+                    // This ensures we use the correct key when accessing weights later.
+                    const weightKeyMap = {
+                        'activity': 'physicalActivity',
+                        'sitStand': 'sitToStand',
+                        'sleepDuration': 'sleepDuration', // Keep mapping even if key is same
+                        'sleepQuality': 'sleepQuality',
+                        'stressLevels': 'stressLevels',
+                        'socialConnections': 'socialConnections',
+                        'dietQuality': 'dietQuality',
+                        'alcoholConsumption': 'alcoholConsumption',
+                        'smokingStatus': 'smokingStatus',
+                        'cognitiveActivity': 'cognitiveActivity',
+                        'sunlightExposure': 'sunlightExposure',
+                        'supplementIntake': 'supplementIntake',
+                        'breathHold': 'breathHold',
+                        'balance': 'balance',
+                        'skinElasticity': 'skinElasticity'
+                        // bmiScore and whrScore are added later after calculation
+                        // overallHealthScore is added later after calculation
+                    };
+                    const scoreKey = weightKeyMap[inputName] || inputName; // Use mapped key if exists
+                    
                     const rawValue = formData.get(inputName);
                     
                     // Only include values that were actually selected by the user
                     if (rawValue && rawValue.trim() !== '') {
                         const value = parseInt(rawValue, 10); // Get value, convert to integer
                         
-                        // --- Specific Debugging Added ---
-                        if (inputName === 'activity' || inputName === 'sitStand') {
-                            debug(`Value retrieved for ${inputName}:`, { raw: rawValue, parsed: value });
-                        }
-                        // --- End Specific Debugging ---
-                        
                         // Only add if it's a valid number
                         if (!isNaN(value)) {
-                            scores[key] = value;
+                            scores[scoreKey] = value; // Use the mapped key
                         }
                     }
                 });
 
+                // --- NEW: Calculate Overall Health Score and add it to scores ---
+                scores.overallHealthScore = calculateOverallHealthScore(measurements.overallHealthPercent);
+                debug("Calculated Overall Health Score:", scores.overallHealthScore);
+                // --- END NEW ---
+
+
                 debug("Collected Measurements:", measurements);
-                debug("Collected Scores:", scores);
+                debug("Collected Scores (Lifestyle & Overall):", scores);
 
                 // --- Basic Input Validation ---
                 // Add checks here for essential fields before proceeding with calculations.
@@ -3433,13 +4021,12 @@ function longevity_assessment_form() {
                 setTimeout(() => {
                     // Delay creating fallback to ensure chart is fully rendered
                     if (chartInstance) {
-                        chartInstance.toBase64Image('image/png', 1.0).then(image => {
-                            const fallbackDiv = document.createElement('div');
-                            fallbackDiv.id = 'scoreChartFallbackImage';
-                            fallbackDiv.className = 'chart-fallback';
-                            fallbackDiv.innerHTML = `<img src="${image}" class="chart-print-image" alt="Health Metrics Radar Chart">`;
-                            containerElement.appendChild(fallbackDiv);
-                        });
+                        const image = chartInstance.toBase64Image('image/png', 1.0);
+                        const fallbackDiv = document.createElement('div');
+                        fallbackDiv.id = 'scoreChartFallbackImage';
+                        fallbackDiv.className = 'chart-fallback';
+                        fallbackDiv.innerHTML = `<img src="${image}" class="chart-print-image" alt="Health Metrics Radar Chart">`;
+                        containerElement.appendChild(fallbackDiv);
                     }
                 }, 500);
             } catch (e) {
@@ -3776,4 +4363,3 @@ function longevity_assessment_form() {
     return ob_get_clean();
 }
 add_shortcode('longevity_form', 'longevity_assessment_form');
-?> 

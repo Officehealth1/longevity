@@ -1,0 +1,28 @@
+## Suggested Premium Report Layout Structure:
+
+### Cover Page (for PDF):
+
+- **Client Name, Date**
+- **Premium branding/logo**
+- **Subtle image or gradient**
+
+### Main Report Layout (Interactive webpage):
+
+1. **Introductory Section:**
+    - Clear summary with personalised greeting.
+2. **Biological Age Section:**
+    - Dial/gauge visualisation.
+    - Short explanatory text.
+3. **Lifestyle Score Section:**
+    - Minimalist horizontal bar or gauge.
+4. **Body Composition Section:**
+    - BMI and WHR graphical visualisations (clean, minimalist).
+5. **Strengths & Areas for Improvement (Polar Chart):**
+    - Radar chart clearly labelled with key metrics.
+6. **AI Insights & Recommendations:**
+    - Accordion/drop-down for deeper insights.
+    - Clickable, expandable sections for each recommendation.
+7. **Optional Iridology Insights (Image section with notes):**
+    - Clearly defined, highlighted.
+8. **Closing & Next Steps Section:**
+    - Call-to-action buttons clearly highlighted (Schedule, Contact Practitioner, etc.).
