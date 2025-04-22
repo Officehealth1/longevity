@@ -149,55 +149,47 @@ function longevity_ai_analysis_callback() {
     $user_data .= $health_goals . "\n";
     // --- END NEW ---
     
-    // --- Send Data to Make.com Webhook ---
-    // $make_webhook_url = 'https://hook.eu2.make.com/rb1qjeq2waa8s7g1pd527j2te8fukovg';
-    // Prepare data payload matching your Make.com scenario expectations
-    // Use $decoded_data which contains the form inputs
-    // $make_payload = array(
-    //     'fullName' => isset($decoded_data['fullName']) ? sanitize_text_field($decoded_data['fullName']) : 'N/A',
-    //     'email' => isset($decoded_data['email']) ? sanitize_email($decoded_data['email']) : 'N/A',
-    //     'age' => $decoded_data['age'],
-    //     'gender' => $decoded_data['gender'],
-    //     'biologicalAge' => $decoded_data['biologicalAge'],
-    //     'ageShift' => $decoded_data['ageShift'],
-    //     'agingRate' => $decoded_data['agingRate'],
-    //     'bmi' => $decoded_data['bmi'],
-    //     'bmiCategory' => $decoded_data['bmiCategory'],
-    //     'whr' => $decoded_data['whr'],
-    //     'whrCategory' => $decoded_data['whrCategory'],
-    //     'scores' => $decoded_data['scores'], // Send all scores
-    //     'positiveFactors' => $decoded_data['positiveFactors'], // Send positive factors
-    //     'negativeFactors' => $decoded_data['negativeFactors'], // Send negative factors
-    //     'healthChallenges' => $health_challenges,
-    //     'healthGoals' => $health_goals,
-    //     // Add any other fields from $decoded_data needed for your PDFMonkey template
-    // );
 
-    // // Send the data asynchronously
-    // wp_remote_post($make_webhook_url, array(
-    //     'method' => 'POST',
-    //     'headers' => array('Content-Type' => 'application/json; charset=utf-8'),
-    //     'body' => json_encode($make_payload),
-    //     'blocking' => false, // Set to false for non-blocking request
-    //     'data_format' => 'body',
-    // ));
-    // error_log('Longevity form data sent to Make.com webhook.'); 
-    // --- End Send Data to Make.com Webhook ---
     
     // --- UPDATED: Modify prompts to use new context --- 
     $prompts['personalizedInsights'] = "Provide a premium, personalised health insight summary based on all the collected data. Emphasise the positive aspects of the client's current health and lifestyle while also addressing 2-3 specific priority areas for improvement, explicitly referencing and incorporating the client's stated health challenges and desired health changes/shifts where relevant. Keep it optimistic, actionable, concise, and supportive (max 80 words).";
-    $prompts['recommendations'] = "Generate specific, concise, and actionable health recommendations tailored explicitly for this client, taking into account their stated health challenges and desired changes/shifts. Group recommendations into three clear categories: immediate actions (short-term), ongoing habits (long-term), and expert consultations or screenings. Each recommendation should include a brief (one-sentence) rationale and be presented positively and clearly.";
+    $prompts['recommendations_intro'] = <<<'EOT'
+You're also an expert health report writer.
+
+Your task is to fine-tune this template text for the "Actionable Recommendations" sections of the holistic longevity health report (see below) so that it's tailored to the needs of this particular client. (metrics, results, self-reported health challenges and changes they hope to see). Yet also include the essence and details in the template text.
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising and also reminding them that this report is not a replacement for seeing a fully trained and experienced health practitioner).
+
+Don't make the output longer than the length of the template text. Shorter is fine. If parts of the template are not relevant to a particular client's situation.
+
+Template text for "Actionable Recommendations":
+
+These personalised suggestions are based on the information you've provided, analysed through both modern health science and traditional wisdom perspectives. Consider them thoughtful starting points rather than rigid prescriptions—a foundation to build upon as you progress.
+
+While these recommendations reflect patterns observed in your assessment, they would ideally be refined through consultation with a healthcare practitioner who can incorporate nuances of your unique constitution, medical history, and personal preferences. As you implement changes and observe your body's responses, these suggestions will naturally evolve to reflect your emerging needs.
+
+Consider the beautiful opportunity that preventative health offers: investing in your wellbeing today creates immediate returns while simultaneously securing your future vitality. Why wait decades to experience the exhilaration of optimal living when you could embody it now? Every moment spent in vibrant health is a moment fully lived—with sharper clarity, deeper connections, and more authentic joy. The resources we inevitably dedicate to our health can either be invested proactively in creating resilience and experiencing life's fullness today, or reactively in attempting to regain balance later, often with added suffering along the way. The gift of preventative care is that small, consistent actions now create compound returns—each beneficial choice strengthening the foundation for the next. This isn't merely avoiding future problems; it's embracing the immediate pleasure of feeling truly alive, energized, and capable in your daily existence. The opportunity before you isn't just better health tomorrow—it's a more vivid, expansive experience of life today.
+EOT;
+    $prompts['recommendations_note'] = <<<'EOT'
+Create a brief but thoughtful note (30-60 words) about how health transformation follows a non-linear path. 
+
+Incorporate the idea that the body's intelligence guides people through cycles of implementation, observation, and refinement—with each cycle bringing them closer to optimal health.
+
+Write in a warm, encouraging tone appropriate for closing the recommendations section of a premium health report. Keep it concise and memorable.
+EOT;
     // --- END UPDATED ---
     
     // Define premium prompts from prompt.txt
     $prompts = array(
         'introduction' => "You are writing the introductory summary for a premium longevity health assessment report targeted at a wealthy, discerning clientele. Using a warm, confident, and professional tone, summarise the client's overall health status, highlighting their biological age versus chronological age, and their lifestyle strengths. Keep it concise (50-70 words) and encouraging.",
         
-        'biologicalAge' => "Clearly explain the client's biological age, chronological age, and rate of ageing in simple, positive terms suitable for a premium health report. Highlight positively if biological age is lower or gently indicate the need for improvement if higher. Encourage continuing good habits or initiating improvements as needed (max 60 words).",
+        'biologicalAge' => "Clearly explain the client's biological age versus chronological age. If biological age is LOWER than chronological (negative age shift), present this as a POSITIVE finding using green highlighting and positive language about their slower aging. If biological age is HIGHER than chronological (positive age shift), use red highlighting and gentle language about improvement opportunities. Be extremely accurate about whether the age is higher or lower. Never suggest 'aligning ages' when biological age is already lower. (max 60 words).",
         
-        'lifestyleScore' => "Provide a concise yet insightful analysis of the client's lifestyle score (0-5), clearly stating their current level, briefly explaining what this indicates about their overall health habits, and encouraging them towards maintaining or improving this score (max 50 words).",
+        'lifestyleScore' => "Provide a concise yet insightful analysis of the client's calculated lifestyle score (0-5 scale), based ONLY on the AVERAGE of their lifestyle metrics (physical activity, sleep, diet, etc.), NOT their overall health percentage. Clearly state their current lifestyle level, briefly explain what this indicates about their health habits, and encourage them towards maintaining or improving their daily routines (max 50 words).",
         
-        'bodyComposition' => "Generate a clear, concise interpretation of the client's BMI and waist-to-hip ratio, specifically mentioning their health risk category. Explain briefly the health implications of these scores. If scores indicate moderate/high risk, provide encouraging and gentle language prompting actionable improvements (max 70 words).",
+        'bodyComposition' => "Generate a clear, concise interpretation of the client's BMI and waist-to-hip ratio, specifically mentioning their health risk category. Explain briefly the health implications of these scores. If scores indicate moderate/high risk, provide encouraging and gentle language prompting actionable improvements. Use words that naturally emphasize concerning values without special formatting tags (max 70 words).",
         
         'strengthsAreas' => "Analyse and summarise clearly and positively the client's health data, listing 3-4 clear strengths first, followed by up to three primary areas for improvement. Use brief bullet points for clarity and easy readability, suitable for a premium client. Tone should be supportive and empowering.",
         
@@ -208,9 +200,257 @@ function longevity_ai_analysis_callback() {
         'closing' => "End the longevity report on an empowering and motivating note. Emphasise the powerful ability of the body to regenerate and improve at any age. Encourage the client to adopt the identity of someone who naturally prioritises health, fitness, and wellbeing, using inspiring yet authentic language suitable for an upscale client (max 50 words).",
         
         // Updated CTA prompt for button text
-        'cta' => "Generate two very short (2-4 words max each), premium-style button texts. The first text should invite the client to schedule a follow-up consultation (e.g., 'Schedule Consultation'). The second text should invite them to explore advanced programs (e.g., 'Explore Advanced Programs'). Respond ONLY with the text for the buttons, following the requested JSON structure { consultation: \"Button text 1\", programs: \"Button text 2\" }."
+        'cta' => "Generate two very short (2-4 words max each), premium-style button texts. The first text should invite the client to schedule a follow-up consultation (e.g., 'Schedule Consultation'). The second text should invite them to explore advanced programs (e.g., 'Explore Advanced Programs'). Respond ONLY with the text for the buttons, following the requested JSON structure { consultation: \"Button text 1\", programs: \"Button text 2\" }.",
+        
+        // Add missing prompts required by PDFMonkey template
+        'ageAssessment' => "Analyze the client's biological age versus chronological age data. Provide a clear interpretation of what this means for their overall health and longevity. Highlight both positive aspects and areas needing attention (max 150 words).",
+        
+        'chronologicalVsBio' => <<<'EOT'
+[AI Prompt - Chronological vs. Biological Age
+
+VERY IMPORTANT: Be extremely precise about whether biological age is higher or lower than chronological age.
+If biological age is LOWER than chronological age (negative shift):
+- Present this as a POSITIVE finding
+- Use encouraging language about continuing their good habits
+- NEVER suggest they should try to make their biological age align with or increase toward their chronological age
+
+If biological age is HIGHER than chronological age (positive shift):
+- Present this gently as an area for improvement
+- Suggest specific lifestyle modifications to help reduce their biological age
+
+When giving recommendations, be conscious of the actual relationship between these ages and never
+suggest making a lower biological age become higher or more aligned with chronological age.
+
+You're a natural holistic health expert experienced at assisting health clients with changing their diet and lifestyle.
+
+You're also an expert health report writer.
+
+Your task is to fine-tune this template text (below) for the "Chronological vs. Biological Age" sections of the holistic longevity health report so that it's tailored to the needs of this particular client (metrics: {$user_data}, Client Full Name: {$fullName}, Chronological Age: {$age}, Biological Age: {$biologicalAge}, Age Shift: {$ageShift}, Aging Rate: {$agingRate}, self-reported health challenges: {$health_challenges}, and changes they hope to see: {$health_goals}). Yet also include the essence and details in the template text.
+
+Follow the interpretation guidance: If biological age < chronological age (good thing). If diff < 3 years (good start, room for more). If diff > 3 years (great, keep improving). If biological age > chronological age (aging faster, good time to make changes). Emphasize body's ability to rejuvenate.
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising, reminding them this report isn't a replacement for a practitioner.
+
+Don't make the output longer than the template text. Shorter is fine. Omit irrelevant parts.
+
+**Important Formatting:** Structure the output using simple HTML. Use `<p>` tags for each paragraph and `<h4>` tags for the subheadings (like 'The Aging Processes', 'Modern Research and Traditional Wisdom', 'Lifespan and Healthspan'). Do not include the initial `[AI Prompt` or final `]` markers in your response.
+
+Template text for "Chronological vs. Biological Age":
+
+The Aging Processes
+
+Your chronological age—the number of years you've been alive—is fixed and unchangeable.
+
+Everyone ages by the clock at the same rate. Your biological age, however, tells a different and more actionable story.
+
+Biological age reflects how your body is aging at the cellular and systemic level, influenced by lifestyle, habits, environment, and genetic expression.
+
+Two 50-year-olds can have vastly different biological ages—one functioning like a 40-year-old, another more like a 60-year-old.
+
+This distinction matters because while chronological age progresses steadily, biological age can be modified.
+
+Your nutrition, physical activity, sleep quality, stress management, thought patterns, social connections, and environmental exposures all influence your rate of aging.
+
+Small, consistent improvements in these areas can significantly impact your overall health trajectory.
+
+Modern Research and Traditional Wisdom
+
+This report calculates your biological age using the information you provided, and drawing on both cutting-edge research and timeless wisdom from traditions like Ayurveda, the science of life.
+
+The past decade of research has seen remarkable advances in understanding aging biomarkers and interventions that can influence this process.
+
+Interestingly, many of these scientific discoveries align with principles from traditional healing systems, which have long emphasised proactive health cultivation rather than simply treating disease.
+
+A useful perspective is to think of health like gardening: focusing primarily on nurturing what you want to grow (positive health practices) rather than just fighting what you don't want (diseases). With nourishing foods, restful sleep, joyful movement, and positive thoughts, you can create a vibrant ecosystem for optimal health.
+
+This positive orientation toward building vitality proves more effective than merely combating illness.
+
+Lifespan and Healthspan
+
+The goal isn't just extending lifespan—how long you live—but expanding healthspan, the portion of life spent in vibrant, functional health. Ideally, you want to remain active, clear-minded, and capable of enjoying meaningful activities throughout your entire life.
+
+Areas of weakness might affect you subtly now but could significantly impact your quality of life in later years. The sooner you address imbalances—whether in nutrition, stress, or movement—the greater your chance of thriving well, all the way, into your last decade.
+
+Your biological age offers a snapshot, not a destiny. While this report provides valuable insights, it cannot capture every nuance of your health. For best results, consider partnering with a holistic practitioner to deepen the effectiveness of you efforts and speed up your journey.
+
+"]
+EOT,
+        
+        'agingProcesses' => "Describe how aging occurs at the cellular and systemic level, relating this to the client's specific health metrics and lifestyle choices. Focus on actionable insights that connect their daily habits to aging processes (max 120 words).",
+        
+        'researchAndWisdom' => "Connect modern longevity research with traditional health wisdom, highlighting principles that have proven effective across cultures and time. Relate this to the client's health data wherever possible (max 120 words).",
+        
+        'lifespanHealthspan' => "Explain the critical distinction between lifespan and healthspan in the context of the client's assessment results. Emphasize how specific lifestyle changes can extend active, functional health years (max 120 words).",
+        
+        'longevityInfluencesExplanation' => "Based on the full assessment data ({$user_data}, including scores, lifestyle factors, challenges: {$health_challenges}, goals: {$health_goals}), explain the *key* factors (positive or negative) influencing the client's longevity profile and aging trajectory as revealed by this assessment. Focus on 2-3 most impactful areas highlighted earlier (e.g., specific high/low scores, significant lifestyle choices). Keep it concise (100-150 words), insightful, and directly relevant to their results. Use an encouraging yet objective tone. Address the client directly.",
+        
+        'ageImpactAnalysis' => "Using the client's positive and negative impact factors (factors lowering and raising biological age), provide a personalized analysis of how these specific factors are affecting their health. Focus on actionable insights for both maintaining positive factors and addressing negative ones. Include specific references to the factors shown in their assessment. (max 150 words).",
+        
+        'keyFindings' => "Summarize 3-4 key findings from the client's assessment in an executive summary style. Highlight the most significant insights about their biological age, greatest strengths, and priority areas for attention. Keep it concise, clear, and actionable (max 100 words).",
+        
+        // Add a new prompt specifically for overall health assessment
+        'overallHealthAssessment' => "Analyze the client's self-reported Overall Health Percentage (%s%%) and corresponding score (%s/5). Explain what this self-assessment suggests about their perceived health status. If their overall health score differs significantly from their lifestyle score, note this discrepancy using clear language that naturally emphasizes the contrast without special formatting tags. Offer 1-2 specific suggestions based on their self-reported overall health level. (max 70 words)",
+        
+        // NEW: Add prompt for Lifestyle Score Analysis
+        'lifestyleScoreAnalysis' => <<<'EOT'
+[AI input: Scores/Results and Explanation]
+
+Your Lifestyle Score offers a snapshot of your daily habits, rated from 1 (poor) to 5 (optimal). Based on the information you shared ({$user_data}), it reflects key areas like nutrition, exercise, sleep, and stress management. While not an exact science—given the limited data provided—it's a helpful guidepost, pointing to strengths and opportunities for growth.
+
+GUIDELINES:
+- Keep the response concise (50-70 words).
+- Directly incorporate the client's calculated score (e.g., "Your Lifestyle Score of X/5...").
+- Briefly touch upon how the score reflects habits.
+- Mention it's a guidepost.
+- Maintain a premium, encouraging tone.
+- Do NOT use markdown or HTML formatting.
+EOT,
+
+        // Add this new prompt for the intro section
+'ai_intro_section' => "You're a natural holistic health expert and expert health report writer. Craft a personalized introduction for a longevity health report based on the client's data.
+
+CLIENT DATA:
+Age: " . $decoded_data['age'] . "
+Gender: " . $decoded_data['gender'] . "
+Biological Age: " . $decoded_data['biologicalAge'] . " years (" . ($decoded_data['ageShift'] > 0 ? '+' : '') . $decoded_data['ageShift'] . " years from chronological age)
+BMI: " . $decoded_data['bmi'] . " (" . $decoded_data['bmiCategory'] . ")
+WHR: " . $decoded_data['whr'] . " (" . $decoded_data['whrCategory'] . ")
+Aging Rate: " . $decoded_data['agingRate'] . "
+Lifestyle Score: " . (isset($decoded_data['lifestyleScoreAverage']) ? $decoded_data['lifestyleScoreAverage'] : "Not available") . "/5
+Top Strengths: " . (isset($decoded_data['positiveFactors']) && !empty($decoded_data['positiveFactors']) ? implode(', ', array_slice(array_column($decoded_data['positiveFactors'], 'name'), 0, 3)) : "Not available") . "
+Top Areas for Improvement: " . (isset($decoded_data['negativeFactors']) && !empty($decoded_data['negativeFactors']) ? implode(', ', array_slice(array_column($decoded_data['negativeFactors'], 'name'), 0, 3)) : "Not available") . "
+Health Challenges: " . $health_challenges . "
+Health Goals: " . $health_goals . "
+
+CONTENT GUIDELINES:
+Create a flowing introduction (approximately 300-400 words) that naturally covers these areas:
+
+1. A personalized welcome that acknowledges their age (" . $decoded_data['age'] . "), gender, biological age, and specific health challenges/goals
+2. A paragraph on health importance as a cornerstone of life
+3. A paragraph describing this report's purpose as a guide, mentioning their specific metrics
+4. A brief professional guidance disclaimer
+5. A paragraph acknowledging their action in completing this assessment
+6. An age-specific insight paragraph appropriate for someone " . $decoded_data['age'] . " years old, including:
+   - A section heading with their decade of life (e.g., 'In Your 30s: Balance and Sustainable Habits')
+   - A relevant inspirational quote based on their age:
+     * 20s: 'The groundwork of all happiness is good health.' – Leigh Hunt
+     * 30s: 'Take care of your body. It's the only place you have to live.' – Jim Rohn
+     * 40s: 'An ounce of prevention is worth a pound of cure.' – Benjamin Franklin
+     * 50s: 'You are never too old to set another goal or to dream a new dream.' – C.S. Lewis
+     * 60s: 'Aging is not lost youth but a new stage of opportunity and strength.' – Betty Friedan
+     * 70s+: 'Years may wrinkle the skin, but to give up enthusiasm wrinkles the soul.' – Samuel Ullman
+7. A brief paragraph using the city/directions metaphor (knowing where you are to get directions)
+8. A closing note that this report complements professional medical advice
+
+OUTPUT STRUCTURE:
+Structure your response in simple HTML format with these tags:
+- <h2> for section headings (only for the age-decade heading)
+- <p> for regular paragraphs
+- <blockquote> for the inspirational quote
+- <span class='highlight-positive'> for positive metrics (e.g., good BMI)
+- <span class='highlight-negative'> for metrics needing improvement
+- <span class='highlight-neutral'> for neutral metrics
+
+Example structure:
+<p>Welcome paragraph...</p>
+<p>Health importance paragraph...</p>
+<h2>In Your 30s: Balance and Sustainable Habits</h2>
+<blockquote>Take care of your body. It's the only place you have to live. – Jim Rohn</blockquote>
+<p>Age-specific content...</p>
+
+IMPORTANT REQUIREMENTS:
+- Write in a premium, professional tone suitable for an upscale health report
+- Be encouraging and empowering while remaining realistic
+- Personalize throughout by referencing specific metrics, challenges, and goals
+- Use only the HTML tags specified above - no other markdown or special formatting
+- When mentioning metrics like BMI, WHR, and biological age, use the highlight spans appropriately
+- Keep the overall length to approximately 300-400 words
+- Output ONLY the final HTML-tagged text with no explanations",
+
+            // --- NEW Health Insight Narrative Prompts (Placeholders) ---
+            'insightWhy' => "Generate a personalized narrative section based on the 'Understanding Your WHY' concept, incorporating client goals ([GOALS]) and challenges ([CHALLENGES]). Keep the tone motivating and link health changes to deeper values. (Max 200 words)",
+            'insightHow' => "Generate a personalized narrative section based on the 'The HOW: Becoming That Person' concept, incorporating client's potential habits, identity shifts, social context, and advice on setbacks. ([GOALS], [CHALLENGES], [STRENGTHS_WEAKNESSES]). (Max 300 words)",
+            'insightWhere' => "Generate a personalized narrative section based on the 'The WHERE: Your Environment Matters' concept, referencing client's likely environments and habits ([LIFESTYLE_HABITS], [CHALLENGES]). Provide actionable advice on environment modification. (Max 200 words)",
+            'insightWhen' => "Generate a personalized narrative section based on the 'The WHEN: Timing Your Transformation' concept, referencing client's age ([AGE]) and health status ([METRICS_CHALLENGES]). Discuss pacing, detoxification sensitivity, and the long-term perspective. (Max 200 words)",
+            // --- END NEW Health Insight Narrative Prompts ---
+            
+            // NEW Prompt for Objectives Section
+            'objectives_section' => "Based on the client's data ({$user_data}, Challenges: {$health_challenges}, Goals: {$health_goals}), outline 2-3 key objectives for their health journey. Focus on actionable outcomes related to their primary areas for improvement (e.g., improve sleep quality, reduce stress impact, optimize nutrition). Keep it concise and encouraging (max 100 words)."
+            
     );
     
+    // --- NEW: Add prompt for personalized context about recommendations ---
+    $prompts['recommendations_intro'] = <<<'EOT'
+You're also an expert health report writer.
+
+Your task is to fine-tune this template text for the "Actionable Recommendations" sections of the holistic longevity health report (see below) so that it's tailored to the needs of this particular client. (metrics, results, self-reported health challenges and changes they hope to see). Yet also include the essence and details in the template text.
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising and also reminding them that this report is not a replacement for seeing a fully trained and experienced health practitioner).
+
+Don't make the output longer than the length of the template text. Shorter is fine. If parts of the template are not relevant to a particular client's situation.
+
+Template text for "Actionable Recommendations":
+
+These personalised suggestions are based on the information you've provided, analysed through both modern health science and traditional wisdom perspectives. Consider them thoughtful starting points rather than rigid prescriptions—a foundation to build upon as you progress.
+
+While these recommendations reflect patterns observed in your assessment, they would ideally be refined through consultation with a healthcare practitioner who can incorporate nuances of your unique constitution, medical history, and personal preferences. As you implement changes and observe your body's responses, these suggestions will naturally evolve to reflect your emerging needs.
+
+Consider the beautiful opportunity that preventative health offers: investing in your wellbeing today creates immediate returns while simultaneously securing your future vitality. Why wait decades to experience the exhilaration of optimal living when you could embody it now? Every moment spent in vibrant health is a moment fully lived—with sharper clarity, deeper connections, and more authentic joy. The resources we inevitably dedicate to our health can either be invested proactively in creating resilience and experiencing life's fullness today, or reactively in attempting to regain balance later, often with added suffering along the way. The gift of preventative care is that small, consistent actions now create compound returns—each beneficial choice strengthening the foundation for the next. This isn't merely avoiding future problems; it's embracing the immediate pleasure of feeling truly alive, energized, and capable in your daily existence. The opportunity before you isn't just better health tomorrow—it's a more vivid, expansive experience of life today.
+EOT;
+
+    $prompts['recommendations_note'] = <<<'EOT'
+Create a brief but thoughtful note (30-60 words) about how health transformation follows a non-linear path. 
+
+Incorporate the idea that the body's intelligence guides people through cycles of implementation, observation, and refinement—with each cycle bringing them closer to optimal health.
+
+Write in a warm, encouraging tone appropriate for closing the recommendations section of a premium health report. Keep it concise and memorable.
+EOT;
+    // --- END NEW ---
+
+    // --- NEW: Add prompt for personalized Summary & Conclusion narrative ---
+    $prompts["summary_results_block"] = <<<'EOT'
+You're a natural holistic health expert experienced at assisting health clients with changing their diet and lifestyle.
+
+You're also an expert health report writer.
+
+Your task is to fine-tune this template text for the "Summary & Conclusion" sections of the holistic longevity health report (see below) so that it's tailored to the needs of this particular client. (metrics, results, self-reported health challenges and changes they hope to see). Yet also include the essence and details in the template text. 
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising and also reminding them that this report is not a replacement for seeing a fully trained and experienced health practitioner).
+
+Don't make the output longer than the length of the template text. Shorter is fine. If parts of the template are not relevant to a particular client's situation.
+
+Template text for "Summary & Conclusion":
+
+A Moment to Celebrate
+
+If you've read this far, take a moment to acknowledge the significant step you've already taken. Seeking to understand your health at this level demonstrates a commitment that many never make. This willingness to clearly assess your current reality is the essential foundation for meaningful change.
+
+When you're healthy your focus is on all the other issues in life, but when your health is the issue, it's the only thing you can focus on. So when your health is "fine" (not optimal but fine), it harder to keep it in your top priorities. The path of health transformation requires a special kind of commitment. It's not about dramatic heroics but consistent choices when easier options are readily available. It's about listening to your body's subtle messages when our culture encourages distraction. It's about investing in your wellbeing today for benefits that unfold over decades.
+
+This journey represents one of life's most rewarding endeavours. The changes you make affect not just your own experience but the lives of everyone around you. As your energy increases, your presence naturally becomes more vibrant. As inflammatory patterns diminish, your mood stabilises. As sleep deepens, your capacity for creativity and connection expands.
+
+Taking responsibility for your wellbeing isn't a burden but a reclaiming of your natural capacity for vitality. The choices you make literally reshape your biology, influencing how your genes express themselves and how your tissues regenerate. This isn't merely about preventing illness—it's about discovering what optimal living feels like in your unique body.
+
+We wish you every success as you continue this important journey. Remember that you're never alone on this path—support is always available when needed.
+EOT;
+
+    $prompts["summary_closing_narrative"] = <<<'EOT'
+You're a natural holistic health expert. Create a brief closing paragraph (60-100 words) for a health assessment report that incorporates these essential elements:
+
+1. An invitation for the client to retake the assessment in a few months to track their progress
+2. Well wishes using words like "strength," "clarity," and "joy"
+3. A reassurance that support is available throughout their journey
+
+Keep your tone warm and encouraging. Your text should flow naturally and feel like a personalized sign-off that gives the client confidence moving forward. Format this as 1-2 concise paragraphs.
+EOT;
+    // --- END NEW ---
+
     // Create a single comprehensive prompt
     $comprehensive_prompt = "Based on the following user data:\n\n" . $user_data . "\n\nGenerate a premium health analysis with multiple sections. Format your response as a JSON object with the following keys that match exactly:\n\n";
     
@@ -241,7 +481,7 @@ function longevity_ai_analysis_callback() {
                     'content' => $comprehensive_prompt
                 )
             ),
-            'max_tokens' => 2000,
+            'max_tokens' => 4000,
             'temperature' => 0.7,
             'response_format' => array('type' => 'json_object')
         )),
@@ -297,50 +537,7 @@ function longevity_ai_analysis_callback() {
                 throw new Exception('Invalid JSON response from AI service');
             }
             
-            // --- NEW: Prepare and Send COMPLETE data to Make.com --- 
-            // $make_webhook_url = 'https://hook.eu2.make.com/rb1qjeq2waa8s7g1pd527j2te8fukovg';
-            // Prepare the *initial* payload (same as before, but we'll add AI results)
-            // $make_payload = array(
-            //     'fullName' => isset($decoded_data['fullName']) ? sanitize_text_field($decoded_data['fullName']) : 'N/A',
-            //     'email' => isset($decoded_data['email']) ? sanitize_email($decoded_data['email']) : 'N/A',
-            //     'age' => $decoded_data['age'],
-            //     'gender' => $decoded_data['gender'],
-            //     'biologicalAge' => $decoded_data['biologicalAge'],
-            //     'ageShift' => $decoded_data['ageShift'],
-            //     'agingRate' => $decoded_data['agingRate'],
-            //     'bmi' => $decoded_data['bmi'],
-            //     'bmiCategory' => $decoded_data['bmiCategory'],
-            //     'whr' => $decoded_data['whr'],
-            //     'whrCategory' => $decoded_data['whrCategory'],
-            //     'scores' => $decoded_data['scores'], 
-            //     'positiveFactors' => $decoded_data['positiveFactors'], 
-            //     'negativeFactors' => $decoded_data['negativeFactors'], 
-            //     'healthChallenges' => $health_challenges,
-            //     'healthGoals' => $health_goals
-            //     // AI results will be added next
-            // );
-            
-            // // Add the AI analysis results under the 'ai_results' key
-            // // This matches the structure expected by your Make.com payload template
-            // $make_payload['ai_results'] = $analysis_results; 
-            
-            // // Send the COMPLETE data payload asynchronously to Make.com
-            // $webhook_response = wp_remote_post($make_webhook_url, array(
-            //     'method' => 'POST',
-            //     'headers' => array('Content-Type' => 'application/json; charset=utf-8'),
-            //     'body' => json_encode($make_payload), // Send the merged payload
-            //     'blocking' => false, // Keep it non-blocking
-            //     'data_format' => 'body',
-            // ));
-            
-            // // Log if sending to webhook failed
-            // if (is_wp_error($webhook_response)) {
-            //     error_log('Make.com webhook request failed: ' . $webhook_response->get_error_message());
-            // } else {
-            //      error_log('Longevity form data including AI results sent to Make.com webhook.'); 
-            // }
-            // --- END NEW --- 
-            
+           
             // Send the results back to the client browser (as before)
             wp_send_json_success($analysis_results);
         } catch (Exception $e) {
@@ -376,18 +573,508 @@ function handle_send_to_make_webhook() {
         return;
     }
     
-    // Prepare the payload for Make.com (it should already be in the correct format)
-    // We might add minor sanitization here if needed, but assume JS sent it correctly
-    $make_payload = $complete_data; 
+    // Prepare the payload for Make.com
+    $make_payload = $complete_data;
+
+    // --- Ensure Overall Health fields are properly included ---
+    if (!isset($make_payload['overall_health_percent']) && isset($make_payload['overallHealthPercentage'])) {
+        $make_payload['overall_health_percent'] = $make_payload['overallHealthPercentage'];
+    }
     
+    if (!isset($make_payload['overall_health_score']) && isset($make_payload['overallHealthScore'])) {
+        $make_payload['overall_health_score'] = $make_payload['overallHealthScore'];
+    }
+    
+    // Ensure lifestyle_score_value is included (separate from overall health)
+    if (!isset($make_payload['lifestyle_score_value']) && isset($make_payload['scores'])) {
+        // PHP calculation of average lifestyle score as fallback
+        $lifestyle_keys = [
+            'physicalActivity', 'sleepDuration', 'sleepQuality', 'stressLevels',
+            'socialConnections', 'dietQuality', 'alcoholConsumption', 'smokingStatus',
+            'cognitiveActivity', 'sunlightExposure', 'supplementIntake', 'sitStand',
+            'breathHold', 'balance', 'skinElasticity'
+        ];
+        
+        $valid_scores = array();
+        foreach ($lifestyle_keys as $key) {
+            if (isset($make_payload['scores'][$key]) && is_numeric($make_payload['scores'][$key])) {
+                $valid_scores[] = $make_payload['scores'][$key];
+            }
+        }
+        
+        if (count($valid_scores) > 0) {
+            $make_payload['lifestyle_score_value'] = round(array_sum($valid_scores) / count($valid_scores), 1);
+    } else {
+            $make_payload['lifestyle_score_value'] = 3; // Default if no scores available
+        }
+    }
+    
+    // --- Ensure AI Results include Overall Health Assessment ---
+    if (isset($make_payload['ai_results'])) {
+        if (!isset($make_payload['ai_results']['overallHealthAssessment']) && isset($make_payload['overall_health_percent'])) {
+            // Generate a fallback text based on percentage
+            $percentage = $make_payload['overall_health_percent'];
+            if ($percentage >= 90) {
+                $make_payload['ai_results']['overallHealthAssessment'] = "Your overall health score of {$percentage}% indicates excellent overall health. This suggests your health practices are highly effective and should be maintained.";
+            } elseif ($percentage >= 75) {
+                $make_payload['ai_results']['overallHealthAssessment'] = "Your overall health score of {$percentage}% indicates very good overall health. Your current health habits are working well, with some room for targeted improvements.";
+            } elseif ($percentage >= 60) {
+                $make_payload['ai_results']['overallHealthAssessment'] = "Your overall health score of {$percentage}% suggests good overall health. This balanced approach is beneficial, though there are opportunities to enhance specific areas.";
+            } elseif ($percentage >= 45) {
+                $make_payload['ai_results']['overallHealthAssessment'] = "Your overall health score of {$percentage}% indicates fair overall health. Consider focusing on the highlighted improvement areas to build greater resilience.";
+            } elseif ($percentage >= 30) {
+                $make_payload['ai_results']['overallHealthAssessment'] = "Your overall health score of {$percentage}% suggests your health may benefit from more attention. The recommendations in this report offer important starting points.";
+            } else {
+                $make_payload['ai_results']['overallHealthAssessment'] = "Your overall health score of {$percentage}% indicates significant room for improvement. Focusing on the recommendations in this report could lead to meaningful health gains.";
+            }
+        }
+    }
+
+    // Add function to properly format arrays
+    function ensureProperArrayStructure(&$data) {
+        // Handle strengths/improvements
+        if (isset($data['ai_results']['strengthsAreas'])) {
+            if (isset($data['ai_results']['strengthsAreas']['strengths'])) {
+                if (is_string($data['ai_results']['strengthsAreas']['strengths'])) {
+                    // Convert string to array if needed
+                    $data['ai_results']['strengthsAreas']['strengths'] = 
+                        [$data['ai_results']['strengthsAreas']['strengths']];
+                }
+            } else {
+                $data['ai_results']['strengthsAreas']['strengths'] = [];
+            }
+            
+            if (isset($data['ai_results']['strengthsAreas']['improvements'])) {
+                if (is_string($data['ai_results']['strengthsAreas']['improvements'])) {
+                    // Convert string to array if needed
+                    $data['ai_results']['strengthsAreas']['improvements'] = 
+                        [$data['ai_results']['strengthsAreas']['improvements']];
+                }
+                 } else {
+                $data['ai_results']['strengthsAreas']['improvements'] = [];
+            }
+        }
+        
+        // Handle recommendations
+        if (isset($data['ai_results']['recommendations'])) {
+            $rec_sections = ['immediate', 'ongoing', 'consultations'];
+            foreach ($rec_sections as $section) {
+                if (isset($data['ai_results']['recommendations'][$section])) {
+                    if (is_string($data['ai_results']['recommendations'][$section])) {
+                        // Convert string to array if needed
+                        $data['ai_results']['recommendations'][$section] = 
+                            [$data['ai_results']['recommendations'][$section]];
+                    }
+        } else {
+                    $data['ai_results']['recommendations'][$section] = [];
+                }
+            }
+        }
+    }
+
+    // Call the function to ensure arrays are properly structured
+    ensureProperArrayStructure($make_payload);
+
+    // *** ADDED: Trim whitespace/newlines from all free-text AI result fields ***
+    $ai_text_fields = [
+        'ai_intro_section', 'biologicalAge', 'lifestyleScore', 'bodyComposition',
+        'lifestyleScoreAnalysis', 'insightWhy', 'insightHow', 'insightWhere', 'insightWhen',
+        'ageAssessment', 'chronologicalVsBio', 'agingProcesses', 'researchAndWisdom',
+        'lifespanHealthspan', 'longevityInfluencesExplanation', 'personalizedInsights',
+        'recommendations_intro', 'recommendations_note', 'closing', 
+        // UPDATED Summary fields:
+        'summary_results_block', 'summary_closing_narrative', 
+        'objectives_section'
+    ];
+
+    if (isset($make_payload['ai_results']) && is_array($make_payload['ai_results'])) {
+        foreach ($ai_text_fields as $field) {
+            if (isset($make_payload['ai_results'][$field]) && is_string($make_payload['ai_results'][$field])) {
+                $make_payload['ai_results'][$field] = trim($make_payload['ai_results'][$field]);
+            }
+        }
+        // Also handle nested CTA fields
+        if (isset($make_payload['ai_results']['cta']['consultation']) && is_string($make_payload['ai_results']['cta']['consultation'])) {
+            $make_payload['ai_results']['cta']['consultation'] = trim($make_payload['ai_results']['cta']['consultation']);
+        }
+        if (isset($make_payload['ai_results']['cta']['programs']) && is_string($make_payload['ai_results']['cta']['programs'])) {
+            $make_payload['ai_results']['cta']['programs'] = trim($make_payload['ai_results']['cta']['programs']);
+        }
+         // Note: recommendations and strengths/improvements are handled by ensureProperArrayStructure or structure expected
+    }
+    // *** END ADDED ***
+
+    // --- Fix potentially problematic AI text fields ---
+    // UPDATED Sanitized fields:
+    $fields_to_sanitize = ['objectives_section', 'summary_results_block', 'summary_closing_narrative', 'recommendations_intro', 'recommendations_note'];
+    foreach ($fields_to_sanitize as $field_key) {
+        if (isset($make_payload['ai_results'][$field_key])) {
+            $original_text = $make_payload['ai_results'][$field_key];
+            
+            // ALWAYS strip HTML tags - this is critical for JSON compatibility
+            $sanitized_text = strip_tags($original_text);
+            
+            // Remove all quotes that might break JSON
+            $sanitized_text = str_replace(['"', "'"], ['', ''], $sanitized_text);
+            
+            // Remove JSON-breaking characters
+            $sanitized_text = str_replace(['{', '}', '[', ']'], ['(', ')', '(', ')'], $sanitized_text);
+            
+            // Remove control characters completely
+            $sanitized_text = preg_replace('/[\x00-\x1F\x7F-\x9F]/u', '', $sanitized_text);
+            
+            // Add paragraph breaks back as plain text formatting
+            $sanitized_text = str_replace('. ', ". \n\n", $sanitized_text);
+            
+            // Limited length
+            $limit = 2000;
+            if (mb_strlen($sanitized_text, 'UTF-8') > $limit) {
+                $sanitized_text = mb_substr($sanitized_text, 0, $limit, 'UTF-8');
+            }
+            
+            // Final cleanup
+            $make_payload['ai_results'][$field_key] = trim($sanitized_text);
+            
+            error_log($field_key . ' SANITIZED: ' . substr($make_payload['ai_results'][$field_key], 0, 100) . '...');
+        } else {
+            // REMOVED Generic fallback - will be handled specifically below
+            // $make_payload['ai_results'][$field_key] = "Thank you for completing this assessment..."; 
+            error_log($field_key . ' MISSING - Will check for specific fallback later');
+        }
+    }
+    // --- End Fix ---
+    
+    // --- NEW: Add Specific Fallbacks for Summary Fields (AFTER SANITIZATION) ---
+    if (!isset($make_payload['ai_results']['summary_results_block']) || empty(trim($make_payload['ai_results']['summary_results_block']))) {
+        $make_payload['ai_results']['summary_results_block'] = "Your assessment reveals key insights about your health and longevity profile. Your biological age of " . 
+            (isset($make_payload['biologicalAge']) ? htmlspecialchars($make_payload['biologicalAge']) : "N/A") . 
+            " compared to your chronological age of " . 
+            (isset($make_payload['age']) ? htmlspecialchars($make_payload['age']) : "N/A") . 
+            " indicates areas of strength and opportunity. Focus on your highlighted strengths and address the priority areas identified to optimize your health trajectory.";
+        error_log('summary_results_block MISSING or EMPTY - Specific fallback provided.');
+    }
+    
+    if (!isset($make_payload['ai_results']['summary_closing_narrative']) || empty(trim($make_payload['ai_results']['summary_closing_narrative']))) {
+        $make_payload['ai_results']['summary_closing_narrative'] = "Taking responsibility for your wellbeing isn't a burden but a reclaiming of your natural capacity for vitality. The choices you make reshape your biology, influencing gene expression and tissue regeneration. This isn't merely about preventing illness—it's about discovering optimal living in your unique body.\n\nWe wish you success as you continue this important journey. Remember that support is always available when needed, and consider retaking this assessment in a few months to track your progress.\n\nWishing you strength, clarity, and joy on your journey forward.";
+        error_log('summary_closing_narrative MISSING or EMPTY - Specific fallback provided.');
+    }
+    // --- END NEW Specific Fallbacks ---
+
+    // Force the ai_intro_section to the top level for better visibility
+    if (isset($make_payload['ai_results']['ai_intro_section'])) {
+        $make_payload['ai_intro_section_direct'] = $make_payload['ai_results']['ai_intro_section'];
+    }
+
+    // --- Ensure all required AI fields are present ---
+    if (!isset($make_payload['ai_results']) || !is_array($make_payload['ai_results'])) {
+        $make_payload['ai_results'] = [];
+    }
+    $required_ai_fields = [
+        'ai_intro_section',            // New intro section
+        'biologicalAge',               // Analysis of biological age
+        'chronologicalVsBio',          // Detailed Chronological vs Bio text
+        'lifestyleScoreAnalysis',      // Lifestyle score analysis
+        'bodyComposition',             // BMI/WHR analysis
+        'longevityInfluencesExplanation', // Explanation for the visual/key factors
+        'strengthsAreas',              // Strengths and improvement areas (structure TBD: object or string)
+        'summary_results_block',       // Summary block 1
+        'summary_closing_narrative',   // Summary block 2 (NB note)
+        'recommendations_intro',       // Recommendations block 1 (main context)
+        'recommendations_note'         // Recommendations block 2 (NB note)
+    ];
+    foreach ($required_ai_fields as $field) {
+        if (!array_key_exists($field, $make_payload['ai_results'])) {
+            // Add meaningful default content instead of empty string
+            switch ($field) {
+                case 'ai_intro_section':
+                    $make_payload['ai_results'][$field] = "Welcome to your personalized Longevity Health Assessment for age " . 
+                        (isset($make_payload['age']) ? $make_payload['age'] : 'N/A') . 
+                        ". Based on your health challenges of '" . 
+                        (isset($make_payload['healthChallenges']) ? $make_payload['healthChallenges'] : 'not provided') . 
+                        "' and goals of '" . 
+                        (isset($make_payload['healthGoals']) ? $make_payload['healthGoals'] : 'not provided') . 
+                        "', this report provides a roadmap for optimizing your well-being and longevity.";
+                    break;
+                case 'biologicalAge':
+                    $make_payload['ai_results'][$field] = "Your biological age provides an estimate of your health at a cellular level compared to your chronological age.";
+                    break;
+                case 'chronologicalVsBio':
+                    $make_payload['ai_results'][$field] = "<p>Your chronological age is fixed, but your biological age reflects how lifestyle influences cellular aging. Consistent positive changes can significantly improve your health trajectory.</p>";
+                    break;
+                case 'lifestyleScoreAnalysis':
+                    $make_payload['ai_results'][$field] = "Your Lifestyle Score reflects daily habits like nutrition and activity. It serves as a guidepost for areas of strength and potential growth.";
+                    break;
+                case 'bodyComposition':
+                    $make_payload['ai_results'][$field] = "BMI and Waist-Hip Ratio offer insights into body composition and potential health risks. Understanding these can guide adjustments for better health.";
+                    break;
+                case 'longevityInfluencesExplanation':
+                    $make_payload['ai_results'][$field] = "Key lifestyle factors significantly influence your long-term health. Focusing on impactful areas identified in your assessment can enhance your vitality.";
+                    break;
+                case 'strengthsAreas':
+                    $make_payload['ai_results'][$field] = ['strengths' => ['Focusing on positive habits'], 'improvements' => ['Reviewing areas for potential enhancements']];
+                    break;
+                case 'summary_results_block':
+                    $make_payload['ai_results'][$field] = "If you've read this far, take a moment to acknowledge the significant step you've already taken. Seeking to understand your health at this level demonstrates a commitment that many never make. This willingness to clearly assess your current reality is the essential foundation for meaningful change.";
+                    break;
+                case 'summary_closing_narrative':
+                    $make_payload['ai_results'][$field] = "I'd like to invite you to consider retaking this assessment in a few months as a way to see the progress you're making on your journey.
+
+Wishing you strength, clarity, and joy on your journey. We're here to support you every step of the way.";
+                    break;
+                case 'recommendations_intro':
+                    $make_payload['ai_results'][$field] = "These personalised suggestions are based on the information you've provided, analysed through both modern health science and traditional wisdom perspectives. Consider them thoughtful starting points rather than rigid prescriptions—a foundation to build upon as you progress.\n\nWhile these recommendations reflect patterns observed in your assessment, they would ideally be refined through consultation with a healthcare practitioner who can incorporate nuances of your unique constitution, medical history, and personal preferences. As you implement changes and observe your body's responses, these suggestions will naturally evolve to reflect your emerging needs.";
+                    break;
+                case 'recommendations_note':
+                    $make_payload['ai_results'][$field] = "Remember that genuine transformation rarely follows a linear path. Your body's intelligence will guide you through cycles of implementation, observation, and refinement—each cycle bringing you closer to your optimal expression of health.";
+                    break;
+                default:
+                    $make_payload['ai_results'][$field] = "";
+            }
+        }
+    }
+    // --- End ensure required AI fields ---
+    
+    // Specific debug for the intro section
+    if (isset($make_payload['ai_results']['ai_intro_section'])) {
+        error_log('ai_intro_section found: ' . substr($make_payload['ai_results']['ai_intro_section'], 0, 50) . '...');
+    } else {
+        error_log('ai_intro_section NOT FOUND in payload!');
+        
+        // Explicitly ensure it exists with meaningful content
+        $make_payload['ai_results']['ai_intro_section'] = "Welcome to your personalized Longevity Health Assessment for age " . 
+            (isset($make_payload['age']) ? $make_payload['age'] : 'N/A') . 
+            ". Based on your health challenges of '" . 
+            (isset($make_payload['healthChallenges']) ? $make_payload['healthChallenges'] : 'not provided') . 
+            "' and goals of '" . 
+            (isset($make_payload['healthGoals']) ? $make_payload['healthGoals'] : 'not provided') . 
+            "', this report provides a roadmap for optimizing your well-being and longevity.";
+    }
+
+    // --- Ensure all required WHR and fallback fields are present ---
+    if (!isset($make_payload['whr_min'])) {
+        $make_payload['whr_min'] = 0.6;
+    }
+    if (!isset($make_payload['whr_max'])) {
+        $make_payload['whr_max'] = 1.2;
+    }
+    if (!isset($make_payload['whr_threshold'])) {
+        // Default to 0.95 (male) if gender is male, else 0.85 (female), else 0.9
+        if (isset($make_payload['gender']) && $make_payload['gender'] === 'male') {
+            $make_payload['whr_threshold'] = 0.95;
+        } elseif (isset($make_payload['gender']) && $make_payload['gender'] === 'female') {
+            $make_payload['whr_threshold'] = 0.85;
+        } else {
+            $make_payload['whr_threshold'] = 0.9;
+        }
+    }
+    if (!isset($make_payload['whr_range'])) {
+        $make_payload['whr_range'] = $make_payload['whr_max'] - $make_payload['whr_min'];
+    }
+    if (!isset($make_payload['chronologicalAge'])) {
+        $make_payload['chronologicalAge'] = isset($make_payload['age']) ? $make_payload['age'] : null;
+    }
+    if (!isset($make_payload['ageAssessmentText'])) {
+        $make_payload['ageAssessmentText'] = "";
+    }
+    // --- End ensure required WHR and fallback fields ---
+
     // Define Make.com webhook URL
     $make_webhook_url = 'https://hook.eu2.make.com/rb1qjeq2waa8s7g1pd527j2te8fukovg';
     
+    // --- START: Add Chart Configuration Data ---
+    $chart_config = [
+        'colors' => ["#007B7F", "#27ae60", "#e74c3c", "#f39c12", "#3498db"], // Default theme colors
+        'agingRate' => [
+            'value' => isset($make_payload['agingRate']) ? floatval($make_payload['agingRate']) : null,
+            'minValue' => 0.5,
+            'maxValue' => 1.5
+        ],
+        'bodyComposition' => [
+            'bmi' => [
+                'value' => isset($make_payload['bmi']) ? floatval($make_payload['bmi']) : null,
+                'category' => $make_payload['bmiCategory'] ?? 'N/A',
+                'minValue' => 15,
+                'maxValue' => 40,
+                'colorStops' => [ // Define color stops for BMI ranges
+                    ['percent' => (18.5 - 15) / (40 - 15), 'color' => '#2ecc71'], // Healthy start
+                    ['percent' => (25.0 - 15) / (40 - 15), 'color' => '#f1c40f'], // Overweight start
+                    ['percent' => (30.0 - 15) / (40 - 15), 'color' => '#e67e22'], // Obese start
+                    ['percent' => (35.0 - 15) / (40 - 15), 'color' => '#e74c3c'], // High Obese start
+                    // Add more stops if needed, ensure percentages are correct
+                ]
+            ],
+            'whr' => [
+                'value' => isset($make_payload['whr']) ? floatval($make_payload['whr']) : null,
+                'category' => $make_payload['whrCategory'] ?? 'N/A',
+                'gender' => $make_payload['gender'] ?? 'other', // Include gender for threshold logic
+                'minValue' => 0.6,
+                'maxValue' => 1.2,
+                'riskThresholdMale' => 0.95,
+                'riskThresholdFemale' => 0.85
+            ]
+        ],
+        'detailedScores' => [
+            // Ensure scores are numbers
+             'scores' => isset($make_payload['scores']) && is_array($make_payload['scores']) 
+                        ? array_map('floatval', $make_payload['scores']) 
+                        : [],
+            'maxValue' => 5
+        ]
+    ];
+    $make_payload['chartConfig'] = $chart_config;
+    
+    // --- Remove old chart URLs to avoid confusion ---
+    unset($make_payload['biological_age_chart_url']);
+    unset($make_payload['age_impact_chart_url']);
+    unset($make_payload['detailed_scores_chart_url']);
+    unset($make_payload['aging_rate_chart_url']);
+    unset($make_payload['body_composition_chart_url']);
+    // --- END: Add Chart Configuration Data ---
+
+    // Ensure chart URLs are included
+    if (!isset($make_payload['biological_age_chart_url']) || empty($make_payload['biological_age_chart_url'])) {
+        // Generate a default chart URL or use a placeholder
+        $age = isset($make_payload['age']) ? $make_payload['age'] : 0;
+        $bioAge = isset($make_payload['biologicalAge']) ? $make_payload['biologicalAge'] : 0;
+        $make_payload['biological_age_chart_url'] = 'https://quickchart.io/chart?c=' . 
+            urlencode(json_encode([
+                'type' => 'bar',
+                'data' => [
+                    'labels' => ['Chronological Age', 'Biological Age'],
+                    'datasets' => [[
+                        'label' => 'Age Comparison',
+                        'data' => [$age, $bioAge],
+                        'backgroundColor' => ['#0077B6', '#00B4D8']
+                    ]]
+                ]
+            ]));
+    }
+
+    // Do the same for other missing chart URLs
+    $charts = [
+        'detailed_scores_chart_url',
+        'age_impact_chart_url',
+        'aging_rate_chart_url'
+    ];
+
+    foreach ($charts as $chart) {
+        if (!isset($make_payload[$chart]) || empty($make_payload[$chart])) {
+            $make_payload[$chart] = 'https://quickchart.io/chart?c=' . 
+                urlencode(json_encode([
+                    'type' => 'pie',
+                    'data' => [
+                        'labels' => ['Placeholder Chart'],
+                        'datasets' => [[
+                            'data' => [100],
+                            'backgroundColor' => ['#0077B6']
+                        ]]
+                    ]
+                ]));
+        }
+    }
+
+    // Before sending data to Make.com, ensure impact factors are properly structured
+    // Check if positiveFactors exists and is a single item when it should be an array
+    if (isset($make_payload['positiveFactors']) && !is_array($make_payload['positiveFactors']) && isset($make_payload['positiveFactors']['name'])) {
+        // Convert single item to array
+        $make_payload['positiveFactors'] = [$make_payload['positiveFactors']];
+    }
+
+    // Same for negativeFactors
+    if (isset($make_payload['negativeFactors']) && !is_array($make_payload['negativeFactors']) && isset($make_payload['negativeFactors']['name'])) {
+        // Convert single item to array
+        $make_payload['negativeFactors'] = [$make_payload['negativeFactors']];
+    }
+
+    // Ensure at least one item exists in each array
+    if (!isset($make_payload['positiveFactors']) || empty($make_payload['positiveFactors'])) {
+        $make_payload['positiveFactors'] = [
+            ['name' => 'Healthy Lifestyle Habits', 'impact' => -1.0, 'description' => 'Your overall health practices contribute to longevity.']
+        ];
+    }
+
+    if (!isset($make_payload['negativeFactors']) || empty($make_payload['negativeFactors'])) {
+        $make_payload['negativeFactors'] = [
+            ['name' => 'Lifestyle Challenges', 'impact' => 1.0, 'description' => 'Areas that may be impacting your health trajectory.']
+        ];
+    }
+
+    // --- START FIX 4: Add explicit age comparison validation ---
+    if (isset($make_payload['biologicalAge']) && isset($make_payload['age'])) {
+        $bioAge = floatval($make_payload['biologicalAge']);
+        $chronoAge = floatval($make_payload['age']);
+        
+        // Force consistency - recalculate age shift to ensure it matches the ages
+        $actualShift = $bioAge - $chronoAge;
+        $make_payload['ageShift'] = number_format($actualShift, 1);
+        
+        // Log the recalculated values
+        error_log("FIXED: Bio Age: $bioAge, Chrono Age: $chronoAge, Shift: $actualShift");
+        
+        // Now we can check if the AI response is inconsistent with these values
+        if (isset($make_payload['ai_results']['biologicalAge'])) {
+            $bioAgeText = $make_payload['ai_results']['biologicalAge'];
+            
+            // If there's a mismatch (text says higher but numbers show lower or vice versa)
+            if (($actualShift < 0 && strpos($bioAgeText, 'higher') !== false) || 
+                ($actualShift > 0 && strpos($bioAgeText, 'lower') !== false)) {
+                
+                // Replace with a safe, data-driven alternative
+                if ($actualShift < 0) {
+                    $make_payload['ai_results']['biologicalAge'] = "Your biological age of $bioAge is " . abs($actualShift) . " years lower than your chronological age of $chronoAge. This positive difference suggests your lifestyle choices are supporting healthy aging.";
+                } else {
+                    $make_payload['ai_results']['biologicalAge'] = "Your biological age of $bioAge is " . abs($actualShift) . " years higher than your chronological age of $chronoAge. Some targeted lifestyle improvements could help reduce this difference.";
+                }
+                
+                error_log("CORRECTED: Inconsistent biological age text was fixed");
+            }
+        }
+    }
+    // --- END FIX 4 ---
+
+    // --- START FIX 2: Fix age shift presentation logic ---
+    if (isset($make_payload['ageShift']) && is_numeric($make_payload['ageShift'])) {
+        // Create a numeric version to ensure proper comparison
+        $ageShiftValue = floatval($make_payload['ageShift']);
+        
+        // Add explicit fields about whether bio age is higher or lower
+        $make_payload['bioAgeLowerThanChrono'] = ($ageShiftValue < 0) ? true : false;
+        $make_payload['bioAgeHigherThanChrono'] = ($ageShiftValue > 0) ? true : false;
+        
+        // Add human-readable text for templates
+        if ($ageShiftValue < 0) {
+            $make_payload['ageShiftText'] = "Your biological age is estimated to be lower than your chronological age by " . abs($ageShiftValue) . " years.";
+            $make_payload['ageShiftClass'] = "positive";
+        } else if ($ageShiftValue > 0) {
+            $make_payload['ageShiftText'] = "Your biological age is estimated to be higher than your chronological age by " . abs($ageShiftValue) . " years.";
+            $make_payload['ageShiftClass'] = "negative";
+        } else {
+            $make_payload['ageShiftText'] = "Your biological age is approximately equal to your chronological age.";
+            $make_payload['ageShiftClass'] = "neutral";
+        }
+    }
+    // --- END FIX 2 ---
+
+    // Add debug log
+    error_log('Impact factors being sent: Positive=' . count($make_payload['positiveFactors']) . ', Negative=' . count($make_payload['negativeFactors']));
+
+    // Log the full payload for debugging
+    error_log('Complete Make.com payload: ' . wp_json_encode($make_payload));
+
+    // Emergency fallback - replace troublesome fields with guaranteed safe content if JSON encoding fails
+    $json_test = wp_json_encode($make_payload);
+    if ($json_test === false) {
+        error_log('JSON encoding failed - providing safe fallbacks for narrative fields');
+        // Provide simple safe content for problematic fields
+        $make_payload['ai_results']['summary_results_block'] = 'Thank you for completing this assessment. We encourage you to continue your health journey with the insights provided.';
+        $make_payload['ai_results']['summary_closing_narrative'] = 'Focus on the key recommendations in this report to improve your overall health and wellbeing.';
+    }
+
     // Send the COMPLETE data payload asynchronously to Make.com
     $webhook_response = wp_remote_post($make_webhook_url, array(
         'method' => 'POST',
         'headers' => array('Content-Type' => 'application/json; charset=utf-8'),
-        'body' => json_encode($make_payload), // Re-encode the validated data
+        'body' => wp_json_encode($make_payload), // Use wp_json_encode for better WP compatibility
         'blocking' => false, // Keep it non-blocking
         'data_format' => 'body',
         'timeout' => 15 // Shorter timeout for non-blocking webhook call
@@ -412,7 +1099,6 @@ function handle_send_to_make_webhook() {
     // Ensure WordPress exits gracefully after handling the AJAX request
     wp_die(); 
 }
-// *** END NEW Function ***
 
 // Register shortcode
 function longevity_assessment_form() {
@@ -546,7 +1232,7 @@ function longevity_assessment_form() {
                         <option value="0">Sedentary (minimal activity)</option>
                         <option value="1">Very low (occasional walking)</option>
                         <option value="2">Low (regular walking or light activity)</option>
-                        <option value="3" selected>Moderate (regular moderate exercise)</option>
+                        <option value="3">Moderate (regular moderate exercise)</option>
                         <option value="4">High (structured exercise 3+ times/week)</option>
                         <option value="5">Very high (intense training 4+ times/week)</option>
                     </select>
@@ -558,7 +1244,7 @@ function longevity_assessment_form() {
                         <option value="0">Less than 4 hours (severely insufficient)</option>
                         <option value="1">4–5 hours (very short sleep)</option>
                         <option value="2">5–6 hours (short sleep)</option>
-                        <option value="3" selected>6–7 hours (slightly below average)</option>
+                        <option value="3">6–7 hours (slightly below average)</option>
                         <option value="4">7–8 hours (recommended duration)</option>
                         <option value="5">More than 8 hours (extended sleep)</option>
                     </select>
@@ -570,7 +1256,7 @@ function longevity_assessment_form() {
                         <option value="0">Never (I never sleep well)</option>
                         <option value="1">Rarely (seldom restful sleep)</option>
                         <option value="2">Occasionally (inconsistent quality)</option>
-                        <option value="3" selected>Sometimes (moderate quality sleep)</option>
+                        <option value="3">Sometimes (moderate quality sleep)</option>
                         <option value="4">Often (mostly restful sleep)</option>
                         <option value="5">Always (consistently high quality sleep)</option>
                     </select>
@@ -582,7 +1268,7 @@ function longevity_assessment_form() {
                         <option value="0">Constantly stressed (high anxiety, unrelenting)</option>
                         <option value="1">Very high stress (frequent overwhelming stress)</option>
                         <option value="2">Moderate stress (often challenging to manage)</option>
-                        <option value="3" selected>Sometimes stressed (occasional stress episodes)</option>
+                        <option value="3">Sometimes stressed (occasional stress episodes)</option>
                         <option value="4">Low stress (generally calm)</option>
                         <option value="5">Rarely stressed (minimal stress, very relaxed)</option>
                     </select>
@@ -594,7 +1280,7 @@ function longevity_assessment_form() {
                         <option value="0">None (no regular social interaction)</option>
                         <option value="1">Rarely (infrequent social contact)</option>
                         <option value="2">Occasionally (sporadic interaction with friends/family)</option>
-                        <option value="3" selected>Regularly (consistent weekly social contact)</option>
+                        <option value="3">Regularly (consistent weekly social contact)</option>
                         <option value="4">Often (frequent social engagement)</option>
                         <option value="5">Daily (social interactions every day)</option>
                     </select>
@@ -606,7 +1292,7 @@ function longevity_assessment_form() {
                         <option value="0">Very poor (nutrient deficient, unhealthy choices)</option>
                         <option value="1">Poor (limited variety, low nutrient density)</option>
                         <option value="2">Below average (occasional healthy meals, frequent unhealthy choices)</option>
-                        <option value="3" selected>Average (balanced diet with some healthy choices)</option>
+                        <option value="3">Average (balanced diet with some healthy choices)</option>
                         <option value="4">Good (mostly nutritious and balanced)</option>
                         <option value="5">Excellent (high nutrient density, varied and balanced)</option>
                     </select>
@@ -618,7 +1304,7 @@ function longevity_assessment_form() {
                         <option value="0">15+ drinks per week (heavy drinking)</option>
                         <option value="1">10-14 drinks per week (frequent heavy drinking)</option>
                         <option value="2">6-9 drinks per week (moderate consumption)</option>
-                        <option value="3" selected>3-5 drinks per week (light to moderate consumption)</option>
+                        <option value="3">3-5 drinks per week (light to moderate consumption)</option>
                         <option value="4">1-2 drinks per week (occasional drinking)</option>
                         <option value="5">0 drinks (abstainer)</option>
                     </select>
@@ -630,7 +1316,7 @@ function longevity_assessment_form() {
                         <option value="0">Current daily smoker (smokes every day)</option>
                         <option value="1">Regular smoker (smokes on most days)</option>
                         <option value="2">Occasional smoker (smokes infrequently)</option>
-                        <option value="3" selected>Recently quit (stopped smoking within the last 6 months)</option>
+                        <option value="3">Recently quit (stopped smoking within the last 6 months)</option>
                         <option value="4">Former smoker (quit more than 6 months ago)</option>
                         <option value="5">Never smoked (no history of smoking)</option>
                     </select>
@@ -642,7 +1328,7 @@ function longevity_assessment_form() {
                         <option value="0">Never (no cognitive activities, e.g. puzzles or reading)</option>
                         <option value="1">Rarely (infrequent mental stimulation)</option>
                         <option value="2">Occasionally (sporadic cognitive activities)</option>
-                        <option value="3" selected>Regularly (weekly engagement in brain-stimulating tasks)</option>
+                        <option value="3">Regularly (weekly engagement in brain-stimulating tasks)</option>
                         <option value="4">Frequently (almost daily mental stimulation)</option>
                         <option value="5">Daily (consistent daily mental exercises such as puzzles or reading)</option>
                     </select>
@@ -654,7 +1340,7 @@ function longevity_assessment_form() {
                         <option value="0">Less than 10 minutes (minimal exposure)</option>
                         <option value="1">10-20 minutes (brief exposure)</option>
                         <option value="2">20-30 minutes (short daily exposure)</option>
-                        <option value="3" selected>30-60 minutes (moderate daily exposure)</option>
+                        <option value="3">30-60 minutes (moderate daily exposure)</option>
                         <option value="4">1-2 hours (extended daily exposure)</option>
                         <option value="5">More than 2 hours (high exposure)</option>
                     </select>
@@ -666,7 +1352,7 @@ function longevity_assessment_form() {
                         <option value="0">None (no supplements)</option>
                         <option value="1">Rarely (less than once per week)</option>
                         <option value="2">Occasionally (1-2 times per week)</option>
-                        <option value="3" selected>Regularly (3-4 times per week)</option>
+                        <option value="3">Regularly (3-4 times per week)</option>
                         <option value="4">Frequently (5-6 times per week)</option>
                         <option value="5">Daily (every day)</option>
                     </select>
@@ -683,7 +1369,7 @@ function longevity_assessment_form() {
                         <option value="0">0 points (unable to perform any stand-ups)</option>
                         <option value="1">1-2 points (minimal performance)</option>
                         <option value="2">3-5 points (below average performance)</option>
-                        <option value="3" selected>6-7 points (average performance)</option>
+                        <option value="3">6-7 points (average performance)</option>
                         <option value="4">8-9 points (above average performance)</option>
                         <option value="5">10 points (excellent performance)</option>
                     </select>
@@ -695,7 +1381,7 @@ function longevity_assessment_form() {
                         <option value="0">Less than 15 seconds (very short duration)</option>
                         <option value="1">15-29 seconds (short duration)</option>
                         <option value="2">30-45 seconds (moderate duration)</option>
-                        <option value="3" selected>46-60 seconds (good duration)</option>
+                        <option value="3">46-60 seconds (good duration)</option>
                         <option value="4">61-90 seconds (long duration)</option>
                         <option value="5">More than 90 seconds (very long duration)</option>
                     </select>
@@ -707,7 +1393,7 @@ function longevity_assessment_form() {
                         <option value="0">Less than 10 seconds (poor balance)</option>
                         <option value="1">10-19 seconds (below average balance)</option>
                         <option value="2">20-29 seconds (moderate balance)</option>
-                        <option value="3" selected>30-39 seconds (good balance)</option>
+                        <option value="3">30-39 seconds (good balance)</option>
                         <option value="4">40-59 seconds (very good balance)</option>
                         <option value="5">More than 60 seconds (excellent balance)</option>
                     </select>
@@ -719,7 +1405,7 @@ function longevity_assessment_form() {
                         <option value="0">More than 30 seconds (very low elasticity)</option>
                         <option value="1">16-30 seconds (low elasticity)</option>
                         <option value="2">10-15 seconds (below average elasticity)</option>
-                        <option value="3" selected>5-9 seconds (moderate elasticity)</option>
+                        <option value="3">5-9 seconds (moderate elasticity)</option>
                         <option value="4">3-4 seconds (good elasticity)</option>
                         <option value="5">1-2 seconds (excellent elasticity)</option>
                     </select>
@@ -1738,7 +2424,7 @@ function longevity_assessment_form() {
             padding: 0 2px; /* Add slight padding for text alignment */
         }
         /* --- End Gauge Styling --- */
-
+        
         /* --- Age Impact Factors Section --- */
         .impact-factors-container {
             display: flex;
@@ -2783,6 +3469,32 @@ function longevity_assessment_form() {
         // --- END NEW Function ---
 
         /**
+         * Gets descriptive text for the overall health score based on percentage.
+         * @param {number} overallHealthPercent - User's reported health percentage (0-100).
+         * @returns {string} - Descriptive text about overall health.
+         */
+        function getOverallHealthAssessmentText(overallHealthPercent) {
+            if (overallHealthPercent === null || isNaN(overallHealthPercent)) {
+                return "No overall health percentage provided. Consider completing a comprehensive health assessment for a more complete evaluation.";
+            }
+            
+            // Determine assessment text based on percentage ranges
+            if (overallHealthPercent >= 90) {
+                return `Your overall health score of ${overallHealthPercent}% indicates excellent overall health. This suggests your health practices are highly effective and should be maintained.`;
+            } else if (overallHealthPercent >= 75) {
+                return `Your overall health score of ${overallHealthPercent}% indicates very good overall health. Your current health habits are working well, with some room for targeted improvements.`;
+            } else if (overallHealthPercent >= 60) {
+                return `Your overall health score of ${overallHealthPercent}% suggests good overall health. This balanced approach is beneficial, though there are opportunities to enhance specific areas.`;
+            } else if (overallHealthPercent >= 45) {
+                return `Your overall health score of ${overallHealthPercent}% indicates fair overall health. Consider focusing on the highlighted improvement areas to build greater resilience.`;
+            } else if (overallHealthPercent >= 30) {
+                return `Your overall health score of ${overallHealthPercent}% suggests your health may benefit from more attention. The recommendations in this report offer important starting points.`;
+            } else {
+                return `Your overall health score of ${overallHealthPercent}% indicates significant room for improvement. Focusing on the recommendations in this report could lead to meaningful health gains.`;
+            }
+        }
+
+        /**
          * Calculates Body Mass Index (BMI), a measure of body size relative to height.
          * 
          * @param {number} heightCm - User's height in centimeters.
@@ -2885,7 +3597,7 @@ function longevity_assessment_form() {
                     const shiftContribution = weights[metric] * (3 - score);
                     totalShift += shiftContribution;
                     debug(`Metric: ${metric}, Score: ${score}, Weight: ${weights[metric]}, Shift Contribution: ${shiftContribution.toFixed(2)}`);
-                } else {
+            } else {
                     debug(`Invalid or missing score for metric: ${metric}. Skipping.`);
                 }
             }
@@ -2955,6 +3667,32 @@ function longevity_assessment_form() {
         }
 
         /**
+         * Calculates the average of lifestyle-specific scores only
+         * Excludes derived metrics like BMI, WHR, and overall health
+         * @param {object} scores - Object containing all score metrics
+         * @returns {number} - The calculated lifestyle score average
+         */
+        function calculateLifestyleScoreAverage(scores) {
+            // Define which keys represent direct lifestyle choices for this calculation
+            const lifestyleKeys = [ 
+                'physicalActivity', 'sleepDuration', 'sleepQuality', 'stressLevels',
+                'socialConnections', 'dietQuality', 'alcoholConsumption', 'smokingStatus',
+                'cognitiveActivity', 'sunlightExposure', 'supplementIntake', 'sitStand',
+                'breathHold', 'balance', 'skinElasticity'
+            ];
+            
+            // Get only the scores for the specified lifestyle keys
+            const lifestyleScoresOnly = lifestyleKeys
+                .map(key => scores[key])
+                .filter(score => typeof score === 'number' && !isNaN(score));
+            
+            // Calculate the average lifestyle score
+            return lifestyleScoresOnly.length > 0
+                ? lifestyleScoresOnly.reduce((a, b) => a + b, 0) / lifestyleScoresOnly.length 
+                : 3; // Default to 3 if no valid scores
+        }
+
+        /**
          * Initiates an asynchronous request to the server for AI-powered analysis
          * based on the user's assessment results. Displays a loading indicator
          * while the analysis is in progress.
@@ -2975,6 +3713,9 @@ function longevity_assessment_form() {
         function performAIAnalysis(scores, measurements, age, biologicalAge, ageShift, agingRate, bmi, bmiCategory, whr, whrCategory, positiveFactors, negativeFactors, healthChallenges, healthGoals, fullName, email) { // Added fullName, email
             debug("Starting AI analysis...");
             
+            // Calculate lifestyle score average explicitly
+            const lifestyleScoreAverage = calculateLifestyleScoreAverage(scores);
+            
             // Show loading indicator
             const aiSection = document.getElementById('aiAnalysisSection');
             const loadingDiv = aiSection.querySelector('.ai-loading');
@@ -2991,11 +3732,6 @@ function longevity_assessment_form() {
             loadingDiv.style.display = 'flex';
             loadingDiv.querySelector('.ai-loading-icon').style.animation = 'spin 1.5s linear infinite';
             contentDiv.style.display = 'none'; // Hide previous results/errors
-            
-            // Add a spinning animation (ensure keyframes are in CSS now)
-            // const style = document.createElement('style');
-            // style.textContent = ` ... keyframes ... `;
-            // document.head.appendChild(style);
             
             // Prepare data for API
             const analysisData = {
@@ -3014,7 +3750,11 @@ function longevity_assessment_form() {
                 healthChallenges: healthChallenges, // Add challenges
                 healthGoals: healthGoals,           // Add goals
                 fullName: fullName,                 // *** ADDED fullName ***
-                email: email                       // *** ADDED email ***
+                email: email,                       // *** ADDED email ***
+                // Explicitly separate these values
+                lifestyleScoreAverage: lifestyleScoreAverage.toFixed(1), // Actual average of lifestyle factors
+                overallHealthPercentage: measurements.overallHealthPercent, // Raw percentage
+                overallHealthScore: scores.overallHealthScore // Calculated 0-5 score
             };
             
             debug("Sending AI analysis data:", analysisData);
@@ -3135,6 +3875,12 @@ function longevity_assessment_form() {
                     <div class="ai-section">
                         <h5>Lifestyle Assessment</h5>
                         <div class="ai-lifestyle-score"></div>
+                    </div>
+                    
+                    <!-- NEW: Overall Health Assessment Section -->
+                    <div class="ai-section">
+                        <h5>Overall Health Assessment</h5>
+                        <div class="ai-overall-health"></div>
                     </div>
                     
                     <!-- Body Composition Section -->
@@ -3267,12 +4013,23 @@ function longevity_assessment_form() {
             populateContent('.ai-introduction', data.introduction);
             populateContent('.ai-biological-age', data.biologicalAge);
             populateContent('.ai-lifestyle-score', data.lifestyleScore);
+            populateContent('.ai-overall-health', data.overallHealthAssessment); // NEW: populate overall health section
             populateContent('.ai-body-composition', data.bodyComposition);
             populateContent('.ai-strengths-areas', data.strengthsAreas); // Handles strengths/improvements object
             populateContent('.ai-personalized-insights', data.personalizedInsights);
             populateContent('.ai-recommendations', data.recommendations); // Handles recommendations object
             populateContent('.ai-closing', data.closing);
             populateContent('.ai-cta', data.cta); // Handles cta object
+            
+            // Fallback for older AI responses that don't include overallHealthAssessment
+            if (!data.overallHealthAssessment && completeFormDataForWebhook && completeFormDataForWebhook.overallHealthPercentage) {
+                const overallHealthElement = contentDiv.querySelector('.ai-overall-health');
+                if (overallHealthElement) {
+                    const percentage = completeFormDataForWebhook.overallHealthPercentage;
+                    const assessmentText = getOverallHealthAssessmentText(percentage);
+                    overallHealthElement.innerHTML = `<p>${assessmentText}</p>`;
+                }
+            }
             
             // Add premium styling for the AI analysis section
             let styleElement = document.getElementById('ai-premium-styles');
@@ -3803,6 +4560,7 @@ function longevity_assessment_form() {
             // --- Populate Lifestyle Score Card ---
             // Calculates and displays the average score from *direct user lifestyle inputs* (0-5).
             // Excludes scores derived from calculations (like BMI/WHR scores).
+            let actualLifestyleScore = NaN; // <<< Declare variable with wider scope
             const lifestyleScoreDiv = document.getElementById('lifestyleScore');
              if (lifestyleScoreDiv) {
                 // Define which keys represent direct lifestyle choices for this calculation
@@ -3817,7 +4575,7 @@ function longevity_assessment_form() {
                     .map(key => scores[key])
                     .filter(score => typeof score === 'number' && !isNaN(score)); // Filter out invalid/missing scores
                 // Calculate the average lifestyle score
-                const actualLifestyleScore = lifestyleScoresOnly.length > 0 
+                actualLifestyleScore = lifestyleScoresOnly.length > 0 // <<< Assign value (remove const)
                     ? lifestyleScoresOnly.reduce((a, b) => a + b, 0) / lifestyleScoresOnly.length 
                     : NaN; // Calculate average, or NaN if no valid scores
                 debug("Actual Lifestyle Score (Inputs Only) calculated:", { value: actualLifestyleScore, count: lifestyleScoresOnly.length });
@@ -3857,12 +4615,12 @@ function longevity_assessment_form() {
                    plotarea: { marginTop: 40, marginBottom: 40 },
                    plot: {
                      size: '100%',
-                     valueBox: { // Displays the numeric value and interpretation
+                     valueBox: {
                        placement: 'center',
                        text: '%v', 
                        fontSize: 30,
                        paddingBottom: 30, 
-                       rules: [ // Add text (Slower/Average/Faster) below the value based on rules
+                       rules: [
                          { rule: '%v < 0.95', text: '%v<br><span style="font-size:18px;color:#00A99D;">Slower</span>' },
                          { rule: '%v >= 0.95 && %v <= 1.05', text: '%v<br><span style="font-size:18px;color:#888888;">Average</span>' },
                          { rule: '%v > 1.05', text: '%v<br><span style="font-size:18px;color:#F58220;">Faster</span>' }
@@ -3870,26 +4628,45 @@ function longevity_assessment_form() {
                      }
                    },
                    tooltip: { borderRadius: 5, text: "Aging Rate: %v" },
-                   scaleR: { // Configuration for the radial scale (the gauge itself)
-                     aperture: 180, // 180 degrees for a semi-circle gauge
-                     minValue: 0.6, maxValue: 1.4, step: 0.1,
-                     center: { visible: false }, tick: { visible: false }, // Hide center point and ticks
-                     item: { offsetR: 0, fontSize: 12, fontColor: '#555' }, // Scale number labels
-                     labels: ['0.6', '0.7', '0.8', '0.9', '1.0', '1.1', '1.2', '1.3', '1.4'], // Displayed labels
-                     ring: { // The colored background segments of the gauge
-                       size: 35, 
-                       rules: [ // Define colors based on aging rate values
-                         { rule: '%v < 0.95', backgroundColor: '#00A99D' }, // Teal for Slower
-                         { rule: '%v >= 0.95 && %v <= 1.05', backgroundColor: '#CCCCCC' }, // Grey for Average
-                         { rule: '%v > 1.05', backgroundColor: '#F58220' } // Orange for Faster
+                   scaleR: {
+                     aperture: 180,
+                     minValue: 0.6, 
+                     maxValue: 1.4,
+                     step: 0.1,
+                     center: { visible: false },
+                     tick: { visible: false },
+                     // Modify how labels are positioned and formatted
+                     item: { 
+                       offsetR: 0, 
+                       fontSize: 12, 
+                       fontColor: '#555',
+                       // Add this to ensure proper angular distribution
+                       angleStart: 180,
+                       angleEnd: 0
+                     },
+                     // You may want to reduce the number of labels to prevent crowding
+                     labels: ['0.6', '0.8', '1.0', '1.2', '1.4'],
+                     // Or keep all labels but ensure they're properly distributed
+                     // labels: ['0.6', '0.7', '0.8', '0.9', '1.0', '1.1', '1.2', '1.3', '1.4'],
+                     labelPlacement: "outside",
+                     // Ensure proper scale calculation with the correct start/end angles
+                     refAngle: 270,
+                     ring: {
+                       size: 35,
+                       rules: [
+                         { rule: '%v < 0.95', backgroundColor: '#00A99D' },
+                         { rule: '%v >= 0.95 && %v <= 1.05', backgroundColor: '#CCCCCC' },
+                         { rule: '%v > 1.05', backgroundColor: '#F58220' }
                        ]
                      }
                    },
-                   series: [{ // The needle indicator
-                     values: [isNaN(agingRate) ? 1.0 : parseFloat(rateText)], // Set needle position
-                     backgroundColor: '#4A4A4A', 
-                     indicator: [10, 1, 10, 10, 0.6], // Needle shape
-                     animation: { effect: 2, method: 1, sequence: 4, speed: 900 }, // Needle animation
+                   series: [{
+                     // Ensure the value is correctly formatted
+                     values: [isNaN(agingRate) ? 1.0 : parseFloat(agingRate.toFixed(2))],
+                     backgroundColor: '#4A4A4A',
+                     // More dramatic changes to indicator parameters
+                     indicator: [10, 5, 10, 0, 0.8], // [length, width-top, width-bottom, offset, pivot-point]
+                     animation: { effect: 2, method: 1, sequence: 4, speed: 900 },
                    }]
                  };
 
@@ -4158,8 +4935,8 @@ function longevity_assessment_form() {
             const filteredOrderedKeys = ALL_METRIC_KEYS_ORDERED.filter(key => 
                 scores[key] !== undefined && scores[key] !== null && !isNaN(scores[key])
             );
-            // --- END NEW ---
-
+    // --- END NEW --- 
+    
             if (breakdownSection && detailedBreakdownDiv) {
                 // Clear previous content and add structure
                 detailedBreakdownDiv.innerHTML = '';
@@ -4189,52 +4966,59 @@ function longevity_assessment_form() {
              
             // --- Collect top factors for AI analysis ---
             function getTopFactors() {
-                const factorDetails = {
-                    physicalActivity: { name: "Physical Activity" },
-                    sleepDuration: { name: "Sleep Duration" },
-                    sleepQuality: { name: "Sleep Quality" },
-                    stressLevels: { name: "Stress Management" },
-                    socialConnections: { name: "Social Connections" },
-                    dietQuality: { name: "Diet Quality" },
-                    alcoholConsumption: { name: "Alcohol Consumption" },
-                    smokingStatus: { name: "Smoking Status" },
-                    cognitiveActivity: { name: "Cognitive Activity" },
-                    sunlightExposure: { name: "Sunlight Exposure" },
-                    supplementIntake: { name: "Supplement Use" },
-                    bmiScore: { name: "Body Mass Index" },
-                    whrScore: { name: "Waist-to-Hip Ratio" },
-                    sitToStand: { name: "Functional Strength" },
-                    breathHold: { name: "Respiratory Function" },
-                    balance: { name: "Balance Ability" },
-                    skinElasticity: { name: "Skin Health" }
+                // <<< ADDED factorDetails with descriptions here >>>
+                 const factorDetails = {
+                    physicalActivity: { name: "Physical Activity", icon: "directions_run", descriptions: { positive: "Regular exercise supports overall health.", negative: "Lack of activity can negatively impact health." } },
+                    sleepDuration: { name: "Sleep Duration", icon: "bedtime", descriptions: { positive: "Optimal sleep supports recovery.", negative: "Insufficient sleep hinders recovery." } },
+                    sleepQuality: { name: "Sleep Quality", icon: "nightlight", descriptions: { positive: "Restful sleep enhances well-being.", negative: "Poor sleep quality detracts from well-being." } },
+                    stressLevels: { name: "Stress Management", icon: "spa", descriptions: { positive: "Managing stress protects health.", negative: "High stress can harm health." } },
+                    socialConnections: { name: "Social Connections", icon: "people", descriptions: { positive: "Strong social ties benefit health.", negative: "Isolation can negatively affect health." } },
+                    dietQuality: { name: "Diet Quality", icon: "restaurant", descriptions: { positive: "A nutritious diet promotes health.", negative: "A poor diet can increase health risks." } },
+                    alcoholConsumption: { name: "Alcohol Consumption", icon: "liquor", descriptions: { positive: "Limiting alcohol supports health.", negative: "Excessive alcohol harms health." } },
+                    smokingStatus: { name: "Smoking Status", icon: "smoke_free", descriptions: { positive: "Being smoke-free is crucial for health.", negative: "Smoking severely impacts health." } },
+                    cognitiveActivity: { name: "Cognitive Activity", icon: "psychology", descriptions: { positive: "Mental stimulation supports brain health.", negative: "Lack of mental activity can affect cognition." } },
+                    sunlightExposure: { name: "Sunlight Exposure", icon: "wb_sunny", descriptions: { positive: "Moderate sun exposure provides Vitamin D.", negative: "Lack of sunlight can affect Vitamin D levels." } },
+                    supplementIntake: { name: "Supplement Use", icon: "medication", descriptions: { positive: "Targeted supplements can fill nutritional gaps.", negative: "Nutrient deficiencies can impact health." } },
+                    bmiScore: { name: "Body Mass Index", icon: "monitor_weight", descriptions: { positive: "Healthy BMI supports metabolic health.", negative: "Suboptimal BMI increases metabolic risks." } },
+                    whrScore: { name: "Waist-to-Hip Ratio", icon: "straighten", descriptions: { positive: "Healthy WHR indicates lower visceral fat.", negative: "High WHR suggests higher visceral fat." } },
+                    sitToStand: { name: "Functional Strength", icon: "accessibility_new", descriptions: { positive: "Good strength supports independence.", negative: "Poor strength increases dependency risk." } },
+                    breathHold: { name: "Respiratory Function", icon: "air", descriptions: { positive: "Good lung capacity supports oxygenation.", negative: "Limited capacity may indicate reduced function." } },
+                    balance: { name: "Balance Ability", icon: "airline_seat_recline_normal", descriptions: { positive: "Good balance reduces fall risk.", negative: "Poor balance increases injury risk." } },
+                    skinElasticity: { name: "Skin Health", icon: "face", descriptions: { positive: "Good elasticity reflects skin health.", negative: "Reduced elasticity indicates skin aging." } }
                 };
-                
+                // <<< END ADDED factorDetails >>>
+
                 // Calculate impact values
                 const impactValues = {};
                 for (let factor in scores) {
                     if (factor in weights && factor in factorDetails) {
                         const score = scores[factor];
-                        impactValues[factor] = weights[factor] * (score - 3);
+                        // <<< Added check for valid score before calculating impact >>>
+                        if (typeof score === 'number' && !isNaN(score)) {
+                           impactValues[factor] = weights[factor] * (score - 3);
+                        }
                     }
                 }
                 
                 // Sort and separate factors
                 const sortedFactors = Object.keys(impactValues)
-                    .filter(factor => factorDetails[factor])
+                    .filter(factor => factorDetails[factor]) // Still filter based on existence in factorDetails
                     .sort((a, b) => Math.abs(impactValues[b]) - Math.abs(impactValues[a]));
                 
                 const positiveFactors = sortedFactors
                     .filter(factor => impactValues[factor] > 0)
                     .map(factor => ({
                         name: factorDetails[factor].name,
-                        impact: impactValues[factor]
+                        impact: impactValues[factor],
+                        description: factorDetails[factor]?.descriptions?.positive || '' // <<< ADDED description
                     }));
                 
                 const negativeFactors = sortedFactors
                     .filter(factor => impactValues[factor] < 0)
                     .map(factor => ({
                         name: factorDetails[factor].name,
-                        impact: impactValues[factor]
+                        impact: impactValues[factor],
+                        description: factorDetails[factor]?.descriptions?.negative || '' // <<< ADDED description
                     }));
                     
                 return { positiveFactors, negativeFactors };
@@ -4243,13 +5027,89 @@ function longevity_assessment_form() {
             // Get the top factors
             const { positiveFactors, negativeFactors } = getTopFactors();
             
+            // --- NEW: Generate Chart URLs using QuickChart ---
+            let biological_age_chart_url = '';
+            let age_impact_chart_url = '';
+            let detailed_scores_chart_url = '';
+            let aging_rate_chart_url = '';
+
+            try {
+                biological_age_chart_url = generateBioAgeComparisonChartUrl(age, biologicalAge);
+                debug("Generated biological_age_chart_url:", biological_age_chart_url);
+
+                aging_rate_chart_url = generateAgingRateGaugeChartUrl(agingRate);
+                debug("Generated aging_rate_chart_url:", aging_rate_chart_url);
+                
+                // Use the filteredOrderedKeys which are calculated just before chart creation
+                const filteredOrderedKeys = ALL_METRIC_KEYS_ORDERED.filter(key => 
+                    scores[key] !== undefined && scores[key] !== null && !isNaN(scores[key])
+                );
+                detailed_scores_chart_url = generateDetailedScoresRadarChartUrl(scores, filteredOrderedKeys);
+                debug("Generated detailed_scores_chart_url:", detailed_scores_chart_url);
+
+                age_impact_chart_url = generateAgeImpactBarChartUrl(positiveFactors, negativeFactors);
+                debug("Generated age_impact_chart_url:", age_impact_chart_url);
+
+            } catch (chartError) {
+                console.error("Error generating chart URLs:", chartError);
+                // Optionally display an error or proceed without chart URLs
+            }
+            // --- END NEW: Generate Chart URLs ---
+
             // --- Perform AI Analysis ---
             const bmiCategory = getBMICategory(bmi);
+            // --- Perform AI Analysis ---
             const whrCategory = getWHRCategory(whr, measurements.gender);
-            
+
             // Check if we have the necessary data for the API call
             if (window.longevity_form_data && window.Chart) { // Also check for Chart.js
-                // Perform AI analysis with all the calculated data
+                // *** MOVED & UPDATED: Update the global webhook object with calculated values ***
+                if (completeFormDataForWebhook) {
+                    completeFormDataForWebhook.biologicalAge = !isNaN(biologicalAge) ? parseFloat(biologicalAge.toFixed(1)) : null;
+                    completeFormDataForWebhook.ageShift = !isNaN(ageShift) ? parseFloat(ageShift.toFixed(1)) : null;
+                    completeFormDataForWebhook.agingRate = !isNaN(agingRate) ? parseFloat(agingRate.toFixed(2)) : null;
+                    completeFormDataForWebhook.bmi = !isNaN(bmi) ? parseFloat(bmi.toFixed(1)) : null;
+                    completeFormDataForWebhook.bmiCategory = bmiCategory; // Now defined
+                    completeFormDataForWebhook.whr = !isNaN(whr) ? parseFloat(whr.toFixed(2)) : null;
+                    completeFormDataForWebhook.whrCategory = whrCategory; // Now defined
+                    completeFormDataForWebhook.positiveFactors = positiveFactors; // Now defined
+                    completeFormDataForWebhook.negativeFactors = negativeFactors; // Now defined
+                    // Store the calculated lifestyle score (average of direct inputs)
+                    completeFormDataForWebhook.lifestyle_score_value = !isNaN(actualLifestyleScore) ? parseFloat(actualLifestyleScore.toFixed(1)) : null;
+                    // Update scores object within webhook data in case bmi/whr scores were added
+                    completeFormDataForWebhook.scores = scores;
+
+                    // *** NEW: Add generated chart URLs ***
+                    completeFormDataForWebhook.biological_age_chart_url = biological_age_chart_url;
+                    completeFormDataForWebhook.age_impact_chart_url = age_impact_chart_url;
+                    completeFormDataForWebhook.detailed_scores_chart_url = detailed_scores_chart_url;
+                    completeFormDataForWebhook.aging_rate_chart_url = aging_rate_chart_url; // Using new key
+                    // We decided not to generate body_composition_chart_url
+                    completeFormDataForWebhook.body_composition_chart_url = ''; 
+
+                    // --- Ensure new top-level fields for PDFMonkey/Make.com ---
+                    // 1. Raw overall health percentage
+                    if (typeof measurements !== 'undefined' && measurements.overallHealthPercent !== undefined) {
+                        completeFormDataForWebhook.overall_health_percent = measurements.overallHealthPercent;
+                    } else {
+                        completeFormDataForWebhook.overall_health_percent = null;
+                    }
+                    // 2. Calculated overall health score (0-5)
+                    if (scores && scores.overallHealthScore !== undefined) {
+                        completeFormDataForWebhook.overall_health_score = scores.overallHealthScore;
+                    } else {
+                        completeFormDataForWebhook.overall_health_score = null;
+                    }
+                    // 3. Lifestyle score (already present, but ensure it's up to date)
+                    completeFormDataForWebhook.lifestyle_score_value = !isNaN(actualLifestyleScore) ? parseFloat(actualLifestyleScore.toFixed(1)) : null;
+
+                    debug("Updated completeFormDataForWebhook with calculated metrics AND CHART URLs:", completeFormDataForWebhook);
+                } else {
+                    console.warn("Cannot update webhook data: completeFormDataForWebhook is not initialized.");
+                }
+                // *** END MOVED & UPDATED ***
+
+                // Call the AI analysis function, passing all relevant data
                 performAIAnalysis(
                     scores, 
                     measurements, 
@@ -4268,11 +5128,11 @@ function longevity_assessment_form() {
                     fullName, 
                     email
                 );
-            } else {
+                    } else {
                 console.error("Cannot perform AI analysis: longevity_form_data or Chart.js missing");
                 displayAIError('Configuration error prevented AI analysis.'); // Use the existing error display
             }
-        }
+}
 
         /**
          * NEW Helper: Determines BMI category text.
@@ -5086,9 +5946,7 @@ function longevity_assessment_form() {
 
             // --- Display Results on Page (existing code) ---
             // ... (code for displaying BMI, WHR, Bio Age, Charts, Factors, etc. on the page)
-            // ... This part might need updating to store calculated values/chart URLs if not already done
-            // Ensure calculations like lifestyle_score_value are available here
-
+    // ... (rest of the code remains unchanged)
 
             // --- Prepare final payload for Make.com --- 
             const combinedDataForWebhook = {
@@ -5128,7 +5986,8 @@ function longevity_assessment_form() {
                 sendButton.parentNode.replaceChild(newSendButton, sendButton);
                 
                 newSendButton.addEventListener('click', function() {
-                    sendToMakeWebhook(combinedDataForWebhook); // Pass the final prepared data
+                    // *** MODIFIED: Send the global object which includes AI results ***
+                    sendToMakeWebhook(completeFormDataForWebhook); 
                 });
             }
              // Display results section
@@ -5212,6 +6071,205 @@ function longevity_assessment_form() {
                 }
             });
         }
+
+        // --- NEW: QuickChart URL Generation Functions ---
+
+        /**
+         * Generates a QuickChart URL for a simple bar chart comparing Chronological and Biological Age.
+         * @param {number} chronologicalAge - User's actual age.
+         * @param {number} biologicalAge - Calculated biological age.
+         * @returns {string} - The QuickChart URL or empty string if data is invalid.
+         */
+        function generateBioAgeComparisonChartUrl(chronologicalAge, biologicalAge) {
+            if (isNaN(chronologicalAge) || isNaN(biologicalAge)) return '';
+            
+            const chartConfig = {
+                type: 'bar',
+                data: {
+                    labels: ['Chronological Age', 'Biological Age'],
+                    datasets: [{
+                        label: 'Age',
+                        data: [chronologicalAge, biologicalAge.toFixed(1)],
+                        backgroundColor: ['rgba(100, 100, 100, 0.7)', biologicalAge > chronologicalAge ? 'rgba(255, 99, 132, 0.7)' : 'rgba(75, 192, 192, 0.7)'],
+                        borderColor: ['rgba(100, 100, 100, 1)', biologicalAge > chronologicalAge ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    title: { display: true, text: 'Biological vs. Chronological Age' },
+                    legend: { display: false },
+                    // Use scales with x/y for Chart.js v3+
+                    scales: { y: { ticks: { beginAtZero: true, suggestedMax: Math.max(chronologicalAge, biologicalAge) + 10 } } }
+                }
+            };
+            // Make background transparent and set size
+            chartConfig.options.plugins = { background_color: 'transparent' };
+            chartConfig.width = 500; chartConfig.height = 300;
+
+            return `https://quickchart.io/chart?encoding=url&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
+        }
+
+        /**
+         * Generates a QuickChart URL for an Aging Rate gauge chart.
+         * @param {number} agingRate - Calculated aging rate.
+         * @returns {string} - The QuickChart URL or empty string if data is invalid.
+         */
+        function generateAgingRateGaugeChartUrl(agingRate) {
+            if (isNaN(agingRate)) return '';
+            const rate = parseFloat(agingRate.toFixed(2));
+            // Determine main color based on rate
+            const color = rate > 1.05 ? '#F58220' : (rate < 0.95 ? '#00A99D' : '#CCCCCC'); // Orange, Teal, Grey
+
+            const chartConfig = {
+                type: 'gauge',
+                data: {
+                    datasets: [{
+                        value: rate,
+                        minValue: 0.6,
+                        maxValue: 1.4,
+                        backgroundColor: color, // Apply the determined color
+                        // Define zones for background color segments
+                        data: [0.95, 1.05], // Points separating zones
+                        backgroundColor: [ // Colors for zones (Slower, Average, Faster)
+                            '#00A99D', // Color for values < 0.95 (Slower)
+                            '#CCCCCC', // Color for values between 0.95 and 1.05 (Average)
+                            '#F58220'  // Color for values > 1.05 (Faster)
+                        ]
+                    }]
+                },
+                options: {
+                    title: { display: true, text: 'Aging Rate' },
+                    valueLabel: { // Display the numeric value
+                        display: true, 
+                        fontSize: 20, 
+                        color: '#333',
+                        formatter: (value) => value.toFixed(2) 
+                    },
+                    plugins: {
+                        datalabels: { display: false }, // Hide default datalabels
+                        // Add gauge needle configuration if needed by QuickChart or use default
+                        gaugeNeedle: {
+                            color: '#4A4A4A',
+                            innerRadius: -10,
+                            outerRadius: 80
+                        },
+                         background_color: 'transparent' // Transparent background
+                    }
+                }
+            };
+            chartConfig.width = 400; chartConfig.height = 250;
+
+            return `https://quickchart.io/chart?encoding=url&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
+        }
+
+        /**
+         * Generates a QuickChart URL for a Radar chart of detailed health scores.
+         * @param {object} scores - Object containing scores for each metric.
+         * @param {string[]} orderedMetricKeys - Array of metric keys in the desired display order.
+         * @returns {string} - The QuickChart URL or empty string if data is invalid.
+         */
+        function generateDetailedScoresRadarChartUrl(scores, orderedMetricKeys) {
+            if (!scores || orderedMetricKeys.length === 0) return '';
+
+            const formatLabel = (label) => {
+                 let formattedLabel = label.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).replace(' Score', '').replace('Bmi', 'BMI').replace('Whr', 'WHR');
+                 return formattedLabel.length > 15 ? formattedLabel.substring(0, 13) + '...' : formattedLabel;
+            };
+
+            const labels = orderedMetricKeys.map(metric => formatLabel(metric));
+            const dataValues = orderedMetricKeys.map(metric => scores[metric] !== undefined && !isNaN(scores[metric]) ? scores[metric] : 0); // Default to 0
+
+            const chartConfig = {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Health Metrics (0-5)',
+                        data: dataValues,
+                        fill: true,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(0, 122, 255, 0.8)',
+                        pointBackgroundColor: 'rgba(0, 122, 255, 0.8)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(0, 122, 255, 1)'
+                    }]
+                },
+                options: {
+                    title: { display: true, text: 'Detailed Assessment Scores' },
+                    // Use scales.r for Chart.js v3/v4
+                    scales: { 
+                       r: { min: 0, max: 5, beginAtZero: true, stepSize: 1, pointLabels: { fontSize: 10 } } 
+                    },
+                     plugins: { legend: { position: 'top' }, background_color: 'transparent' } // Transparent background
+                }
+            };
+            chartConfig.width = 500; chartConfig.height = 500; // Radar charts often look better square
+
+            return `https://quickchart.io/chart?encoding=url&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
+        }
+
+        /**
+         * Generates a QuickChart URL for a Bar chart showing top age impact factors.
+         * @param {array} positiveFactors - Array of top {name, impact, description} objects.
+         * @param {array} negativeFactors - Array of top {name, impact, description} objects.
+         * @returns {string} - The QuickChart URL or empty string if data is invalid.
+         */
+        function generateAgeImpactBarChartUrl(positiveFactors, negativeFactors) {
+             // Combine top 3 positive (inverted impact) and top 3 negative
+            const factors = [
+                ...positiveFactors.slice(0, 3).map(f => ({ name: f.name, impact: f.impact * -1 })), // Invert positive impact
+                ...negativeFactors.slice(0, 3).map(f => ({ name: f.name, impact: f.impact }))      // Keep negative impact
+            ].sort((a, b) => a.impact - b.impact); // Sort: most age-reducing first
+
+             if (factors.length === 0) return '';
+
+            const labels = factors.map(f => f.name);
+            const dataValues = factors.map(f => f.impact.toFixed(1));
+            // Green for negative impact (age reduction), Red for positive impact (age increase)
+            const backgroundColors = factors.map(f => f.impact < 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)');
+
+            const chartConfig = {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Impact on Biological Age (Years)',
+                        data: dataValues,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    title: { display: true, text: 'Top Age Impact Factors' },
+                    legend: { display: false },
+                     // Use scales with x/y for Chart.js v3/v4
+                     scales: { 
+                        x: { title: { display: true, text: 'Factor' } },
+                        y: { title: { display: true, text: 'Impact (Years)' } /* No beginAtZero needed here */ }
+                     },
+                     plugins: { 
+                         tooltip: { 
+                             callbacks: { 
+                                label: function(context) { 
+                                    let value = parseFloat(context.raw);
+                                    return value < 0 ? `Reduces Age by ${Math.abs(value).toFixed(1)} yrs` : `Increases Age by ${value.toFixed(1)} yrs`;
+                                } 
+                             } 
+                         },
+                         background_color: 'transparent' // Transparent background
+                    }
+                }
+            };
+             chartConfig.width = 500; chartConfig.height = 350;
+
+            return `https://quickchart.io/chart?encoding=url&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
+        }
+
+        // --- End NEW QuickChart Functions ---
+
+        // --- Chart Creation Functions ---
 
     })(jQuery); // Pass jQuery to the closure to use the `$` alias safely
     </script>

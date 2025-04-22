@@ -1,0 +1,78 @@
+[AI Prompt
+
+You’re a natural holistic health expert experienced at assisting health clients with changing their diet and lifestyle.
+
+You’re also an expert health report writer.
+
+Your task is to fine-tune this template text for the “Introduction” sections of the holistic longevity health report (see below) so that it’s tailored to the needs of this particular client. (metrics, results, self-reported health challenges and changes they hope to see). Yet also include the essence and details in the template text. 
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising and also reminding them that this report is not a replacement for seeing a fully trained and experienced health practitioner).
+
+Don’t make the output longer than the length of the template text. Shorter is fine. If parts of the template are not relevant to a particular client’s situation.
+
+Template text for “Introduction”:
+
+“ Welcome to your *Personalised Health and Longevity Report*—a transformative guide crafted to illuminate your current state of wellbeing and empower you to shape a vibrant, fulfilling future. 
+
+Health is the cornerstone of a rich and meaningful life, influencing your energy, clarity, and capacity to pursue what matters most. 
+
+This report acts as a first overview and can be used as a compass, offering clear insights, actionable steps, and gentle encouragement to help you thrive, no matter where you stand today.
+
+It’s important to note that this report is not a substitute for personalised guidance from a trusted health professional. Ideally, you’ll work with someone who embraces a holistic approach, focusing not just on symptoms but on the whole you.
+
+You’ve already taken the most courageous step: choosing to take action, to look at your health from a higher altitude. Let’s begin this journey together.
+
+Tailored Introduction by Decade
+
+Depending on your age, one of the following introductions will resonate most deeply with your current life stage. Each reflects why this report is valuable now, what to prioritize, the risks of inaction, and the rewards of proactive steps.*
+
+In Your 20s: Foundations for Future Vitality"The groundwork of all happiness is good health." – Leigh Hunt
+
+Your twenties are a vibrant decade of exploration and opportunity—a time to lay the cornerstone for a lifetime of wellbeing. This report is your guide to building strength, resilience, and habits that will carry you far. Prioritize fitness, balanced nutrition, and mental clarity now to create a foundation that enhances your career, relationships, and personal growth. Neglecting health at this stage can quietly sow seeds of fatigue or chronic issues that limit your future potential. By investing in yourself today, you ensure a life brimming with energy, optimism, and endless possibilities.
+
+In Your 30s: Balance and Sustainable Habits"Take care of your body. It’s the only place you have to live."* – Jim Rohn
+
+Your thirties are a dynamic season of ambition and responsibility, where career, family, and social demands often compete for your attention. This report helps you strike balance, offering insights to sustain your energy and vitality amidst life’s pace. Prioritize stress management, restorative sleep, and mindful nutrition to fuel your goals. Ignoring health now risks burnout or long-term imbalances that sap your joy. By acting today, you cultivate sustainable habits that empower you to thrive personally and professionally for decades to come.
+
+In Your 40s: Prevention and Empowerment"An ounce of prevention is worth a pound of cure." – Benjamin Franklin
+
+Your forties mark a pivotal moment where past choices begin to reveal their impact. This report empowers you to take charge, identifying opportunities to prevent or reverse trends before they become challenges. Focus on heart health, joint mobility, and emotional resilience to maintain your vibrancy. Neglecting wellness now increases the risk of chronic conditions that could dim your quality of life. By prioritizing health today, you unlock the tools to age with strength, clarity, and confidence.
+
+In Your 50s: Vitality and Renewed Purpose "You are never too old to set another goal or to dream a new dream."* – C.S. Lewis
+
+Your fifties are a time of reflection and reinvention—a chance to align your health with your deepest aspirations. This report offers clarity to navigate bodily changes, emphasizing strength, flexibility, and mental sharpness. Ignoring health at this stage risks accelerated aging or reduced vitality. Prioritise hormone balance, gut health, and meaningful movement to rediscover youthful energy. By acting now, you ensure your later years are active, purposeful, and filled with possibility.
+
+In Your 60s: Active Aging and Independence"Aging is not lost youth but a new stage of opportunity and strength."* – Betty Friedan
+
+Your sixties are an exciting chapter where independence and engagement take center stage. This report equips you to maintain mobility, cognitive vitality, and social connections. Focus on bone health, cardiovascular fitness, and stress resilience to savor life’s adventures. Neglecting wellness now can lead to rapid declines in function, limiting your freedom. By prioritizing health, you create a retirement rich with travel, hobbies, and meaningful relationships.
+
+In Your 70s: Quality of Life and Continued Growth "Years may wrinkle the skin, but to give up enthusiasm wrinkles the soul."* – Samuel Ullman
+
+Your seventies are a profound season of wisdom and joy, where quality of life reigns supreme. This report helps you manage age-related changes, supporting emotional resilience and physical function. Prioritize gentle movement, nutrient-dense foods, and social bonds to stay vibrant. Ignoring health risks loss of autonomy or isolation. By embracing wellness, you ensure a decade of enthusiasm, connection, and continued growth.
+
+In Your 80s: Cherishing Independence and Wisdom "Do not regret growing older—it is a privilege denied to many."* – Unknown
+
+Your eighties are a testament to a life well-lived, rich with experience and perspective. This report supports your independence and mental clarity, helping you navigate aging gracefully. Focus on balance, hydration, and cognitive engagement to maintain your spark. Neglecting health now can diminish daily joys. By prioritizing wellness, you live with purpose, surrounded by loved ones and the dignity of your wisdom.
+
+In Your 90s: Legacy and Meaningful Connections "It’s not the years in your life that count, it’s the life in your years."* – Abraham Lincoln
+
+Your nineties are a precious gift, a time to cherish connections and leave a lasting legacy. This report ensures you stay engaged and comfortable, emphasizing gentle care and emotional wellbeing. Prioritize rest, nourishment, and heartfelt moments with family. Ignoring health risks dependency or disconnection. By nurturing wellness, you live each day fully, enriching your story and those you love.
+
+In Your 100s: Celebrating Longevity and Grace "Beautiful young people are accidents of nature, but beautiful old people are works of art."* – Eleanor Roosevelt
+
+Reaching your hundredth decade is a remarkable milestone—a celebration of resilience and grace. This report honors your journey, optimizing comfort and joy. Focus on daily ease, mental stimulation, and loving interactions. Neglecting health could limit these precious moments. By embracing wellness, you inspire others, living as a masterpiece of longevity with dignity and warmth.
+
+A Note on Your Journey**
+
+Imagine you’re visiting a new city and you call a friend for directions. Their first question will be *“Where are you?”* 
+
+Without clarity on your current situation, no guidance can help you reach your destination. And by the way, there’s no *one-size fits all*, you are unique and your situation is unique. 
+
+Whether you’re just beginning or well on your way to optimal health.
+
+What This Report Is "Not"
+
+- It is not a replacement for professional medical advice or a comprehensive health evaluation.
+- It is based on limited self-reported data and cannot diagnose critical conditions.

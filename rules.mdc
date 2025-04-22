@@ -1,0 +1,104 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rules for Longevity Assessment System
+
+This document establishes the memory management protocol for AI assistants ensuring complete retention of commands, context, and user instructions throughout sessions.
+
+## System Architecture and Data Flow
+
+The AI must maintain complete understanding of the three-tier system:
+- WordPress form (`longevity-form.php`) collects user health data
+- Make.com receives data via webhook integration
+- PDFMonkey generates the personalized health report using `pdfmonkeytemplate.html`
+
+## Data Structure and Variables
+
+The AI must retain knowledge of:
+- All health assessment variables in `webhook.json`
+- The biological age calculation methodology
+- BMI and WHR thresholds and significance
+- Score calculation for all metrics (1-5 scale)
+- All AI-generated sections including insights, recommendations, and personalized content
+
+## Template Structure
+
+The AI must understand:
+- The complete PDFMonkey template structure
+- Dynamic content sections that use Liquid templating
+- Chart generation for health metrics visualization
+- Conditional display logic for strengths/improvements
+- Age-specific content adaptation
+
+## Health Assessment Logic
+
+The AI must remember:
+- Biological vs chronological age calculation and significance
+- The impact of lifestyle factors on longevity
+- The interpretation of all health metrics
+- The relationship between metrics and recommendations
+- How to generate personalized insights based on assessment data
+
+## Recommendation Framework
+
+The AI must maintain knowledge of:
+- The three-tiered recommendation structure:
+  - Immediate actions
+  - Ongoing habits
+  - Expert consultations/screenings
+- How to connect health metrics to specific recommendations
+- The personalization approach for recommendations based on user data
+
+## Technical Integration
+
+The AI must recall:
+- The complete data mapping between WordPress, Make.com, and PDFMonkey
+- The webhook structure and field mapping
+- The Liquid templating syntax for dynamic content
+- Chart generation endpoints and parameters
+
+## Memory Persistence Rules
+
+All AI systems must maintain complete memory of previous instructions, including:
+
+- Every command issued by the user
+- All context from the current conversation 
+- Any specific instructions about tone, style, or approach
+- Technical details about data flow and processing
+- User preferences and settings
+
+## Command Retention Protocol
+
+The AI must never forget previously issued commands. Each new interaction should build upon the complete history of the conversation, with no information loss between responses.
+
+## Context Maintenance Guidelines
+
+The AI must maintain full awareness of:
+
+- The complete data flow from WordPress form to Make.com to PDFMonkey
+- All variables and their transformations throughout the process
+- Template structure and variable relationships
+- Conditional logic for health metrics and recommendations
+- Chart generation parameters and visualization settings
+
+## Response Requirements
+
+When responding, the AI must:
+
+- Demonstrate awareness of all previous instructions
+- Never contradict earlier commands unless explicitly instructed
+- Maintain consistent technical understanding of the health assessment workflow
+- Preserve knowledge of the PDF template structure and variable usage
+
+## Recovery Protocol
+
+If the AI appears to have forgotten any previous instruction, it must immediately:
+
+1. Acknowledge the memory failure
+2. Request clarification on the forgotten element
+3. Re-incorporate the information into its working memory
+4. Continue with full context restoration
+
+This protocol ensures the AI maintains complete context for supporting the longevity assessment system across all its components and integration points.

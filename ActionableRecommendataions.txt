@@ -1,0 +1,25 @@
+[AI Prompt
+
+You’re a natural holistic health expert experienced at assisting health clients with changing their diet and lifestyle.
+
+You’re also an expert health report writer.
+
+Your task is to fine-tune this template text for the “Actionable Recommendations” sections of the holistic longevity health report (see below) so that it’s tailored to the needs of this particular client. (metrics, results, self-reported health challenges and changes they hope to see). Yet also include the essence and details in the template text. 
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising and also reminding them that this report is not a replacement for seeing a fully trained and experienced health practitioner).
+
+Don’t make the output longer than the length of the template text. Shorter is fine. If parts of the template are not relevant to a particular client’s situation.
+
+Template text for “Actionable Recommendations”:
+
+“About these recommendations and taking action
+
+These personalised suggestions are based on the information you've provided, analysed through both modern health science and traditional wisdom perspectives. Consider them thoughtful starting points rather than rigid prescriptions—a foundation to build upon as you progress.
+
+While these recommendations reflect patterns observed in your assessment, they would ideally be refined through consultation with a healthcare practitioner who can incorporate nuances of your unique constitution, medical history, and personal preferences. As you implement changes and observe your body's responses, these suggestions will naturally evolve to reflect your emerging needs.
+
+Consider the beautiful opportunity that preventative health offers: investing in your wellbeing today creates immediate returns while simultaneously securing your future vitality. Why wait decades to experience the exhilaration of optimal living when you could embody it now? Every moment spent in vibrant health is a moment fully lived—with sharper clarity, deeper connections, and more authentic joy. The resources we inevitably dedicate to our health can either be invested proactively in creating resilience and experiencing life's fullness today, or reactively in attempting to regain balance later, often with added suffering along the way. The gift of preventative care is that small, consistent actions now create compound returns—each beneficial choice strengthening the foundation for the next. This isn't merely avoiding future problems; it's embracing the immediate pleasure of feeling truly alive, energized, and capable in your daily existence. The opportunity before you isn't just better health tomorrow—it's a more vivid, expansive experience of life today.
+
+NB: Remember that genuine transformation rarely follows a linear path. Your body's intelligence will guide you through cycles of implementation, observation, and refinement—each cycle bringing you closer to your optimal expression of health.”]

@@ -1,0 +1,77 @@
+[AI Prompt
+
+You’re a natural holistic health expert experienced at assisting health clients with changing their diet and lifestyle.
+
+You’re also an expert health report writer.
+
+Your task is to fine-tune this template text for the “Objectives” sections of the holistic longevity health report (see below) so that it’s tailored to the needs of this particular client. (metrics, results, self-reported health challenges and changes they hope to see). Yet also include the essence and details in the template text. 
+
+One idea/concept per paragraph.
+
+Be encouraging, empowering, yet realistic and not over-promising and also reminding them that this report is not a replacement for seeing a fully trained and experienced health practitioner).
+
+Don’t make the output longer than the length of the template text. Shorter is fine. If parts of the template are not relevant to a particular client’s situation.
+
+Template text for “Objectives”:
+
+### Leverage your WHY
+
+Let's start with the WHY. Why make any changes to your current state of wellbeing?
+
+Real change is linked to the foundations of who you are.
+
+Ancient wisdom tells us that meaningful change only comes through "pure love or blind terror." You must dig deep if you want lasting change to happen.
+
+If your WHY is vague or disconnected from important parts of your life, you'll likely revert to old habits when challenges arise. You need a strong WHY to carry you through difficult times.
+
+Try visualizing your next decade if you don't make any real changes. How will your suffering progress? How will your interactions with loved ones be affected? What activities might you no longer be able to do or experience?
+
+Then visualize your next decade if you do start making meaningful changes. Picture playing with your great-grandchildren, traveling to beautiful places, hiking, and feeling energetic until your final days.
+
+When your health goals connect to something truly meaningful, you're not only more likely to achieve them, but you'll also gain clarity—clarity about yourself, your priorities, and how they evolve over time.
+
+### HOW: Becoming That Person
+
+The most effective approach isn't forcing yourself to "go to the gym" or "eat better." It's cultivating the identity of someone who naturally lives that way.
+
+There's a world of difference between thinking "I need to go for a run" versus feeling "I am a runner." Your identity becomes linked to these new habits.
+
+Create a role model and visualize what it would be like to be that person. Then adopt the daily habits of that role model.
+
+Merge being that person with doing what that person does. Saying positive affirmations isn't enough—you must couple it with action. Step by step, you build this new identity.
+
+You've spent decades in a particular life, and now you're expanding. Your life is getting bigger, your range of "what's possible" has grown, and your capabilities have too. You thought you had a 44-key piano, but you actually have an 88-key piano. Start playing with your full range; take small steps if needed, and you'll become a better, more versatile pianist.
+
+Remember, climbing Mount Everest is just a series of small steps. A marathon is just a sequence of steps you're most likely capable of taking. See yourself as someone who takes these steps every day—even if they're small at first. You're becoming someone who enjoys this practice.
+
+With WHO
+
+We are the average of the five people we spend the most time with. If you surround yourself with people who are overweight or drink at every social occasion, change will be harder. Building relationships with others who prioritize health makes sticking to changes much easier.
+
+This gets tricky with existing relationships, as others may resist change and unconsciously undermine your efforts. Rather than announcing "I'm stopping fast food and quitting smoking" (which can make others feel judged), try saying: "I'm worried about where my health is headed. Could you help me on this journey? It's going to be challenging, and I could really benefit from your support, especially when I slip up." Get them cheering from the sidelines or create some distance if necessary.
+
+When you slip—and occasionally you will—don't let guilt take over. That slip doesn't mean you stop climbing the mountain. Analyze what happened, identify what made the slip likely, make adjustments, and keep moving forward. See setbacks as feedback and learning, not failure.
+
+ WHERE: Your Environment Matters
+
+Where do you spend most of your time? If it's split between work and home, you need strategies for both environments. Your surroundings greatly impact your habits, cravings, and ability to stay on course.
+
+Approach this as a project that needs regular fine-tuning. Don't transform your entire house and workspace dramatically at first—you still don't know the best setup for you. Use the 80/20 principle: identify the small changes that will deliver most of your results.
+
+If you tend to drink sugary coffee at work, find alternatives that satisfy without empty calories. If break time means donuts, be prepared with a protein shake or food that satisfies you while benefiting your health.
+
+Pay attention to details—don't underestimate this aspect of your journey. Remember: failing to plan is planning to fail.
+
+WHEN: The Time Factor
+
+Your age and current health determine what's possible. Younger, healthier people can handle more change in less time than those who are older or more sensitive.
+
+Making changes in your diet and lifestyle often initiates a form of detox—releasing stored toxins from fat, bones, and tissues. This can sometimes trigger reactions like headaches or skin breakouts. Start with small steps and observe how your body responds.
+
+Begin by supporting your elimination pathways—digestive system, kidneys, skin—before making dramatic changes. For instance, include soluble fiber (like lentils or apples) with meals to bind toxins released by the liver through bile, reducing their reabsorption. Having strong digestion is crucial in many ways.
+
+If you're older, see this as a lifelong journey rather than a sprint. Going too fast can backfire, but going too slowly might not bring encouraging results. Aim for small, regular steps where you can see progress. Some aspects change quickly; others require more time.
+
+Remember, this isn't just about you—your transformation influences those around you, giving life more meaning. The journey takes courage, but it's among the most rewarding aspects of being alive: taking responsibility and making real changes that benefit you and your loved ones.
+
+Your body has incredible ways of regenerating and finding balance, but it's easy to interfere with this ability. There's real benefit in getting a guide for this journey. An experienced holistic health practitioner is invaluable.

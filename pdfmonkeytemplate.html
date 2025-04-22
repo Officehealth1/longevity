@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Longevity & Health Report - {{ fullName | default: 'Client' }}</title>
+  <!-- Import fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Playfair+Display:400,700&display=swap" rel="stylesheet">
+  <style>
+    /* Base styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      color: #000000;  /* Updated to black for better readability */
+      background-color: #FFFFFF; /* Use white from palette */
+      font-size: 12pt; /* Increased base font size */
+      line-height: 1.4; /* Reduced base line-height */
+    }
+    /* Cover page specific background removed from body.first-page */
+    /* body.first-page rule deleted */
+    .container {
+      width: 210mm; /* A4 width */
+      margin: auto;
+      padding: 15mm; /* Side and bottom padding */
+      padding-top: 25mm; /* Increased top padding - this is the key fix */
+      box-sizing: border-box;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Montserrat', sans-serif; /* Updated to use consistent font */
+      margin-bottom: 0.4em; /* Reduced base margin */
+      color: #004F59; /* Dark Teal for headings */
+      line-height: 1.2; /* Reduced line-height */
+      /* page-break-after: avoid; /* Moved to @media print */
+    }
+    h1 { font-size: 24pt; margin-bottom: 0.8em; color: #004F59; } /* Dark Teal */
+    h2 { font-size: 18pt; margin-bottom: 6mm; color: #004F59; } /* Dark Teal */
+    /* Apply specific margin adjustments for h2.section-title */
+    h2.section-title {
+      margin-top: 5mm; /* Reduced top margin */
+      margin-bottom: 15mm; /* Increased bottom margin */
+    }
+    h3 { font-size: 14pt; font-weight: 600; margin-top: 0.6em; margin-bottom: 0.3em; color: #004F59; } /* Dark Teal */
+    h4 { font-size: 12pt; font-weight: 600; color: #0077B6; margin-top: 0.6em; margin-bottom: 0.3em;} /* Primary Blue for sub-subheadings */
+    p {
+      line-height: 1.4; /* Reduced line-height */
+      margin-bottom: 10mm; /* Increased margin */
+      text-align: left;
+      font-size: 12pt; /* Kept font size */
+      font-family: 'Montserrat', sans-serif; /* Ensure paragraphs use Montserrat */
+    }
+    ul { padding-left: 15px; margin-bottom: 0.6em; list-style: disc; } /* Reduced margin and padding */
+    li { margin-bottom: 0.3em; font-size: 12pt;} /* Reduced margin, increased font size */
+
+    .section {
+      position: relative;
+      padding-top: 8mm; /* Critical fix: creates space below header */
+      min-height: calc(297mm - 45mm); /* A4 height - (25mm top + 20mm bottom @page margins) */
+      box-sizing: border-box;
+      margin-bottom: 12mm; /* Increased margin */
+      padding-bottom: 2mm; /* Reduced padding */
+      border-bottom: 1px solid #eee; /* Lighter border */
+      /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .section:last-of-type { /* Use last-of-type for better reliability */
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        width: 100%; /* Ensure full width */
+        /* page-break-inside: avoid; /* Moved to @media print */
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    /* Header with 3-column layout */
+    .header {
+      display: none; /* Hide header to use PDFMonkey's built-in header */
+    }
+    .header-logo {
+      display: none;
+    }
+    .header-title {
+      display: none;
+    }
+    .header-center {
+      display: none;
+    }
+    .header-page {
+      display: none;
+    }
+
+    /* Remove footer and page number styling */
+    .footer {
+      display: none;
+    }
+    .page-footer {
+      display: none;
+    }
+    .page-number {
+      display: none;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      text-align: center;
+      /* Set dimensions to US Letter */
+      width: 215.9mm;
+      height: 279.4mm;
+      /* Adjust padding to visually recreate margins inside the full-bleed background */
+      /* Example: Top 50mm + 15mm margin = 65mm. Left/Right = 15mm. Bottom 40mm + 15mm = 55mm */
+      padding: 65mm 15mm 55mm 15mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* background: linear-gradient(135deg, #ffffff, #f0f7fa); Removed gradient */
+      position: relative; /* Needed for absolute positioning of page number */
+      /* Add background styling directly to cover page */
+      background-color: #f0f0f0; /* Light grey background */
+      background-image: repeating-linear-gradient(
+          -45deg,
+          rgba(0, 0, 0, 0.02), /* Very subtle dark line */
+          rgba(0, 0, 0, 0.02) 1px,
+          transparent 1px,
+          transparent 6px /* Space between lines */
+      );
+      /* margin: 0; removed as @page :first handles this */
+      width: 100%; /* Ensure full width */
+      page-break-inside: avoid; /* Ensure cover doesn't break */
+    }
+    .cover-brand-text { /* New class for "HealthDataLab" */
+      font-size: 12pt;
+      color: #0077B6;
+      margin-bottom: 30mm; /* Reduced spacing below */
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700; /* Bolder */
+      color: #004F59; /* Darker Teal/Blue */
+      line-height: 1.2;
+    }
+    .cover-main-title { /* New class for main title */
+      font-size: 36pt; /* Slightly larger */
+      font-family: 'Montserrat', sans-serif;
+      margin-bottom: 30mm; /* Reduced spacing below */
+      font-weight: 700; /* Bolder */
+      color: #005f63; /* Darker Teal/Blue */
+      line-height: 1.2;
+    }
+    .cover-logo {
+      max-width: 75mm; /* Slightly smaller */
+      max-height: 40mm;
+      /* Centering handled by inline style */
+      /* margin: 10mm auto 30mm auto; /* Spacing handled by surrounding element margins */
+    }
+    .cover-date {
+      font-size: 13pt; /* Slightly smaller */
+      color: #444; /* Darker grey */
+      margin-top: 25mm; /* Reduced space above */
+      font-family: 'Montserrat', sans-serif;
+    }
+    .cover-client-name {
+        font-size: 30pt; /* Slightly larger */
+        font-family: 'Montserrat', sans-serif;
+        margin-top: 8mm; /* Space between date and name */
+        margin-bottom: 10mm; /* Keep existing bottom margin for now */
+        color: #0077B6; /* HealthDataLab blue */
+        font-weight: 600;
+    }
+     /* Cover Page Number Style */
+    .cover-page-number {
+        position: absolute;
+        bottom: 10mm;
+        right: 15mm;
+        font-size: 10pt;
+        color: #666;
+    }
+
+    /* Section titles */
+    .section-title {
+      border-bottom: 2px solid #0077B6; /* Primary Blue border */
+      padding-bottom: 4px; /* Increased padding */
+      margin-bottom: 8mm; /* Increased margin */
+      font-size: 20pt; /* Increased size */
+      color: #004F59; /* Dark Teal */
+      /* page-break-after: avoid; /* Moved to @media print */
+    }
+
+    /* Visuals placeholders */
+    .visual {
+      margin: 20mm 0; /* Increased vertical margin */
+      margin-top: 10mm; /* Add more space at the top of visuals */
+      font-size: 10pt;
+      color: #666;
+      min-height: 60mm; /* Increased min height */
+      text-align: center; /* Center chart images */
+      /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .visual img {
+      max-width: 100%;
+      max-height: 65mm; /* Reduced max height */
+      margin: 5mm 0; /* Consistent vertical margins */
+      border: 1px solid #eee; /* Optional border for clarity */
+      border-radius: 5px;
+      /* page-break-inside: avoid; /* Moved to @media print */
+    }
+
+    /* Insights and recommendations */
+    .insight-group { /* Keep original insight styling */
+        margin-bottom: 8mm; /* Reduced margin */
+        padding: 6mm; /* Reduced padding */
+        background-color: #fdfdfd;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        page-break-inside: avoid;
+    }
+    .insight-group h3 {
+        margin-top: 0;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.3em; /* Reduced */
+    }
+    
+    /* Update recommendation styling for consistency */
+    /* Recommendation styles removed as requested */
+
+    /* CTA Buttons */
+    .cta-button {
+      display: inline-block;
+      padding: 2.5mm 5mm; /* Reduced */
+      background-color: #0077B6; /* Primary Blue */
+      color: #FFFFFF !important; /* White text */
+      text-decoration: none !important;
+      margin-right: 4mm; /* Reduced */
+      border-radius: 3mm;
+      font-weight: bold;
+      font-size: 10pt; /* Reduced */
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+     .cta-button:hover {
+      background-color: #00B4D8; /* Lighter blue on hover */
+     }
+
+     /* Footer */
+     .footer {
+        text-align: center;
+        margin-top: 10mm; /* Reduced margin */
+        font-size: 9pt;
+        color: #666;
+        border-top: 1px solid rgba(0, 119, 182, 0.2); /* Light blue border */
+        padding-top: 5mm; /* Reduced padding */
+     }
+
+     /* Page numbering */
+     @page {
+        /* Default margins for pages other than the first */
+        /* margin: 15mm; */ /* Replaced by new rule below */
+        margin-top: 25mm; /* Increased to fully avoid overlap */
+        margin-bottom: 20mm; /* Increased bottom margin */
+        margin-left: 15mm; /* Keep side margins */
+        margin-right: 15mm;
+     }
+     
+     @page :first {
+        /* Remove margins for the first page (cover) */
+        margin: 0;
+     }
+     
+     /* Fixed footer that works in both environments */
+     .page-footer {
+       position: absolute;
+       bottom: 0;
+       left: 0;
+       right: 0;
+       width: 100%;
+       height: 15mm;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       font-size: 10pt;
+       color: #666;
+       border-top: 1px solid rgba(0, 119, 182, 0.2);
+       padding-top: 5mm;
+       background-color: white;
+       box-sizing: border-box;
+       padding: 0 15mm;
+     }
+     
+     /* Mini logo styling for footer */
+     .footer-logo, .page-footer img, .page-number img {
+       max-height: 6mm !important; /* Smaller size for mini logo */
+       max-width: 20mm !important;
+       vertical-align: middle;
+       opacity: 0.85; /* Slightly transparent */
+     }
+     
+     /* Custom page numbering - placed at bottom of each page */
+     .page-number {
+        position: fixed;
+        bottom: 10mm;
+        left: 0;
+        right: 0;
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10pt;
+        color: #666;
+        height: 20px;
+        z-index: 1000;
+        padding: 0 15mm;
+        box-sizing: border-box;
+        background-color: white; /* Add background to ensure visibility */
+     }
+     .page-number .footer-logo {
+        max-height: 4mm; /* Reduced from 8mm */
+        vertical-align: middle;
+     }
+     .page-number span {
+        vertical-align: middle;
+     }
+     
+     /* First page doesn't show page number (using this generic class) */
+     body.first-page .page-number {
+        display: none;
+     }
+     
+     /* Hide regular footer on each page except the last one */
+     .section:not(:last-child) .footer {
+       display: none;
+     }
+
+     /* Hide PDFmonkey's page numbers on preview */
+     .html-preview .page-number {
+       display: none;
+     }
+
+     /* First page (cover) doesn't show page footer */
+     .cover-page .page-footer {
+       display: none;
+     }
+
+    /* Table Styling */
+     table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 6mm; /* Reduced margin */
+        font-size: 10pt;
+     }
+     th, td {
+        border: 1px solid #ddd;
+        padding: 4px; /* Reduced padding */
+        text-align: left;
+     }
+     th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+     }
+     tr:nth-child(even) {background-color: #f9f9f9;}
+
+    /* Grid for metrics */
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-bottom: 0.6em;} /* Reduced gap and margin */
+      .metric-card {
+          background-color: #FFFFFF; /* White background */
+          border: 1px solid rgba(0, 119, 182, 0.1); /* Light border based on Primary Blue */
+          border-radius: 6px; /* Increased radius */
+          padding: 5mm; /* Increased padding */
+          /* page-break-inside: avoid; /* Moved to @media print */
+          box-shadow: 0 2px 4px rgba(0, 119, 182, 0.08); /* Subtle shadow based on Primary Blue */
+          text-align: center;
+          margin-top: 15mm; /* Add more space above metric cards */
+      }
+      .metric-card h4 { 
+          margin-top: 0;
+          margin-bottom: 0.3em; /* Reduced */
+          border-bottom: 1px solid rgba(0, 79, 89, 0.1);
+          padding-bottom: 0.2em; /* Reduced */
+          font-size: 12pt;
+          color: #004F59; /* Dark Teal */
+          /* page-break-after: avoid; /* Moved to @media print */
+      }
+      .metric-value {
+          font-size: 16pt;
+          font-weight: bold;
+          color: #00A7C7; /* Secondary Blue */
+          margin-bottom: 0.1em; /* Reduced */
+      }
+      .metric-label { font-size: 9pt; color: #666; margin-top: 0.1em; } /* Reduced */
+
+      /* Impact Factors */
+      .impact-factors { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; } /* Reduced gap */
+      .impact-column h3 { border-bottom: 1px solid #eee; padding-bottom: 0.2em; margin-bottom: 0.6em; } /* Reduced margins/padding */
+      .impact-factor { margin-bottom: 0.4em; font-size: 10pt; padding: 3px 0; border-bottom: 1px dotted #eee;} /* Reduced margin/padding */
+      .impact-factor:last-child { border-bottom: none; }
+      .factor-name { font-weight: bold; display: inline-block; width: 70%; }
+      .factor-impact { font-weight: bold; float: right; }
+      /* Updated positive/negative colors */
+      .positive { color: #38b000; } /* Vibrant Green */
+      .negative { color: #d62828; } /* Bright Red */
+
+      /* Section combiner - for putting charts with their data */
+      .combined-section {
+          display: flex;
+          flex-direction: column;
+      }
+      .data-container {
+          margin-bottom: 4mm; /* Reduced */
+      }
+      .chart-container {
+          margin-top: 0;
+      }
+      
+      /* Two column layout */
+      .two-column {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8mm; /* Reduced */
+      }
+      
+      /* Chart container specific styling */
+      .chart-display {
+          padding: 4mm 0; /* Reduced */
+          margin: 3mm 0; /* Reduced */
+          text-align: center;
+      }
+      
+      .chart-display img {
+          display: block;
+          margin: 0 auto;
+          border: 1px solid #eee;
+          padding: 2px;
+          background-color: white;
+      }
+      
+      .chart-caption {
+          font-size: 9pt;
+          color: #666;
+          margin-top: 1mm; /* Reduced */
+          text-align: center;
+      }
+      
+      .comparison-chart {
+          margin-top: 8mm; /* Reduced */
+          text-align: center;
+          grid-column: 1 / -1;
+      }
+
+    /* Style for emphasizing values */
+    .value-emphasis {
+      font-weight: 600;
+      color: #00A7C7; /* Secondary Blue */
+      display: inline-block; /* Prevent potential line breaks within metrics */
+    }
+    /* Updated positive/negative emphasis colors */
+    .positive-emphasis {
+      font-weight: 600;
+      color: #38b000; /* Vibrant Green */
+      display: inline-block; /* Prevent potential line breaks within metrics */
+    }
+    .negative-emphasis {
+      font-weight: 600;
+      color: #d62828; /* Bright Red */
+      display: inline-block; /* Prevent potential line breaks within metrics */
+    }
+
+    /* Custom list styling for Key Health Insights */
+    .custom-list {
+      text-align: left;
+      padding-left: 0; /* Remove default list padding */
+      list-style: none; /* Remove default list bullets */
+    }
+    .custom-list-item {
+      /* margin-bottom: 1.2em; Original - replaced by item padding */
+      /* line-height: 1.4; Inherited */
+      /* padding-left: 5mm; Replaced by flex structure */
+      /* text-indent: -5mm; Removed */
+      display: flex; /* Align bullet and content */
+      align-items: flex-start; /* Align items to the top */
+      margin-bottom: 10mm; /* Reduced spacing between items */
+      font-size: 13pt;
+      line-height: 1.5; /* Reduced line-height */
+    }
+
+    /* New styles for enhanced insights display */
+    .insight-bullet {
+      flex-shrink: 0; /* Prevent bullet from shrinking */
+      width: 8px;
+      height: 8px;
+      border-radius: 2px; /* Slightly rounded square */
+      margin-right: 6mm; /* Reduced space between bullet and text */
+      margin-top: 0.4em; /* Align vertically with first line of text */
+    }
+    .insight-bullet-strength {
+      background-color: #38b000; /* Vibrant Green - matches positive emphasis */
+    }
+    .insight-bullet-improvement {
+      background-color: #d62828; /* Bright Red - matches negative emphasis */
+    }
+    .insight-content {
+      flex-grow: 1; /* Allow content to take remaining space */
+      display: flex;
+      justify-content: space-between; /* Push score to the right */
+      align-items: flex-start;
+      flex-wrap: wrap; /* Allow wrapping if needed */
+    }
+    .insight-text {
+       /* Takes up most space, score pushed right */
+       padding-right: 8px; /* Reduced space before score */
+    }
+    .insight-score {
+      font-weight: 600;
+      padding: 2px 6px; /* Reduced padding */
+      border-radius: 4px;
+      font-size: 10pt; /* Reduced font size */
+      margin-left: auto; /* Ensure it stays right */
+      white-space: nowrap; /* Prevent score breaking */
+      line-height: 1.2; /* Reduced line height */
+    }
+    .insight-score-strength {
+      background-color: rgba(56, 176, 0, 0.15); /* Light green background */
+      color: #38b000; /* Vibrant Green text */
+      border: 1px solid rgba(56, 176, 0, 0.3);
+    }
+    .insight-score-improvement {
+      background-color: rgba(214, 40, 40, 0.1); /* Light red background */
+      color: #d62828; /* Bright Red text */
+      border: 1px solid rgba(214, 40, 40, 0.3);
+    }
+
+    /* --- New Introduction Section Styles --- */
+    .intro-paragraph {
+      font-size: 12pt;
+      line-height: 1.4; /* Reduced line height */
+      color: #333333; /* Dark grey for readability */
+      margin-bottom: 0.8em; /* Reduced spacing */
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .intro-paragraph em {
+      font-style: italic;
+      color: #0077B6; /* Use primary blue for emphasis */
+      font-weight: 600; /* Slightly bolder emphasis */
+    }
+    .intro-subheading {
+      font-size: 14pt;
+      font-weight: 600;
+      color: #004F59; /* Dark Teal */
+      margin-top: 1.5em; /* Reduced space before subheading */
+      margin-bottom: 0.5em; /* Reduced space after subheading */
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 79, 89, 0.15); /* Subtle underline */
+      padding-bottom: 0.2em; /* Reduced */
+      page-break-after: avoid; /* Avoid breaking after this heading */
+    }
+    .intro-subheading em {
+      font-style: italic;
+      font-weight: 600; /* Consistent emphasis */
+      /* Color inherited from .intro-subheading */
+    }
+    .intro-list {
+      padding-left: 20px; /* Reduced indentation */
+      margin-bottom: 1em; /* Reduced space after list */
+      list-style-type: disc; /* Standard bullet */
+      list-style-position: outside;
+      text-align: left;
+    }
+    .intro-list-item {
+      font-size: 12pt; /* Increased font size */
+      line-height: 1.4; /* Reduced */
+      color: #333333;
+      margin-bottom: 0.4em; /* Reduced space between items */
+    }
+    /* --- End Introduction Section Styles --- */
+
+    .quote-text {
+        font-style: italic;
+        color: #00A7C7; /* Match your blue accent color for quotes */
+        font-weight: normal; /* Ensure not bold */
+        letter-spacing: -0.01em;
+    }
+
+    /* --- New Age-Dynamic Content Styles --- */
+    .age-dynamic-container {
+        margin-bottom: 15mm; /* Reduced spacing after each block */
+        padding-left: 5mm; /* Slight indent for the whole block */
+        border-left: 3px solid rgba(0, 119, 182, 0.2); /* Subtle left border matching theme blue */
+        /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .age-dynamic-title {
+        font-size: 14pt;
+        font-weight: 600;
+        color: #0077B6; /* Primary theme blue */
+        margin-bottom: 0.5em; /* Reduced */
+        text-align: left;
+        /* page-break-after: avoid; /* Moved to @media print */
+    }
+    .age-dynamic-quote {
+        font-size: 12pt; /* Increased font size */
+        font-style: italic;
+        color: #555555; /* Slightly darker grey for quote */
+        margin-bottom: 0.8em; /* Reduced */
+        padding-left: 8mm; /* Reduced indent quote */
+        text-align: left;
+        position: relative;
+    }
+    .age-dynamic-quote::before { /* Optional: Add subtle quote mark */
+        content: '\"';
+        position: absolute;
+        left: 1mm; /* Adjusted */
+        top: -3mm; /* Adjusted */
+        font-size: 18pt; /* Reduced */
+        color: rgba(0, 119, 182, 0.2);
+        font-family: 'Playfair Display', serif; /* Use serif for quote mark */
+    }
+    .age-dynamic-quote em {
+        font-style: italic;
+        font-weight: normal; /* Ensure emphasis doesn't make it bolder */
+        /* Color inherited from .age-dynamic-quote */
+    }
+    .age-dynamic-attribution {
+        display: block; /* Put attribution on new line */
+        margin-top: 0.4em; /* Reduced */
+        font-size: 10pt;
+        color: #666666;
+        text-align: right; /* Align attribution right */
+        font-style: normal;
+    }
+    .age-dynamic-text {
+        font-size: 12pt; /* Increased font size */
+        line-height: 1.5; /* Reduced */
+        color: #333333; /* Same as intro paragraph */
+        margin-bottom: 0.4em; /* Reduced */
+        text-align: left;
+    }
+    /* --- End Age-Dynamic Content Styles --- */
+
+    /* Practitioner Details Section CSS Removed */
+    
+    /* Conditional Score Styling for Table */
+    .score-high { font-weight: bold; color: #38b000; } /* Keep semantic green */
+    .score-low { font-weight: bold; color: #d62828; } /* Keep semantic red */
+    .score-normal { font-weight: normal; color: #000000; }
+    
+    /* Table Row Background Cycling */
+    .row-bg-1 { background-color: #f9f9f9; } /* Consider #CAF0F8 (Light Blue) for one? */
+    .row-bg-2 { background-color: #ffffff; }
+    
+    /* Section-specific overrides for compactness */
+    .chrono-bio-section h3 {
+      margin-bottom: 3mm; /* Tighter spacing below h3 in this section */
+    }
+    .chrono-bio-section p {
+      margin-bottom: 0.5em; /* Tighter spacing below p in this section */
+      line-height: 1.4; /* Slightly tighter lines in this section */
+    }
+    .about-recs-text p {
+        margin-bottom: 0.5em; /* Tighter spacing below p in this specific block */
+        line-height: 1.4; /* Slightly tighter lines in this block */
+    }
+    
+    /* Critical page break controls */
+    @media print {
+      /* Keep these items together */
+      .metric-card,
+      .recommendation-item, /* Might be too large, test carefully */
+      .custom-list-item,
+      .age-dynamic-container,
+      .insight-group,
+      .visual,
+      .cover-page,
+      .recommendation-group,
+      .intro-paragraph {
+        page-break-inside: avoid;
+      }
+      
+      /* Avoid breaking after these elements */
+      h1, h2, h3, h4, 
+      .section-title,
+      .intro-subheading,
+      .age-dynamic-title,
+      .metric-card h4 {
+        page-break-after: avoid;
+        page-break-inside: avoid; /* Also avoid breaking inside headings */
+      }
+      
+      /* Force page breaks before major sections (except the first) */
+      .section:not(:first-child) {
+        page-break-before: always;
+      }
+      
+      /* Avoid orphans and widows */
+      p, li {
+        orphans: 3;
+        widows: 3;
+      }
+
+      /* Ensure sections don't break internally if possible */
+      .section {
+          page-break-inside: avoid;
+          margin-bottom: 12mm; /* Ensure consistent margin even in print */
+      }
+    }
+
+    /* NEW CSS for Chronological vs. Biological Age section */
+    .chrono-bio-section {
+      margin-bottom: 20mm;
+    }
+
+    .analysis-subheading {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #004F59; /* Dark Teal */
+      margin-top: 10mm;
+      margin-bottom: 4mm;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 79, 89, 0.1);
+      padding-bottom: 2mm;
+      page-break-after: avoid;
+    }
+
+    .analysis-paragraph {
+      font-size: 12pt;
+      line-height: 1.4;
+      margin-bottom: 6mm;
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+      color: #333333;
+    }
+
+    /* Use existing emphasis classes from intro section (already defined earlier) */
+    /*
+    .positive-emphasis {
+      font-weight: 600;
+      color: #38b000; /* Vibrant Green */
+      display: inline-block;
+    }
+
+    .negative-emphasis {
+      font-weight: 600;
+      color: #d62828; /* Bright Red */
+      display: inline-block;
+    }
+
+    .value-emphasis {
+      font-weight: 600;
+      color: #00A7C7; /* Secondary Blue */
+      display: inline-block;
+    }
+    */
+    /* END NEW CSS */
+
+    /* New CSS rule for Recommendation Group Titles */
+    .recommendation-group-title {
+        font-size: 14pt;
+        font-weight: 600;
+        color: #0077B6; /* Primary Blue */
+        margin-top: 10mm;
+        margin-bottom: 5mm;
+        padding-bottom: 3mm;
+        border-bottom: 1px solid rgba(0, 119, 182, 0.2);
+        page-break-after: avoid;
+    }
+
+    /* New Disclaimer Section Styling */
+    .disclaimer-content {
+        column-count: 2;
+        column-gap: 10mm; /* Increased from 8mm */
+        font-size: 10pt; /* Increased from 8pt */
+        line-height: 1.4; /* Increased from 1.2 */
+        color: #333; /* Darker for better contrast */
+        margin-top: 5mm;
+    }
+    .disclaimer-content h4 {
+        font-size: 13pt; /* Increased from 10pt */
+        color: #004F59;
+        margin-top: 0;
+        margin-bottom: 5mm; /* Increased from 4mm */
+        font-weight: 600;
+        break-after: avoid;
+    }
+    .disclaimer-content h5 {
+        font-size: 11pt; /* Increased from 9pt */
+        color: #005f63;
+        margin-top: 8mm; /* Increased from 6mm */
+        margin-bottom: 4mm; /* Increased from 3mm */
+        font-weight: 600;
+        break-after: avoid;
+    }
+    .disclaimer-content p {
+        margin-bottom: 5mm; /* Increased from 4mm */
+        text-align: left;
+        font-size: 10pt; /* Increased from 8pt */
+        line-height: 1.4; /* Increased from 1.2 */
+    }
+    .disclaimer-content ul {
+        margin-top: 0;
+        margin-bottom: 5mm; /* Increased from 4mm */
+        padding-left: 15px; /* Increased from 10px */
+        list-style: disc;
+    }
+    .disclaimer-content li {
+        margin-bottom: 3mm; /* Increased from 2mm */
+        font-size: 10pt; /* Increased from 8pt */
+        line-height: 1.4; /* Increased from 1.2 */
+    }
+    .disclaimer-content hr {
+        margin: 8mm 0; /* Increased from 6mm */
+        border: none;
+        border-top: 1px solid #ddd; /* Lighter */
+        column-span: all;
+    }
+    /* End Disclaimer Styling */
+
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mark as HTML preview for CSS targeting
+      document.body.classList.add('html-preview');
+      
+      // No need to add page footers anymore
+    });
+  </script>
+</head>
+<body class="first-page">
+  <div class="container">
+
+    <!-- Cover Page -->
+    <div class="cover-page page-break">
+      <!-- HealthDataLab text -->
+      <div class="cover-brand-text">HealthDataLab</div>
+      <!-- Report Title -->
+      <div class="cover-main-title">HEALTH & LONGEVITY REPORT</div>
+      <!-- Logo -->
+      <img src="{{ cover_logo_url | default: 'https://i.imgur.com/vP6oY12.png' }}" alt="Logo" class="cover-logo" style="display: block; margin-left: auto; margin-right: auto;">
+      <!-- Date -->
+      <div class="cover-date">Date: {{ 'now' | date: '%B %d, %Y' }}</div>
+      <!-- Client Name -->
+      <div class="cover-client-name">{{ fullName | default: 'Client' }}</div>
+    </div>
+    
+    <!-- Practitioner Details HTML Section Removed -->
+
+    <!-- 1. Introductory Section with Age-Based Dynamic Content -->
+    <div class="section">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title">Intro</h2>
+
+      <!-- Display the AI-generated intro section when available, otherwise use static content -->
+      {% if ai_results.ai_intro_section %}
+          {% comment %} Directly render the AI-generated intro text block {% endcomment %}
+          <p class="intro-paragraph">{{ ai_results.ai_intro_section | newline_to_br }}</p> {% comment %} Use newline_to_br if the AI might include line breaks {% endcomment %}
+
+      {% else %}
+          <!-- Your existing fallback content -->
+          <p class="intro-paragraph" style="font-style: italic; color: #666;">
+            [AI Intro Section Placeholder - AI Data Not Found]
+          </p>
+          <!-- Fallback content below is kept for now -->
+          <p class="intro-paragraph">
+            Welcome to your <em>Personalised Health and Longevity Report</em>—a transformative guide crafted to illuminate your current state of wellbeing and empower you to shape a vibrant, fulfilling future. Health is the cornerstone of a rich and meaningful life, influencing your energy, clarity, and capacity to pursue what matters most. This report is your compass, offering clear insights, actionable steps, and gentle encouragement to help you thrive, no matter where you stand today.
+          </p>
+          <p class="intro-paragraph">
+            Understanding your health is like standing at a crossroads with a map in hand. Without knowing your starting point, even the best directions can lead you astray. This report provides that clarity—your unique starting point—while celebrating your commitment to investing in yourself. However, it's important to note that this report is not a substitute for personalised guidance from a trained health professional. Ideally, you'll work with someone who embraces a holistic approach, focusing not just on symptoms but on empowering you to actively shape your wellness journey.
+          </p>
+          <p class="intro-paragraph">
+            Consider this report your foundation—a moment to pause, reflect, and gain direction. It highlights your strengths, identifies areas for growth, and equips you with the awareness to move forward with confidence.
+          </p>
+          <p class="intro-paragraph">
+            You've already taken the most courageous step: choosing to take action, to look at your health from a higher altitude. Let's begin this journey together.
+          </p>
+      {% endif %}
+
+      {% comment %} Removed the "A Note on Your Journey" section and other structured logic {% endcomment %}
+      <!-- End updated introduction content -->
+
+      <!-- Add fallback logic to still use ai_results.introduction if needed -->
+      {% comment %} This block is now removed as the logic is handled above {% endcomment %}
+    </div>
+
+    <!-- New Chronological vs. Biological Age Section -->
+    <div class="section chrono-bio-section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Results</h2>
+
+      <h3 style="color: #004F59; margin-top: 15mm; margin-bottom: 8mm;">Chronological vs. Biological age</h3>
+
+      <!-- Moved 3-card grid layout here -->
+      <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 8mm; margin-bottom: 15mm;">
+          <!-- Card 1: Chronological Age -->
+          <div class="metric-card">
+              <h4>Chronological Age</h4>
+              <div class="metric-value">{{ age | default: 'N/A' }}</div>
+              <div class="metric-label">Your actual age</div>
+          </div>
+          <!-- Card 2: Biological Age -->
+          <div class="metric-card">
+              <h4>Biological Age</h4>
+              <div class="metric-value">{{ biologicalAge | round: 1 | default: 'N/A' }}</div>
+              <div class="metric-label">Estimated age based on health</div>
+          </div>
+          <!-- Card 3: Age Shift -->
+          <div class="metric-card">
+               <h4>Age Shift</h4>
+               {% comment %}
+               {% assign age_diff_calc = biologicalAge | minus: age %}
+               {% assign current_age_shift = ageShift | default: age_diff_calc %}
+               {% assign age_shift_num = current_age_shift | plus: 0 %}
+               {% assign is_positive_shift = age_shift_num > 0.05 %}
+               {% assign is_negative_shift = age_shift_num < -0.05 %}
+               {% endcomment %}
+
+               {% assign current_age_shift = ageShift | default: 0 %}
+               {% assign shift_num_for_sign = current_age_shift | plus: 0 %}
+               {% assign emphasis_class = "value-emphasis" %}
+               {% if ageShiftClass == "positive" %}
+                  {% assign emphasis_class = "positive-emphasis" %}
+               {% elsif ageShiftClass == "negative" %}
+                  {% assign emphasis_class = "negative-emphasis" %}
+               {% endif %}
+
+               {% if biologicalAge != nil and age != nil %}
+                   <div class="metric-value {{ emphasis_class }}">
+                       {% if shift_num_for_sign > 0 %}+{% endif %}{{ current_age_shift | round: 1 }} yrs
+                   </div>
+                   <div class="metric-label">
+                       {% if ageShiftText %}
+                           {{ ageShiftText | replace: "lower", "<strong class=\"positive-emphasis\">lower</strong>" | replace: "higher", "<strong class=\"negative-emphasis\">higher</strong>" | replace: "approximately equal to", "<strong class=\"value-emphasis\">aligns closely with</strong>" }}
+                       {% else %}
+                           {% comment %} Fallback if ageShiftText is missing for some reason {% endcomment %}
+                           Calculation requires biological and chronological age.
+                       {% endif %}
+                   </div>
+               {% else %}
+                   <div class="metric-value">N/A</div>
+                   <div class="metric-label">Calculation not available.</div>
+               {% endif %}
+          </div>
+      </div>
+
+      <!-- Moved AI Analysis Text here -->
+      <!-- AI Analysis Text -->
+      <div style="margin-top: 10mm; margin-bottom: 10mm;"> <!-- Adjusted spacing -->
+          {% if ai_results.biologicalAge %}
+              <p style="font-size: 13pt; line-height: 1.6; text-align: left;">{{ ai_results.biologicalAge }}</p>
+          {% else %}
+              {% assign age_ratio_calc = biologicalAge | divided_by: age %}
+              {% assign current_aging_rate = agingRate | default: age_ratio_calc %}
+              {% assign aging_rate_num = current_aging_rate | plus: 0 %}
+              {% assign is_faster_rate = aging_rate_num > 1.1 %}
+              {% assign is_slower_rate = aging_rate_num < 0.9 %}
+              {% assign age_diff_calc = biologicalAge | minus: age %}
+              {% assign current_age_shift = ageShift | default: age_diff_calc %}
+              {% assign age_shift_num = current_age_shift | plus: 0 %}
+              {% assign is_positive_shift = age_shift_num > 0.05 %}
+              {% assign is_negative_shift = age_shift_num < -0.05 %}
+              <p style="font-size: 13pt; line-height: 1.6; text-align: left;">
+                  <!-- Default text if AI result is not available -->
+                  Your <strong>biological age</strong> is estimated to be 
+                  <strong class="{% if is_positive_shift %}negative-emphasis{% elsif is_negative_shift %}positive-emphasis{% else %}value-emphasis{% endif %}">
+                      {{ current_age_shift | abs | round: 1 }} years 
+                      {% if is_positive_shift %}higher{% else %}lower{% endif %}
+                  </strong> 
+                  than your chronological age. This suggests an <strong>aging rate</strong> of <strong>{{ current_aging_rate | round: 2 }}</strong>, which is 
+                  <strong class="{% if is_faster_rate %}negative-emphasis{% elsif is_slower_rate %}positive-emphasis{% else %}value-emphasis{% endif %}">
+                      {% if is_faster_rate %}faster{% elsif is_slower_rate %}slower{% else %}average{% endif %}
+                  </strong> 
+                  compared to others of your age. <strong>Maintaining positive lifestyle habits</strong> is key to 
+                  {% if is_positive_shift %}improving{% else %}preserving{% endif %} this 
+                  {% if is_positive_shift %}situation{% else %}advantage{% endif %}.
+                  <br><em style="font-size: 10pt; color: #666;">(This is default text. AI analysis for this section would ideally appear here.)</em>
+              </p>
+          {% endif %}
+      </div>
+
+      <!-- NEW LOCATION FOR CHART: Insert QuickChart gauge block here -->
+      <!-- QuickChart: Biological vs Chronological Age Gauge -->
+      {% if biologicalAge != nil and age != nil %}
+      {% assign age_ratio_calc = biologicalAge | divided_by: age %}
+      {% assign current_aging_rate = agingRate | default: age_ratio_calc %}
+      <div class="visual" style="min-height: 80mm; margin-top: 8mm;">
+          {% capture gauge_config %}
+          {
+            type: 'gauge',
+            data: {
+              labels: ['Slower', 'Average', 'Faster'],
+              datasets: [{
+                data: [0.9, 1.1, 1.4],
+                value: {{ current_aging_rate | round: 2 }},
+                minValue: 0.6,
+                maxValue: 1.4,
+                backgroundColor: [
+                  'rgba(67, 191, 85, 0.95)',   /* Vibrant Green */
+                  'rgba(65, 165, 238, 0.95)',  /* Bright Blue */
+                  'rgba(255, 111, 75, 0.95)'   /* Coral Orange */
+                ],
+                borderWidth: 2,
+                borderColor: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: 5
+              }]
+            },
+            options: {
+              layout: { padding: { top: 35, bottom: 20, left: 20, right: 20 } },
+              plugins: {
+                annotation: {
+                  annotations: {
+                    // Premium tick marks
+                    ...Array.from({ length: 9 }, (_, i) => ({
+                      type: 'line',
+                      id: `tick${i}`,
+                      yMin: 0.85,
+                      yMax: 0.95,
+                      xMin: -0.8 + (i * 0.2),
+                      xMax: -0.8 + (i * 0.2),
+                      borderColor: 'rgba(0, 79, 89, 0.4)',
+                      borderWidth: 2,
+                      display: true
+                    })),
+                    // Decorative outer lines
+                    ...Array.from({ length: 16 }, (_, i) => ({
+                      type: 'line',
+                      id: `decorative${i}`,
+                      yMin: 1.1,
+                      yMax: 1.2,
+                      xMin: -1 + (i * 0.133),
+                      xMax: -1 + (i * 0.133),
+                      borderColor: 'rgba(0, 79, 89, 0.15)',
+                      borderWidth: 3,
+                      display: true
+                    })),
+                    // Score labels with enhanced styling
+                    score07: {
+                      type: 'label',
+                      content: '0.7',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: -0.9,
+                      yValue: 0.75
+                    },
+                    score08: {
+                      type: 'label',
+                      content: '0.8',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: -0.7,
+                      yValue: 0.75
+                    },
+                    score09: {
+                      type: 'label',
+                      content: '0.9',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: -0.5,
+                      yValue: 0.75
+                    },
+                    score10: {
+                      type: 'label',
+                      content: '1.0',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: 0,
+                      yValue: 0.8
+                    },
+                    score11: {
+                      type: 'label',
+                      content: '1.1',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: 0.5,
+                      yValue: 0.75
+                    },
+                    score12: {
+                      type: 'label',
+                      content: '1.2',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: 0.7,
+                      yValue: 0.75
+                    },
+                    score13: {
+                      type: 'label',
+                      content: '1.3',
+                      position: 'center',
+                      font: { size: 11, weight: '600', family: "'Montserrat', sans-serif" },
+                      color: 'rgba(0, 79, 89, 0.7)',
+                      xValue: 0.9,
+                      yValue: 0.75
+                    }
+                  }
+                },
+                datalabels: {
+                  display: 'auto',
+                  formatter: function (value, context) {
+                    // Use the predefined labels: 'Slower', 'Average', 'Faster'
+                    return context.chart.data.labels[context.dataIndex];
+                  },
+                  color: function(context) {
+                    // Make labels white for better contrast on colored backgrounds
+                    return '#ffffff';
+                  },
+                  font: {
+                    size: 16, // Adjust size as needed
+                    weight: 'bold',
+                    family: "'Montserrat', sans-serif"
+                  },
+                  align: 'center',
+                  anchor: 'center',
+                  offset: -20 // Adjust offset to position label within the arc
+                }
+              },
+              needle: {
+                radiusPercentage: 2.5,
+                widthPercentage: 3.5,
+                lengthPercentage: 65,
+                color: '#004F59',
+                shadowColor: 'rgba(0, 79, 89, 0.3)',
+                shadowBlur: 6,
+                shadowOffsetY: 4,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.8)'
+              },
+              valueLabel: {
+                display: true,
+                fontSize: 42,
+                fontFamily: "'Montserrat', sans-serif",
+                fontWeight: 'bold',
+                color: '#004F59',
+                backgroundColor: 'transparent',
+                formatter: function(value) {
+                  return value.toFixed(2);
+                },
+                bottomMarginPercentage: -10, // Adjusted from 25 to move score down
+                padding: 10
+              },
+              centerArea: {
+                displayText: false,
+                backgroundColor: 'transparent',
+                width: 60,
+                height: 60,
+                border: {
+                  width: 2,
+                  color: 'rgba(0, 79, 89, 0.1)'
+                }
+              },
+              arc: {
+                borderWidth: 0,
+                borderColor: 'rgba(0, 79, 89, 0.1)',
+                padding: 3,
+                margin: 5,
+                roundedCorners: true
+              },
+              subtitle: {
+                display: true,
+                {% assign is_faster_rate = aging_rate_num > 1.1 %}
+                {% assign is_slower_rate = aging_rate_num < 0.9 %}
+                text: '{% if is_slower_rate %}Slower{% elsif is_faster_rate %}Faster{% else %}Average{% endif %}',
+                color: '{% if is_slower_rate %}#688C3E{% elsif is_faster_rate %}#8B2703{% else %}#00A7C7{% endif %}',
+                font: {
+                  size: 24,
+                  weight: 'bold',
+                  family: "'Montserrat', sans-serif"
+                },
+                padding: { top: 10 }
+              }
+            }
+          }
+          {% endcapture %}
+          <div style="
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+            border-radius: 12px;
+            padding: 25px 25px 40px 25px; /* Adjust back padding since main issue is image height */
+            box-shadow: 0 10px 25px rgba(0, 79, 89, 0.05),
+                        0 5px 10px rgba(0, 79, 89, 0.03);
+            margin: 10px auto;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;">
+
+              <!-- Increased QuickChart height from 300 to 400 -->
+              <img src="https://quickchart.io/chart?c={{ gauge_config | url_encode }}&w=450&h=400"
+                   alt="Aging Rate Gauge"
+                   style="max-width: 100%; max-height: none; display: block; margin: 0 auto 5mm auto;" /> <!-- Added bottom margin -->
+
+              <div style="text-align: center; margin-top: 4mm; font-size: 12pt; color: #004F59;">
+                  <span style="font-weight: 600;">Aging Rate:</span> {{ current_aging_rate | round: 2 }}
+                  <span style="color: #666;">(Biological Age / Chronological Age)</span>
+              </div>
+              <!-- Added new paragraph below -->
+
+          </div>
+      </div>
+      {% endif %}
+      <!-- END MOVED CHART BLOCK -->
+
+      <!-- START INSERTED PROGRESS BARS -->
+      <!-- Progress Bar Visualization Section -->
+      <div style="margin: 15mm 0mm 25mm 0mm; page-break-inside: avoid;">
+        <!-- Grid Container with MORE HORIZONTAL SPACE -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15mm; align-items: start; width: 100%; max-width: 180mm; margin: 0 auto;">
+        
+          <!-- BMI Progress Bar Container -->
+          <div style="width: 100%; margin: 0 auto;">
+          
+            <!-- Progress Bar Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span style="font-weight: 600; font-size: 13pt; color: #004F59;">BMI: {{ bmi | round: 1 }}</span>
+              <span style="font-size: 10pt;">
+                <span style="color: #0077B6; font-weight: 500;">Healthy</span>
+                <span style="margin: 0 3px; color: #666;">|</span>
+                <span style="color: #E67E22; font-weight: 500;">Moderate</span>
+                <span style="margin: 0 3px; color: #666;">|</span>
+                <span style="color: #E74C3C; font-weight: 500;">High Risk</span>
+              </span>
+            </div>
+          
+            <!-- Wider Progress Bar -->
+            <div style="position: relative; width: 100%; max-width: 110%; margin-left: -5%; margin-right: -5%;">
+              <div style="height: 36px; background: linear-gradient(to right, #0077B6, #00A7C7 45%, #E67E22 70%, #E74C3C); border-radius: 18px;"></div>
+              
+              <!-- BMI Marker -->
+              {% assign bmi_percent = bmi | minus: 15 | times: 100 | divided_by: 20 | at_most: 100 | at_least: 0 %}
+              <div style="position: absolute; top: -12px; left: {{ bmi_percent }}%; transform: translateX(-50%);">
+                <div style="width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 18px solid #004F59;"></div>
+              </div>
+          
+              <!-- Numerical Scale Markers (Adjusted spacing) -->
+              <div style="display: flex; justify-content: space-between; margin-top: 20px; font-size: 11pt; color: #444;">
+                <span style="flex: 1; text-align: center;">15</span>
+                <span style="flex: 1; text-align: center;">18.5</span>
+                <span style="flex: 1; text-align: center;">25</span>
+                <span style="flex: 1; text-align: center;">30</span>
+                <span style="flex: 1; text-align: center;">35+</span>
+              </div>
+          
+              <!-- Textual Category Labels (Clear separation) -->
+              <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 9.5pt; color: #555;">
+                <span style="flex: 1; text-align: center;">Underweight</span>
+                <span style="flex: 1; text-align: center;">Normal</span>
+                <span style="flex: 1; text-align: center;">Overweight</span>
+                <span style="flex: 1; text-align: center;">Obese</span>
+              </div>
+          
+            </div>
+          </div>
+          
+          <!-- WHR Progress Bar Container -->
+          <div style="width: 100%; margin: 0 auto;">
+          
+            <!-- Progress Bar Header -->
+            <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 15px;">
+              <span style="font-weight: 600; font-size: 13pt; color: #004F59;">WHR: {{ whr | round: 2 }}</span>
+              <span style="font-size: 10pt; margin-left: 10px;"> <!-- Added margin-left for spacing -->
+                <span style="color: #0077B6; font-weight: 500;">Healthy</span>
+                <span style="margin: 0 1px; color: #666;">|</span>
+                <span style="color: #E74C3C; font-weight: 500;">Risk</span>
+              </span>
+            </div>
+          
+            <!-- Wider Progress Bar -->
+            <div style="position: relative; width: 100%; max-width: 110%; margin-left: -5%; margin-right: -5%;">
+              <div style="height: 36px; background: linear-gradient(to right, #0077B6, #00A7C7 50%, #E67E22 75%, #E74C3C); border-radius: 18px;"></div>
+              
+              <!-- WHR Marker -->
+              {% assign whr_position_percent = whr | minus: 0.6 | divided_by: 0.6 | times: 100 %}
+              <div style="position: absolute; top: -12px; left: {{ whr_position_percent }}%; transform: translateX(-50%);">
+                <div style="width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 18px solid #004F59;"></div>
+              </div>
+          
+              <!-- Numerical Scale Markers -->
+              <div style="display: flex; justify-content: space-between; margin-top: 20px; font-size: 11pt; color: #444;">
+                <span style="flex: 1; text-align: center;">0.60</span>
+                <span style="flex: 1; text-align: center;">0.75</span>
+                <span style="flex: 1; text-align: center;">0.95</span>
+                <span style="flex: 1; text-align: center;">1.0</span>
+                <span style="flex: 1; text-align: center;">1.20</span>
+              </div>
+          
+              <!-- Textual Category Labels -->
+              <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 9.5pt; color: #555;">
+                <span style="flex: 1; text-align: center;">Healthy Range</span>
+                <span style="flex: 1; text-align: center;">Increased Health Risk</span>
+              </div>
+          
+            </div>
+          </div>
+
+        </div> <!-- End Grid Container -->
+
+        <!-- Explanation note (unchanged) -->
+        <div style="margin-top: 20mm; font-size: 10pt; color: #666; line-height: 1.5;">
+          <p style="margin-bottom: 4mm;"><strong style="color: #004F59;">Note:</strong> These metrics provide general health indicators. BMI measures weight relative to height, while Waist-Hip Ratio indicates fat distribution patterns that may signal potential health risks.</p>
+        </div>
+      </div>
+      <!-- END INSERTED PROGRESS BARS -->
+
+      <!-- START INSERTED RADAR CHART -->
+      <div style="margin: 0; padding: 0; width: 100%; page-break-inside: avoid;">
+        {% capture radar_data %}
+        {
+          type: 'radar',
+          data: {
+            labels: [
+              {% assign score_map = '{
+                  "physicalActivity": "Physical Activity", "sitToStand": "Sit-to-Stand Test", "breathHold": "Breath Hold Test", "balance": "Balance Test",
+                  "sleepDuration": "Sleep Duration", "sleepQuality": "Sleep Quality", "stressLevels": "Stress Levels", "socialConnections": "Social Connections",
+                  "dietQuality": "Diet Quality", "alcoholConsumption": "Alcohol Consumption", "smokingStatus": "Smoking Status", "cognitiveActivity": "Cognitive Activity",
+                  "sunlightExposure": "Sunlight Exposure", "supplementIntake": "Supplement Intake", "skinElasticity": "Skin Elasticity",
+                  "bmiScore": "BMI Score", "whrScore": "WHR Score", "overallHealthScore": "Overall Health Score"
+              }' | parse_json %}
+              {% assign displayed_keys = "" | split: "," %}
+              {% for pair in score_map %}
+                 {% assign key = pair[0] %}
+                 {% assign name = pair[1] %}
+                 {% assign value = scores[key] %}
+                 {% if value != nil %}{% assign displayed_keys = displayed_keys | push: key %}'{{ name }}'{% unless forloop.last %},{% endunless %}{% endif %}
+              {% endfor %}
+              {% for score_pair in scores %}
+                 {% assign key = score_pair[0] %}
+                 {% assign value = score_pair[1] %}
+                 {% assign already_displayed = false %}
+                 {% for displayed_key in displayed_keys %}{% if displayed_key == key %}{% assign already_displayed = true %}{% endif %}{% endfor %}
+                 {% unless already_displayed %}{% if forloop.first != true or displayed_keys.size > 0 %},{% endif %}'{{ key | replace: "_", " " | capitalize }}'{% endunless %}
+              {% endfor %}
+            ],
+            datasets: [
+              {
+                label: 'Low Score Zone',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 0.7)',
+                borderWidth: 2,
+                borderDash: [3, 3],
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                data: [
+                  {% for pair in score_map %}{% assign key = pair[0] %}{% assign value = scores[key] %}{% if value != nil %}2{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}
+                  {% for score_pair in scores %}{% assign key = score_pair[0] %}{% assign value = score_pair[1] %}{% assign already_displayed = false %}{% for displayed_key in displayed_keys %}{% if displayed_key == key %}{% assign already_displayed = true %}{% endif %}{% endfor %}{% unless already_displayed %}{% if forloop.first != true or displayed_keys.size > 0 %},{% endif %}2{% endunless %}{% endfor %}
+                ]
+              },
+              {
+                label: 'Your Scores',
+                backgroundColor: 'rgba(54, 162, 235, 0.4)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 5,
+                pointBackgroundColor: 'rgb(54, 162, 235)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(54, 162, 235)',
+                pointRadius: 8,
+                pointBorderWidth: 3,
+                data: [
+                  {% for pair in score_map %}{% assign key = pair[0] %}{% assign value = scores[key] %}{% if value != nil %}{{ value }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}
+                  {% for score_pair in scores %}{% assign key = score_pair[0] %}{% assign value = score_pair[1] %}{% assign already_displayed = false %}{% for displayed_key in displayed_keys %}{% if displayed_key == key %}{% assign already_displayed = true %}{% endif %}{% endfor %}{% unless already_displayed %}{% if forloop.first != true or displayed_keys.size > 0 %},{% endif %}{{ value }}{% endunless %}{% endfor %}
+                ]
+              },
+              {
+                label: 'Optimal (5/5)',
+                backgroundColor: 'rgba(0, 0, 0, 0)',
+                borderColor: 'rgba(75, 192, 192, 0.6)',
+                borderWidth: 2,
+                borderDash: [6, 6],
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                fill: false,
+                data: [
+                  {% for pair in score_map %}{% assign key = pair[0] %}{% assign value = scores[key] %}{% if value != nil %}5{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}
+                  {% for score_pair in scores %}{% assign key = score_pair[0] %}{% assign value = score_pair[1] %}{% assign already_displayed = false %}{% for displayed_key in displayed_keys %}{% if displayed_key == key %}{% assign already_displayed = true %}{% endif %}{% endfor %}{% unless already_displayed %}{% if forloop.first != true or displayed_keys.size > 0 %},{% endif %}5{% endunless %}{% endfor %}
+                ]
+              }
+            ]
+          },
+          options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                enabled: false
+              },
+              datalabels: {
+                display: function(context) {
+                  return context.datasetIndex === 1; // Only show for "Your Scores" dataset
+                },
+                formatter: function(value) {
+                  return value.toFixed(1);
+                },
+                color: '#333',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: 4,
+                padding: 6,
+                font: {
+                  weight: 'bold',
+                  size: 14
+                }
+              }
+            },
+            scales: {
+              r: {
+                min: 0,
+                max: 5,
+                ticks: {
+                  stepSize: 1,
+                  display: true,
+                  backdropColor: 'rgba(255, 255, 255, 0.75)',
+                  z: 1,
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  },
+                  color: '#333'
+                },
+                pointLabels: {
+                  font: {
+                    size: 18,
+                    weight: 'bold'
+                  },
+                  color: '#005f63',
+                  padding: 25
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.2)',
+                  circular: true,
+                  lineWidth: 1
+                },
+                angleLines: {
+                  color: 'rgba(0, 0, 0, 0.25)',
+                  lineWidth: 1.5
+                }
+              }
+            }
+          }
+        }
+        {% endcapture %}
+        
+        <!-- Using full-page approach with direct styling for the chart container -->
+        <div style="position: relative; width: 100%; height: 230mm; margin: 0; padding: 0;">
+          <img src="https://quickchart.io/chart?v=4&c={{ radar_data | url_encode }}&w=1200&h=1200&backgroundColor=white"
+               alt="Health Assessment Radar Chart"
+               style="position: absolute; width: 100%; height: 100%; left: 0; top: 0; object-fit: contain;" />
+        </div>
+      </div>
+      <!-- END INSERTED RADAR CHART -->
+
+      <!-- START INSERTED STRENGTHS/IMPROVEMENTS -->
+      <div class="visual" style="page-break-inside: avoid;">
+        <div class="impact-factors" style="text-align: left; gap: 20mm;">
+            <div style="position: relative;">
+                <h3 style="text-align: left; margin-bottom: 15mm; font-size: 16pt; color: #004F59; page-break-after: avoid;">Strengths</h3>
+                {% if ai_results.strengthsAreas.strengths and ai_results.strengthsAreas.strengths.size > 0 %}
+                    <div class="custom-list">
+                    {% for item in ai_results.strengthsAreas.strengths %}
+                        <div class="custom-list-item">
+                            <div class="insight-bullet insight-bullet-strength"></div>
+                            <div class="insight-content">
+                                <span class="insight-text">
+                                    {{ item.text | default: item }}
+                                </span>
+                                {% if item.score %}
+                                <span class="insight-score insight-score-strength">
+                                    {{ item.score }} / 5
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="font-size: 13pt; line-height: 1.6;">No specific strengths highlighted.</p>
+                {% endif %}
+            </div>
+            <div style="position: relative;">
+                <h3 style="text-align: left; margin-bottom: 15mm; font-size: 16pt; color: #004F59; page-break-after: avoid;">Improvement Areas</h3>
+                {% if ai_results.strengthsAreas.improvements and ai_results.strengthsAreas.improvements.size > 0 %}
+                    <div class="custom-list">
+                    {% for item in ai_results.strengthsAreas.improvements %}
+                        <div class="custom-list-item">
+                             <div class="insight-bullet insight-bullet-improvement"></div>
+                             <div class="insight-content">
+                                <span class="insight-text">
+                                    {{ item.text | default: item }}
+                                </span>
+                                {% if item.score %}
+                                <span class="insight-score insight-score-improvement">
+                                    {{ item.score }} / 5
+                                </span>
+                                {% endif %}
+                             </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="font-size: 13pt; line-height: 1.6;">No specific improvement areas highlighted.</p>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 2. Lifestyle Assessment Section (Previously Biological Age with Gauge) -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Analysis</h2>
+      
+      <h3 style="color: #004F59; margin-top: 15mm; margin-bottom: 8mm;">Chronological vs. Biological Age</h3>
+      <!-- Display the AI generated text -->
+      {% if ai_results.chronologicalVsBio %}
+         <p class="analysis-paragraph">{{ ai_results.chronologicalVsBio }}</p>
+      {% else %}
+         <p class="analysis-paragraph" style="font-style: italic; color: #666;">[AI-generated analysis comparing Chronological and Biological Age will appear here.]</p>
+      {% endif %}
+      
+      <h3 style="color: #004F59; margin-top: 20mm; margin-bottom: 8mm;">Overall Lifestyle Score</h3>
+      <!-- Removed specific AI blocks for lifestyleScoreIntro and lifestyleScoreExplanation -->
+      <!-- Display the AI generated text for Lifestyle Score Analysis -->
+      {% if ai_results.lifestyleScoreAnalysis %}
+         <p class="analysis-paragraph">{{ ai_results.lifestyleScoreAnalysis }}</p>
+      {% else %}
+         <p class="analysis-paragraph" style="font-style: italic; color: #666;">[AI-generated introduction and explanation for the Overall Lifestyle Score will appear here.]</p>
+      {% endif %}
+
+      <h3 style="color: #004F59; margin-top: 20mm; margin-bottom: 8mm;">BMI and Waist-Hip Ratio</h3>
+      <!-- Display the AI generated text for BMI/WHR -->
+      {% if ai_results.bodyComposition %}
+         <p class="analysis-paragraph">{{ ai_results.bodyComposition }}</p>
+      {% else %}
+        <p class="analysis-paragraph" style="font-style: italic; color: #666;">[AI-generated analysis of BMI and Waist-Hip Ratio implications will appear here.]</p>
+      {% endif %}
+      {% comment %} Displaying raw values might be done within the AI content itself if needed {% endcomment %}
+
+      <h3 style="color: #004F59; margin-top: 20mm; margin-bottom: 8mm;">Longevity Influences</h3>
+      <!-- Display the AI generated text for Longevity Influences Explanation -->
+       {% if ai_results.longevityInfluencesExplanation %}
+          <p class="analysis-paragraph">{{ ai_results.longevityInfluencesExplanation }}</p>
+       {% else %}
+         <p class="analysis-paragraph" style="font-style: italic; color: #666;">[AI-generated explanation of key Longevity Influences (often related to a visual summary) will appear here.]</p>
+       {% endif %}
+
+      <!-- Removed misplaced combined-section -->
+    </div>
+
+    <!-- 4. Actionable Recommendations Section -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Actionable Recommendations</h2>
+
+      <!-- First AI Block with Subheading -->
+      <h3 class="analysis-subheading" style="margin-top: 15mm; margin-bottom: 8mm;">About these recommendations and taking action</h3>
+      <div style="margin-bottom: 20mm;">
+        {% if ai_results.recommendations_intro %}
+          <div class="analysis-paragraph">{{ ai_results.recommendations_intro | newline_to_br }}</div>
+        {% else %}
+          <p class="analysis-paragraph" style="font-style: italic; color: #666;">
+            [AI Recommendations Context Placeholder - AI Data Not Found]
+          </p>
+          <p class="analysis-paragraph">
+            These personalised suggestions are based on the information you've provided, analysed through both modern health science and traditional wisdom perspectives. Consider them thoughtful starting points rather than rigid prescriptions—a foundation to build upon as you progress.
+          </p>
+        {% endif %}
+      </div>
+      
+      <!-- Second AI Block with NB Quote Styling -->
+      <div style="display: flex; margin-top: 15mm; margin-bottom: 20mm; background-color: #f9f9f9; padding: 15px; border-left: 3px solid #004F59; border-radius: 4px;">
+        <div style="flex: 0 0 auto; margin-right: 15mm;">
+          <p style="font-weight: 600; color: #004F59; font-size: 12pt; margin: 0;">NB:</p> <!-- Reduced font-size from 14pt -->
+        </div>
+        <div style="flex: 1;">
+          {% if ai_results.recommendations_note %}
+            <p class="analysis-paragraph" style="font-style: italic; margin: 0; font-size: 11pt;">{{ ai_results.recommendations_note | newline_to_br }}</p> <!-- Added smaller font-size -->
+          {% else %}
+            <p class="analysis-paragraph" style="font-style: italic; margin: 0; font-size: 11pt;"> <!-- Added smaller font-size -->
+              Remember that genuine transformation rarely follows a linear path. Your body's intelligence will guide you through cycles of implementation, observation, and refinement—each cycle bringing you closer to your optimal expression of health.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Recommendations Content Below -->
+      <!-- Your existing recommendation items code here -->
+    </div>
+    <!-- End New Actionable Recommendations Section -->
+
+    <!-- 9. Summary & Conclusion Section (Updated & Merged) -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Summary & Conclusion</h2>
+      
+      <!-- First AI block with subheading -->
+      <h3 class="analysis-subheading" style="margin-top: 15mm; margin-bottom: 8mm;">A Moment to Celebrate</h3>
+      <div style="margin-bottom: 20mm;">
+        {% if ai_results.summary_results_block %}
+          <div class="analysis-paragraph">{{ ai_results.summary_results_block | newline_to_br }}</div>
+        {% else %}
+          <p class="analysis-paragraph" style="font-style: italic; color: #666;">
+            [AI Results Summary Placeholder - AI Data Not Found]
+          </p>
+          {% comment %} Use fallback provided in instructions {% endcomment %}
+           <p class="analysis-paragraph">
+             If you've read this far, take a moment to acknowledge the significant step you've already taken. Seeking to understand your health at this level demonstrates a commitment that many never make. This willingness to clearly assess your current reality is the essential foundation for meaningful change.
+           </p>
+        {% endif %}
+      </div>
+      
+      <!-- Second AI block with stylized NB note -->
+      <div style="display: flex; margin-top: 15mm; margin-bottom: 20mm; background-color: #f9f9f9; padding: 15px; border-left: 3px solid #004F59; border-radius: 4px;">
+        <div style="flex: 0 0 auto; margin-right: 15mm;">
+          <p style="font-weight: 600; color: #004F59; font-size: 12pt; margin: 0;">NB:</p> <!-- Reduced font-size from 14pt -->
+        </div>
+        <div style="flex: 1;">
+          {% if ai_results.summary_closing_narrative %}
+            <p class="analysis-paragraph" style="font-style: italic; margin: 0; font-size: 11pt;">{{ ai_results.summary_closing_narrative | newline_to_br }}</p> <!-- Added smaller font-size -->
+          {% else %}
+            <p class="analysis-paragraph" style="font-style: italic; margin: 0; font-size: 11pt;"> <!-- Added smaller font-size -->
+              {% comment %} Use fallback provided in instructions {% endcomment %}
+              I'd like to invite you to consider retaking this assessment in a few months as a way to see the progress you're making on your journey.
+              <br><br>
+              Wishing you strength, clarity, and joy on your journey. We're here to support you every step of the way.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+      
+    </div>
+    <!-- End Moved Summary & Conclusion Section -->
+
+    <!-- New Next Steps Section -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Next Steps</h2>
+
+      <!-- Step 1: Free Chat -->
+      <div class="next-step-item" style="background-color: #fdfdfd; border: 1px solid rgba(0, 119, 182, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; padding: 12mm; margin-bottom: 10mm; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; flex-grow: 1; margin-right: 10mm;">
+              <span class="step-number" style="font-size: 18pt; font-weight: bold; color: #00B4D8; margin-right: 8mm; min-width: 25px; text-align: center;">1.</span>
+              <div>
+                  <span style="font-weight: 600; display: block; margin-bottom: 3mm; color: #005f63; font-size: 12pt;">Book a Free 10 min Chat</span>
+                  <span style="font-size: 11pt; color: #333; line-height: 1.4;">With experienced Holistic and Natural Health Practitioner, Matthew D'haemer (Naturopath).</span>
+              </div>
+          </div>
+          <a href="https://calendly.com/matthewdhaemer/15min" target="_blank" class="cta-button" style="padding: 5mm 10mm; font-size: 12pt; min-width: 140px; text-align: center;">Book Free Chat</a>
+      </div>
+
+      <!-- Step 2: Full Consultation -->
+      <div class="next-step-item" style="background-color: #fdfdfd; border: 1px solid rgba(0, 119, 182, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; padding: 12mm; margin-bottom: 15mm; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; flex-grow: 1; margin-right: 10mm;">
+              <span class="step-number" style="font-size: 18pt; font-weight: bold; color: #00B4D8; margin-right: 8mm; min-width: 25px; text-align: center;">2.</span>
+              <div>
+                  <span style="font-weight: 600; display: block; margin-bottom: 3mm; color: #005f63; font-size: 12pt;">Book a Full Consultation</span>
+                  <span style="font-size: 11pt; color: #333; line-height: 1.4;">With experienced Holistic and Natural Health Practitioner, Matthew D'haemer (Naturopath).</span>
+              </div>
+          </div>
+          <a href="https://calendly.com/matthewdhaemer/consultation-1st-session" target="_blank" class="cta-button" style="padding: 5mm 10mm; font-size: 12pt; min-width: 140px; text-align: center;">Book Consultation</a>
+      </div>
+
+      <!-- Hint Text -->
+      <p style="font-size: 10pt; font-style: italic; color: #666; margin-top: 10mm; text-align: center; line-height: 1.4;">
+          Learn more about Matthew D'haemer - Holistic Health Naturopath: 
+          <a href="https://www.matthewdhaemer.com/" target="_blank" style="color: inherit; text-decoration: none;">
+              https://www.matthewdhaemer.com/
+          </a>
+      </p>
+
+    </div>
+    <!-- End New Next Steps Section -->
+
+    <!-- New Disclaimer Section -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Disclaimer - Terms and Conditions</h2>
+
+      <!-- Disclaimer Content Start -->
+      <div class="disclaimer-content">
+          <h4>WELLNESS JOURNEY NOTICE</h4>
+          <p>Our Health & Longevity Reports offer guidance on your personal wellness journey. These reports reflect insights based on the information you've shared with us, but they're meant to complement—never replace—the wisdom and care of health practitioners.</p>
+
+          <h5>A PARTNERSHIP IN WELLNESS</h5>
+          <p>Your HealthDataLab report serves as a conversation starter with your healthcare team. While our AI-powered tools analyse your self-reported information to provide personalised insights, these insights require interpretation by qualified professionals who understand your unique health story.</p>
+
+          <h5>HOLISTIC PERSPECTIVE</h5>
+          <p>Remember that true wellness embraces the whole person. Our assessments offer one perspective on your health journey, but they cannot capture the full complexity of your individual biology, life circumstances, or health history.</p>
+
+          <h5>ACCURACY CONSIDERATIONS</h5>
+          <p>Your report's accuracy depends on:</p>
+          <ul>
+              <li>The information you've provided</li>
+              <li>The inherent limitations of our assessment models</li>
+              <li>The evolving nature of health research</li>
+          </ul>
+          <p>Our Health Calculator and assessments are designed for informational and educational purposes only. They provide general indications of health based on self-reported data and cannot detect, diagnose, or treat medical conditions.</p>
+
+          <h5>A COMMITMENT TO YOUR JOURNEY</h5>
+          <p>While we believe in the value of our insights, we cannot guarantee specific health outcomes. Your body's wisdom and your intuition are vital companions to any health data or recommendations.</p>
+
+
+          <h4>DATA PRIVACY & SECURITY</h4>
+          <h5>YOUR INFORMATION</h5>
+          <p>We respect your privacy deeply:</p>
+          <ul>
+              <li>Health data you enter is processed in real-time and not stored permanently</li>
+              <li>Only account information (name, email) is securely stored for communication</li>
+              <li>All data transmission utilises industry-standard security measures</li>
+              <li>We implement reasonable technical, administrative, and physical safeguards</li>
+              <li>No online system is completely immune to security risks despite best efforts</li>
+          </ul>
+
+          <h5>DATA SECURITY PRACTICES</h5>
+          <p>To protect your information, we:</p>
+          <ul>
+              <li>Employ encryption for data in transit and at rest</li>
+              <li>Regularly update our security protocols</li>
+              <li>Restrict access to personal information to authorized personnel only</li>
+              <li>Partner with service providers who maintain similar security standards</li>
+              <li>Conduct periodic security assessments</li>
+          </ul>
+
+          <h5>PRIVACY RECOMMENDATIONS</h5>
+          <p>If you have privacy concerns, consider:</p>
+          <ul>
+              <li>Using a nickname rather than your full name</li>
+              <li>Creating an email address that doesn't contain your real name</li>
+              <li>Providing only information you're comfortable sharing</li>
+              <li>Understanding that information transmitted online always carries some risk despite our security measures</li>
+          </ul>
+
+          <h5>YOUR DATA RIGHTS</h5>
+          <p>You maintain control of your account information and have the right to:</p>
+          <ul>
+              <li>Access your account data</li>
+              <li>Request corrections to inaccurate information</li>
+              <li>Delete your account data</li>
+              <li>Restrict processing of your data in certain circumstances</li>
+              <li>Raise concerns about our data practices</li>
+          </ul>
+
+          <h5>DATA BREACH NOTIFICATION</h5>
+          <p>In the unlikely event of a data breach affecting your personal information:</p>
+          <ul>
+              <li>We will notify you promptly in accordance with applicable laws</li>
+              <li>Our notification will include the nature of the breach, affected information types, and steps we're taking</li>
+              <li>We will work diligently to address the situation and prevent further unauthorised access</li>
+              <li>You will receive guidance on protecting yourself following the incident</li>
+          </ul>
+
+
+          <h4>TERMS & CONDITIONS</h4>
+          <h5>USING OUR SERVICES</h5>
+          <p>By using HealthDataLab's tools and receiving our reports, you're acknowledging these limitations and agreeing to use this information responsibly—with professional guidance when making significant health decisions.</p>
+
+          <h5>THIRD-PARTY SERVICE PROVIDERS</h5>
+          <p>HealthDataLab may engage trusted third-party service providers to support our operations:</p>
+          <ul>
+              <li>These providers may have limited access to your information solely to perform services on our behalf</li>
+              <li>We require these providers to maintain confidentiality and security standards comparable to our own</li>
+              <li>While we carefully select our providers, we cannot be held liable for their actions beyond our reasonable control</li>
+              <li>You acknowledge that data transmitted to or stored by third-party providers is subject to their respective security practices</li>
+          </ul>
+
+          <h5>CONSULTATION REQUIRED</h5>
+          <p>Always consult qualified healthcare professionals before:</p>
+          <ul>
+              <li>Making significant changes to your diet or exercise routine</li>
+              <li>Altering your medication or supplement regimen</li>
+              <li>Pursuing new treatments based on report insights</li>
+              <li>Making major lifestyle changes that could impact your health</li>
+          </ul>
+
+          <h5>INFORMATION SHARING</h5>
+          <p>Our reports are designed for your personal use. While sharing insights with your healthcare providers is encouraged, please respect our intellectual property by not reproducing or distributing the reports for commercial purposes.</p>
+
+          <h5>YOUR RESPONSIBILITY</h5>
+          <p>We invite you to:</p>
+          <ul>
+              <li>Approach these insights with both openness and healthy skepticism</li>
+              <li>Consult qualified practitioners before making significant health changes</li>
+              <li>Listen to your body's wisdom alongside any recommendations</li>
+              <li>Use common sense when interpreting health information</li>
+              <li>Remember that each person's optimal path to wellness is unique</li>
+          </ul>
+
+          <h5>LIMITATIONS OF LIABILITY</h5>
+          <p>While we strive for excellence in our services, HealthDataLab cannot be held liable for:</p>
+          <ul>
+              <li>Health outcomes resulting from following report recommendations</li>
+              <li>Decisions made based on calculator outputs or report insights</li>
+              <li>Inaccuracies resulting from incomplete or incorrect self-reported data</li>
+              <li>Any direct, indirect, incidental, consequential, special, or exemplary damages</li>
+              <li>Lost profits, data loss, business interruption, or personal injury</li>
+              <li>Damages exceeding the fees paid to us (where permitted by law)</li>
+          </ul>
+
+          <h5>DATA SECURITY LIABILITY LIMITATIONS</h5>
+          <p>With respect to data security specifically, you acknowledge and agree that:</p>
+          <ul>
+              <li>Despite our reasonable security measures, no data transmission or storage system is 100% secure</li>
+              <li>We cannot guarantee absolute security of your information</li>
+              <li>HealthDataLab's liability for data security incidents is limited to the maximum extent permitted by law</li>
+              <li>We are not responsible for circumvention of any privacy settings or security measures</li>
+              <li>Our maximum liability related to data incidents shall not exceed the amount paid by you to HealthDataLab in the 12 months preceding the incident (where legally permissible)</li>
+          </ul>
+
+          <h5>FORCE MAJEURE</h5>
+          <p>HealthDataLab shall not be liable for failures or delays resulting from circumstances beyond our reasonable control, including but not limited to:</p>
+          <ul>
+              <li>Cyber attacks, malicious intrusions, or security breaches by sophisticated third parties</li>
+              <li>Acts of nature, war, terrorism, riots, civil unrest, or epidemics</li>
+              <li>Actions of government authorities or regulatory changes</li>
+              <li>Failures of internet connectivity, hosting providers, or third-party service providers</li>
+          </ul>
+
+          <h5>AMENDMENTS TO TERMS</h5>
+          <p>We may periodically update these terms to reflect improvements in our services or changes in regulations. We encourage you to review this information occasionally. Continued use of our services after changes to these terms constitutes acceptance of the updated terms.</p>
+
+          <h5>INDEMNIFICATION</h5>
+          <p>You agree to indemnify, defend, and hold harmless HealthDataLab and its officers, directors, employees, agents, and affiliates from and against any claims, disputes, demands, liabilities, damages, losses, costs, and expenses, including reasonable legal fees, arising out of or in any way connected with:</p>
+          <ul>
+              <li>Your access to or use of our services</li>
+              <li>Your violation of these terms</li>
+              <li>Your violation of any third-party right</li>
+              <li>Any claim that information you provided caused damage to another party</li>
+          </ul>
+
+          <h5>SEVERABILITY</h5>
+          <p>If any provision of these terms is found to be unenforceable or invalid under any applicable law, such unenforceability or invalidity shall not render these terms unenforceable or invalid as a whole. Any such provision shall be deleted or modified to the minimum extent necessary to make it enforceable while preserving the intent of the original provision.</p>
+
+          <h5>OUR PROMISE</h5>
+          <p>HealthDataLab is committed to supporting your health journey with integrity. Our reports are created to inspire and inform—offering a meaningful snapshot of your current health landscape and potential pathways toward enhanced vitality.</p>
+
+          <hr>
+
+          <p>By receiving this report, you acknowledge that you understand its purpose as a wellness tool, not a medical diagnostic. HealthDataLab's assessments are designed to complement professional care and support your personal wellness journey.*</p>
+
+          <p>These Terms and Conditions are governed by the laws of the jurisdiction in which HealthDataLab operates, without regard to its conflict of law principles. Any disputes arising from these terms will be adjudicated under this legal framework and shall be subject to the exclusive jurisdiction of the courts in that jurisdiction. Any cause of action you may have with respect to your use of our services must be commenced within one (1) year after the claim or cause of action arises.*</p>
+
+          <p>For questions or concerns: office at healthdatalab dot com</p>
+      </div>
+      <!-- Disclaimer Content End -->
+
+    </div>
+    <!-- End New Disclaimer Section -->
+
+    <!-- 5. Dedicated Detailed Scores Section (Moved) -->
+    {% comment %} Deleting the entire section from {% if scores %} to {% endif %} {% endcomment %}
+
+    <!-- 6. Health Insights Section -->
+    {% comment %} Entire section from {% if ai_results.strengthsAreas... %} to {% endif %} removed {% endcomment %}
+    <!-- End Health Insights Section -->
+
+    <!-- 10. Closing & Next Steps Section (Removed) -->
+
+    <!-- Remove Footer -->
+    <!-- Footer div should be removed -->
+  </div> <!-- End .container -->
+
+  <!-- Remove Page number container -->
+  <!-- page-number div should be removed -->
+
+</body>
+<!-- Remove PDFmonkey's page number container -->
+</html>

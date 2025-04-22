@@ -1,0 +1,69 @@
+Now I understand better. After looking at the images you provided, I can see the existing AI analysis section already displays a complete report with all the necessary sections. Instead of duplicating the code, we should update the existing webhook payload to include these already-generated AI sections.
+
+Let's analyze the current AI analysis sections from the images:
+
+1. **Introduction/Overview** - The first paragraph with congratulations and overall assessment
+2. **Biological Age** - Analysis of biological vs chronological age
+3. **Lifestyle Assessment** - Interpretation of lifestyle score
+4. **Body Composition** - BMI and WHR analysis
+5. **Key Insights**
+   - Your Strengths (bullet points)
+   - Improvement Areas (bullet points)
+6. **Health Optimization** - Personalized insights paragraph
+7. **Actionable Recommendations**
+   - Immediate Actions (bullet points)
+   - Ongoing Habits (bullet points)
+   - Expert Consultations (bullet points)
+8. **Closing** - Final motivational paragraph
+9. **CTA Buttons** - "Schedule Consultation" and "Explore Advanced Programs"
+
+These match the structure I can see in the existing `displayAIAnalysis()` function, which is already set up to handle data from the OpenAI response with keys like `introduction`, `biologicalAge`, `lifestyleScore`, etc.
+
+Here's my revised plan:
+
+1. **Use the existing AI data structure** - The `ai_results` property is already included in the webhook payload.
+
+2. **Ensure the AI results object contains all data** - The OpenAI response already includes all the sections we need, they just need to be mapped correctly:
+   ```
+   {
+     introduction: "...",           // Maps to intro paragraph
+     biologicalAge: "...",          // Maps to Your Biological Age section
+     lifestyleScore: "...",         // Maps to Lifestyle Assessment section
+     bodyComposition: "...",        // Maps to Body Composition section
+     strengthsAreas: {              // Maps to Key Insights section
+       strengths: [...],
+       improvements: [...]
+     },
+     personalizedInsights: "...",   // Maps to Health Optimization section
+     recommendations: {             // Maps to Actionable Recommendations section
+       immediate: [...],
+       ongoing: [...],
+       consultations: [...]
+     },
+     closing: "...",                // Maps to closing paragraph
+     cta: {                         // Maps to CTA buttons
+       consultation: "...",
+       programs: "..."
+     }
+   }
+   ```
+
+3. **Update the webhook payload construction** - The code in the `handle_send_to_make_webhook()` function is already adding all this data to the Make.com webhook. The function stores the complete AI results in the `ai_results` property:
+
+```php
+// Make_payload already contains user info, metrics, etc.
+$make_payload['ai_results'] = $analysis_results; 
+```
+
+4. **Add the additional specific fields** - For the new analysis fields requested, we should extend the existing OpenAI prompt system to include these additional sections. This can be done by adding to the existing `$prompts` array:
+
+```php
+// Add to the existing prompts array
+$prompts['ageAssessment'] = "Provide professional commentary on the client's biological versus chronological age...";
+$prompts['chronologicalVsBio'] = "Write a personalized introduction for the age section...";
+// Add all the other new prompt definitions...
+```
+
+This approach maintains the existing code structure while adding the new fields needed for the enhanced PDF report.
+
+The implementation just requires modifying the existing `$prompts` array in the `longevity_ai_analysis_callback()` function, and all the results will automatically be included in the webhook payload with no duplicate code or functions.

@@ -1,0 +1,23 @@
+1. Front Page & Title
+ • Update the front page to display “longevity and health report” as the title in an enlarged font.
+ 
+2. Chart Adjustments
+ • Modify the polar chart so that its center value is 0 instead of 1.
+ • Increase the overall text size and ensure that the text within the polar chart is larger.
+ • Enhance the gauge design by adding more premium styling, including additional lines and numerical markings.
+
+3. Text Formatting & Styling
+ • Align paragraph text to the left. (unless a score is displayed, make sure the score is prominently featured in a different color or if within text make bold).
+ • Ensure that key numbers, values, and important keywords (e.g., indicating good or bad) are bolded for better emphasis.
+
+4. Layout Changes
+ • Change the “your health focus” section from a two-column layout to a single-column format.
+ 
+5. Recommendation Sections
+ • For sections mentioning recommendation or actions, update the color to dark blue or purple.
+ • The initial part of the report should highlight more results.
+ • In the middle section, display recommendations alongside explanations on why they’ve been linked to specific results.
+ • Conclude with a clear summary page outlining the conclusion of the report.
+
+6. Pagination
+ • Add page numbers in the bottom center of all pages except for the first page.

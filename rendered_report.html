@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Longevity & Health Report - Jane Doe</title>
+  <!-- Import fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Playfair+Display:400,700&display=swap" rel="stylesheet">
+  <style>
+    /* Base styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      color: #000000;  /* Updated to black for better readability */
+      background-color: #FFFFFF; /* Use white from palette */
+      font-size: 12pt; /* Increased base font size */
+      line-height: 1.4; /* Reduced base line-height */
+    }
+    /* Cover page specific background removed from body.first-page */
+    /* body.first-page rule deleted */
+    .container {
+      width: 210mm; /* A4 width */
+      margin: auto;
+      padding: 15mm; /* Side and bottom padding */
+      padding-top: 25mm; /* Increased top padding - this is the key fix */
+      box-sizing: border-box;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Montserrat', sans-serif; /* Updated to use consistent font */
+      margin-bottom: 0.4em; /* Reduced base margin */
+      color: #004F59; /* Dark Teal for headings */
+      line-height: 1.2; /* Reduced line-height */
+      /* page-break-after: avoid; /* Moved to @media print */
+    }
+    h1 { font-size: 24pt; margin-bottom: 0.8em; color: #004F59; } /* Dark Teal */
+    h2 { font-size: 18pt; margin-bottom: 6mm; color: #004F59; } /* Dark Teal */
+    /* Apply specific margin adjustments for h2.section-title */
+    h2.section-title {
+      margin-top: 5mm; /* Reduced top margin */
+      margin-bottom: 15mm; /* Increased bottom margin */
+    }
+    h3 { font-size: 14pt; font-weight: 600; margin-top: 0.6em; margin-bottom: 0.3em; color: #004F59; } /* Dark Teal */
+    h4 { font-size: 12pt; font-weight: 600; color: #0077B6; margin-top: 0.6em; margin-bottom: 0.3em;} /* Primary Blue for sub-subheadings */
+    p {
+      line-height: 1.4; /* Reduced line-height */
+      margin-bottom: 10mm; /* Increased margin */
+      text-align: left;
+      font-size: 12pt; /* Kept font size */
+      font-family: 'Montserrat', sans-serif; /* Ensure paragraphs use Montserrat */
+    }
+    ul { padding-left: 15px; margin-bottom: 0.6em; list-style: disc; } /* Reduced margin and padding */
+    li { margin-bottom: 0.3em; font-size: 12pt;} /* Reduced margin, increased font size */
+
+    .section {
+      position: relative;
+      padding-top: 8mm; /* Critical fix: creates space below header */
+      min-height: calc(297mm - 45mm); /* A4 height - (25mm top + 20mm bottom @page margins) */
+      box-sizing: border-box;
+      margin-bottom: 12mm; /* Increased margin */
+      padding-bottom: 2mm; /* Reduced padding */
+      border-bottom: 1px solid #eee; /* Lighter border */
+      /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .section:last-of-type { /* Use last-of-type for better reliability */
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        width: 100%; /* Ensure full width */
+        /* page-break-inside: avoid; /* Moved to @media print */
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    /* Header with 3-column layout */
+    .header {
+      display: none; /* Hide header to use PDFMonkey's built-in header */
+    }
+    .header-logo {
+      display: none;
+    }
+    .header-title {
+      display: none;
+    }
+    .header-center {
+      display: none;
+    }
+    .header-page {
+      display: none;
+    }
+
+    /* Remove footer and page number styling */
+    .footer {
+      display: none;
+    }
+    .page-footer {
+      display: none;
+    }
+    .page-number {
+      display: none;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      text-align: center;
+      /* Set dimensions to US Letter */
+      width: 215.9mm;
+      height: 279.4mm;
+      /* Adjust padding to visually recreate margins inside the full-bleed background */
+      /* Example: Top 50mm + 15mm margin = 65mm. Left/Right = 15mm. Bottom 40mm + 15mm = 55mm */
+      padding: 65mm 15mm 55mm 15mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* background: linear-gradient(135deg, #ffffff, #f0f7fa); Removed gradient */
+      position: relative; /* Needed for absolute positioning of page number */
+      /* Add background styling directly to cover page */
+      background-color: #f0f0f0; /* Light grey background */
+      background-image: repeating-linear-gradient(
+          -45deg,
+          rgba(0, 0, 0, 0.02), /* Very subtle dark line */
+          rgba(0, 0, 0, 0.02) 1px,
+          transparent 1px,
+          transparent 6px /* Space between lines */
+      );
+      /* margin: 0; removed as @page :first handles this */
+      width: 100%; /* Ensure full width */
+      page-break-inside: avoid; /* Ensure cover doesn't break */
+    }
+    .cover-brand-text { /* New class for "HealthDataLab" */
+      font-size: 12pt;
+      color: #0077B6;
+      margin-bottom: 30mm; /* Reduced spacing below */
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700; /* Bolder */
+      color: #004F59; /* Darker Teal/Blue */
+      line-height: 1.2;
+    }
+    .cover-main-title { /* New class for main title */
+      font-size: 36pt; /* Slightly larger */
+      font-family: 'Montserrat', sans-serif;
+      margin-bottom: 30mm; /* Reduced spacing below */
+      font-weight: 700; /* Bolder */
+      color: #005f63; /* Darker Teal/Blue */
+      line-height: 1.2;
+    }
+    .cover-logo {
+      max-width: 75mm; /* Slightly smaller */
+      max-height: 40mm;
+      /* Centering handled by inline style */
+      /* margin: 10mm auto 30mm auto; /* Spacing handled by surrounding element margins */
+    }
+    .cover-date {
+      font-size: 13pt; /* Slightly smaller */
+      color: #444; /* Darker grey */
+      margin-top: 25mm; /* Reduced space above */
+      font-family: 'Montserrat', sans-serif;
+    }
+    .cover-client-name {
+        font-size: 30pt; /* Slightly larger */
+        font-family: 'Montserrat', sans-serif;
+        margin-top: 8mm; /* Space between date and name */
+        margin-bottom: 10mm; /* Keep existing bottom margin for now */
+        color: #0077B6; /* HealthDataLab blue */
+        font-weight: 600;
+    }
+     /* Cover Page Number Style */
+    .cover-page-number {
+        position: absolute;
+        bottom: 10mm;
+        right: 15mm;
+        font-size: 10pt;
+        color: #666;
+    }
+
+    /* Section titles */
+    .section-title {
+      border-bottom: 2px solid #0077B6; /* Primary Blue border */
+      padding-bottom: 4px; /* Increased padding */
+      margin-bottom: 8mm; /* Increased margin */
+      font-size: 20pt; /* Increased size */
+      color: #004F59; /* Dark Teal */
+      /* page-break-after: avoid; /* Moved to @media print */
+    }
+
+    /* Visuals placeholders */
+    .visual {
+      margin: 20mm 0; /* Increased vertical margin */
+      margin-top: 10mm; /* Add more space at the top of visuals */
+      font-size: 10pt;
+      color: #666;
+      min-height: 60mm; /* Increased min height */
+      text-align: center; /* Center chart images */
+      /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .visual img {
+      max-width: 100%;
+      max-height: 65mm; /* Reduced max height */
+      margin: 5mm 0; /* Consistent vertical margins */
+      border: 1px solid #eee; /* Optional border for clarity */
+      border-radius: 5px;
+      /* page-break-inside: avoid; /* Moved to @media print */
+    }
+
+    /* Insights and recommendations */
+    .insight-group { /* Keep original insight styling */
+        margin-bottom: 8mm; /* Reduced margin */
+        padding: 6mm; /* Reduced padding */
+        background-color: #fdfdfd;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        page-break-inside: avoid;
+    }
+    .insight-group h3 {
+        margin-top: 0;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.3em; /* Reduced */
+    }
+    
+    /* Update recommendation styling for consistency */
+    .recommendation-group {
+        margin-bottom: 10mm; /* Ensure spacing between recommendation groups */
+        padding: 10mm; /* More generous internal padding */
+        background-color: rgba(0, 119, 182, 0.05); /* Very light blue - Adjust alpha if needed, matches #CAF0F8 conceptually */
+        border: 1px solid rgba(0, 119, 182, 0.1); /* Light border related to Primary Blue */
+        border-radius: 6px; /* Increased radius */
+        /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .recommendation-group h3 {
+        margin-top: 0;
+        color: #0077B6; /* HealthDataLab blue */
+        border-bottom: 1px solid rgba(0, 119, 182, 0.2);
+        padding-bottom: 0.3em; /* Reduced */
+    }
+    .recommendation-item {
+        margin-bottom: 8mm; /* Ensure spacing between recommendation items */
+        padding: 6mm; /* Add padding */
+        /* page-break-inside: avoid; /* Consider moving if needed for finer control */
+    }
+    .recommendation-item strong {
+        color: #005f63; /* Darker Teal */
+    }
+
+    /* CTA Buttons */
+    .cta-button {
+      display: inline-block;
+      padding: 2.5mm 5mm; /* Reduced */
+      background-color: #0077B6; /* Primary Blue */
+      color: #FFFFFF !important; /* White text */
+      text-decoration: none !important;
+      margin-right: 4mm; /* Reduced */
+      border-radius: 3mm;
+      font-weight: bold;
+      font-size: 10pt; /* Reduced */
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+     .cta-button:hover {
+      background-color: #00B4D8; /* Lighter blue on hover */
+     }
+
+     /* Footer */
+     .footer {
+        text-align: center;
+        margin-top: 10mm; /* Reduced margin */
+        font-size: 9pt;
+        color: #666;
+        border-top: 1px solid rgba(0, 119, 182, 0.2); /* Light blue border */
+        padding-top: 5mm; /* Reduced padding */
+     }
+
+     /* Page numbering */
+     @page {
+        /* Default margins for pages other than the first */
+        /* margin: 15mm; */ /* Replaced by new rule below */
+        margin-top: 25mm; /* Increased to fully avoid overlap */
+        margin-bottom: 20mm; /* Increased bottom margin */
+        margin-left: 15mm; /* Keep side margins */
+        margin-right: 15mm;
+     }
+     
+     @page :first {
+        /* Remove margins for the first page (cover) */
+        margin: 0;
+     }
+     
+     /* Fixed footer that works in both environments */
+     .page-footer {
+       position: absolute;
+       bottom: 0;
+       left: 0;
+       right: 0;
+       width: 100%;
+       height: 15mm;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       font-size: 10pt;
+       color: #666;
+       border-top: 1px solid rgba(0, 119, 182, 0.2);
+       padding-top: 5mm;
+       background-color: white;
+       box-sizing: border-box;
+       padding: 0 15mm;
+     }
+     
+     /* Mini logo styling for footer */
+     .footer-logo, .page-footer img, .page-number img {
+       max-height: 6mm !important; /* Smaller size for mini logo */
+       max-width: 20mm !important;
+       vertical-align: middle;
+       opacity: 0.85; /* Slightly transparent */
+     }
+     
+     /* Custom page numbering - placed at bottom of each page */
+     .page-number {
+        position: fixed;
+        bottom: 10mm;
+        left: 0;
+        right: 0;
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10pt;
+        color: #666;
+        height: 20px;
+        z-index: 1000;
+        padding: 0 15mm;
+        box-sizing: border-box;
+        background-color: white; /* Add background to ensure visibility */
+     }
+     .page-number .footer-logo {
+        max-height: 4mm; /* Reduced from 8mm */
+        vertical-align: middle;
+     }
+     .page-number span {
+        vertical-align: middle;
+     }
+     
+     /* First page doesn't show page number (using this generic class) */
+     body.first-page .page-number {
+        display: none;
+     }
+     
+     /* Hide regular footer on each page except the last one */
+     .section:not(:last-child) .footer {
+       display: none;
+     }
+
+     /* Hide PDFmonkey's page numbers on preview */
+     .html-preview .page-number {
+       display: none;
+     }
+
+     /* First page (cover) doesn't show page footer */
+     .cover-page .page-footer {
+       display: none;
+     }
+
+    /* Table Styling */
+     table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 6mm; /* Reduced margin */
+        font-size: 10pt;
+     }
+     th, td {
+        border: 1px solid #ddd;
+        padding: 4px; /* Reduced padding */
+        text-align: left;
+     }
+     th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+     }
+     tr:nth-child(even) {background-color: #f9f9f9;}
+
+     /* Grid for metrics */
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-bottom: 0.6em;} /* Reduced gap and margin */
+      .metric-card {
+          background-color: #FFFFFF; /* White background */
+          border: 1px solid rgba(0, 119, 182, 0.1); /* Light border based on Primary Blue */
+          border-radius: 6px; /* Increased radius */
+          padding: 5mm; /* Increased padding */
+          /* page-break-inside: avoid; /* Moved to @media print */
+          box-shadow: 0 2px 4px rgba(0, 119, 182, 0.08); /* Subtle shadow based on Primary Blue */
+          text-align: center;
+          margin-top: 15mm; /* Add more space above metric cards */
+      }
+      .metric-card h4 { 
+          margin-top: 0;
+          margin-bottom: 0.3em; /* Reduced */
+          border-bottom: 1px solid rgba(0, 79, 89, 0.1);
+          padding-bottom: 0.2em; /* Reduced */
+          font-size: 12pt;
+          color: #004F59; /* Dark Teal */
+          /* page-break-after: avoid; /* Moved to @media print */
+      }
+      .metric-value {
+          font-size: 16pt;
+          font-weight: bold;
+          color: #00A7C7; /* Secondary Blue */
+          margin-bottom: 0.1em; /* Reduced */
+      }
+      .metric-label { font-size: 9pt; color: #666; margin-top: 0.1em; } /* Reduced */
+
+      /* Impact Factors */
+      .impact-factors { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; } /* Reduced gap */
+      .impact-column h3 { border-bottom: 1px solid #eee; padding-bottom: 0.2em; margin-bottom: 0.6em; } /* Reduced margins/padding */
+      .impact-factor { margin-bottom: 0.4em; font-size: 10pt; padding: 3px 0; border-bottom: 1px dotted #eee;} /* Reduced margin/padding */
+      .impact-factor:last-child { border-bottom: none; }
+      .factor-name { font-weight: bold; display: inline-block; width: 70%; }
+      .factor-impact { font-weight: bold; float: right; }
+      /* Updated positive/negative colors */
+      .positive { color: #38b000; } /* Vibrant Green */
+      .negative { color: #d62828; } /* Bright Red */
+
+      /* Section combiner - for putting charts with their data */
+      .combined-section {
+          display: flex;
+          flex-direction: column;
+      }
+      .data-container {
+          margin-bottom: 4mm; /* Reduced */
+      }
+      .chart-container {
+          margin-top: 0;
+      }
+      
+      /* Two column layout */
+      .two-column {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8mm; /* Reduced */
+      }
+      
+      /* Chart container specific styling */
+      .chart-display {
+          padding: 4mm 0; /* Reduced */
+          margin: 3mm 0; /* Reduced */
+          text-align: center;
+      }
+      
+      .chart-display img {
+          display: block;
+          margin: 0 auto;
+          border: 1px solid #eee;
+          padding: 2px;
+          background-color: white;
+      }
+      
+      .chart-caption {
+          font-size: 9pt;
+          color: #666;
+          margin-top: 1mm; /* Reduced */
+          text-align: center;
+      }
+      
+      .comparison-chart {
+          margin-top: 8mm; /* Reduced */
+          text-align: center;
+          grid-column: 1 / -1;
+      }
+
+    /* Style for emphasizing values */
+    .value-emphasis {
+      font-weight: 600;
+      color: #00A7C7; /* Secondary Blue */
+      display: inline-block; /* Prevent potential line breaks within metrics */
+    }
+    /* Updated positive/negative emphasis colors */
+    .positive-emphasis {
+      font-weight: 600;
+      color: #38b000; /* Vibrant Green */
+      display: inline-block; /* Prevent potential line breaks within metrics */
+    }
+    .negative-emphasis {
+      font-weight: 600;
+      color: #d62828; /* Bright Red */
+      display: inline-block; /* Prevent potential line breaks within metrics */
+    }
+
+    /* Custom list styling for Key Health Insights */
+    .custom-list {
+      text-align: left;
+      padding-left: 0; /* Remove default list padding */
+      list-style: none; /* Remove default list bullets */
+    }
+    .custom-list-item {
+      /* margin-bottom: 1.2em; Original - replaced by item padding */
+      /* line-height: 1.4; Inherited */
+      /* padding-left: 5mm; Replaced by flex structure */
+      /* text-indent: -5mm; Removed */
+      display: flex; /* Align bullet and content */
+      align-items: flex-start; /* Align items to the top */
+      margin-bottom: 10mm; /* Reduced spacing between items */
+      font-size: 13pt;
+      line-height: 1.5; /* Reduced line-height */
+    }
+
+    /* New styles for enhanced insights display */
+    .insight-bullet {
+      flex-shrink: 0; /* Prevent bullet from shrinking */
+      width: 8px;
+      height: 8px;
+      border-radius: 2px; /* Slightly rounded square */
+      margin-right: 6mm; /* Reduced space between bullet and text */
+      margin-top: 0.4em; /* Align vertically with first line of text */
+    }
+    .insight-bullet-strength {
+      background-color: #38b000; /* Vibrant Green - matches positive emphasis */
+    }
+    .insight-bullet-improvement {
+      background-color: #d62828; /* Bright Red - matches negative emphasis */
+    }
+    .insight-content {
+      flex-grow: 1; /* Allow content to take remaining space */
+      display: flex;
+      justify-content: space-between; /* Push score to the right */
+      align-items: flex-start;
+      flex-wrap: wrap; /* Allow wrapping if needed */
+    }
+    .insight-text {
+       /* Takes up most space, score pushed right */
+       padding-right: 8px; /* Reduced space before score */
+    }
+    .insight-score {
+      font-weight: 600;
+      padding: 2px 6px; /* Reduced padding */
+      border-radius: 4px;
+      font-size: 10pt; /* Reduced font size */
+      margin-left: auto; /* Ensure it stays right */
+      white-space: nowrap; /* Prevent score breaking */
+      line-height: 1.2; /* Reduced line height */
+    }
+    .insight-score-strength {
+      background-color: rgba(56, 176, 0, 0.15); /* Light green background */
+      color: #38b000; /* Vibrant Green text */
+      border: 1px solid rgba(56, 176, 0, 0.3);
+    }
+    .insight-score-improvement {
+      background-color: rgba(214, 40, 40, 0.1); /* Light red background */
+      color: #d62828; /* Bright Red text */
+      border: 1px solid rgba(214, 40, 40, 0.3);
+    }
+
+    /* --- New Introduction Section Styles --- */
+    .intro-paragraph {
+      font-size: 12pt;
+      line-height: 1.4; /* Reduced line height */
+      color: #333333; /* Dark grey for readability */
+      margin-bottom: 0.8em; /* Reduced spacing */
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .intro-paragraph em {
+      font-style: italic;
+      color: #0077B6; /* Use primary blue for emphasis */
+      font-weight: 600; /* Slightly bolder emphasis */
+    }
+    .intro-subheading {
+      font-size: 14pt;
+      font-weight: 600;
+      color: #004F59; /* Dark Teal */
+      margin-top: 1.5em; /* Reduced space before subheading */
+      margin-bottom: 0.5em; /* Reduced space after subheading */
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 79, 89, 0.15); /* Subtle underline */
+      padding-bottom: 0.2em; /* Reduced */
+      page-break-after: avoid; /* Avoid breaking after this heading */
+    }
+    .intro-subheading em {
+      font-style: italic;
+      font-weight: 600; /* Consistent emphasis */
+      /* Color inherited from .intro-subheading */
+    }
+    .intro-list {
+      padding-left: 20px; /* Reduced indentation */
+      margin-bottom: 1em; /* Reduced space after list */
+      list-style-type: disc; /* Standard bullet */
+      list-style-position: outside;
+      text-align: left;
+    }
+    .intro-list-item {
+      font-size: 12pt; /* Increased font size */
+      line-height: 1.4; /* Reduced */
+      color: #333333;
+      margin-bottom: 0.4em; /* Reduced space between items */
+    }
+    /* --- End Introduction Section Styles --- */
+
+    .quote-text {
+        font-style: italic;
+        color: #00A7C7; /* Match your blue accent color for quotes */
+        font-weight: normal; /* Ensure not bold */
+        letter-spacing: -0.01em;
+    }
+
+    /* --- New Age-Dynamic Content Styles --- */
+    .age-dynamic-container {
+        margin-bottom: 15mm; /* Reduced spacing after each block */
+        padding-left: 5mm; /* Slight indent for the whole block */
+        border-left: 3px solid rgba(0, 119, 182, 0.2); /* Subtle left border matching theme blue */
+        /* page-break-inside: avoid; /* Moved to @media print */
+    }
+    .age-dynamic-title {
+        font-size: 14pt;
+        font-weight: 600;
+        color: #0077B6; /* Primary theme blue */
+        margin-bottom: 0.5em; /* Reduced */
+        text-align: left;
+        /* page-break-after: avoid; /* Moved to @media print */
+    }
+    .age-dynamic-quote {
+        font-size: 12pt; /* Increased font size */
+        font-style: italic;
+        color: #555555; /* Slightly darker grey for quote */
+        margin-bottom: 0.8em; /* Reduced */
+        padding-left: 8mm; /* Reduced indent quote */
+        text-align: left;
+        position: relative;
+    }
+    .age-dynamic-quote::before { /* Optional: Add subtle quote mark */
+        content: '\"';
+        position: absolute;
+        left: 1mm; /* Adjusted */
+        top: -3mm; /* Adjusted */
+        font-size: 18pt; /* Reduced */
+        color: rgba(0, 119, 182, 0.2);
+        font-family: 'Playfair Display', serif; /* Use serif for quote mark */
+    }
+    .age-dynamic-quote em {
+        font-style: italic;
+        font-weight: normal; /* Ensure emphasis doesn't make it bolder */
+        /* Color inherited from .age-dynamic-quote */
+    }
+    .age-dynamic-attribution {
+        display: block; /* Put attribution on new line */
+        margin-top: 0.4em; /* Reduced */
+        font-size: 10pt;
+        color: #666666;
+        text-align: right; /* Align attribution right */
+        font-style: normal;
+    }
+    .age-dynamic-text {
+        font-size: 12pt; /* Increased font size */
+        line-height: 1.5; /* Reduced */
+        color: #333333; /* Same as intro paragraph */
+        margin-bottom: 0.4em; /* Reduced */
+        text-align: left;
+    }
+    /* --- End Age-Dynamic Content Styles --- */
+
+    /* Practitioner Details Section CSS Removed */
+    
+    /* Conditional Score Styling for Table */
+    .score-high { font-weight: bold; color: #38b000; } /* Keep semantic green */
+    .score-low { font-weight: bold; color: #d62828; } /* Keep semantic red */
+    .score-normal { font-weight: normal; color: #000000; }
+    
+    /* Table Row Background Cycling */
+    .row-bg-1 { background-color: #f9f9f9; } /* Consider #CAF0F8 (Light Blue) for one? */
+    .row-bg-2 { background-color: #ffffff; }
+    
+    /* Section-specific overrides for compactness */
+    .chrono-bio-section h3 {
+      margin-bottom: 3mm; /* Tighter spacing below h3 in this section */
+    }
+    .chrono-bio-section p {
+      margin-bottom: 0.5em; /* Tighter spacing below p in this section */
+      line-height: 1.4; /* Slightly tighter lines in this section */
+    }
+    .about-recs-text p {
+        margin-bottom: 0.5em; /* Tighter spacing below p in this specific block */
+        line-height: 1.4; /* Slightly tighter lines in this block */
+    }
+    
+    /* Critical page break controls */
+    @media print {
+      /* Keep these items together */
+      .metric-card,
+      .recommendation-item, /* Might be too large, test carefully */
+      .custom-list-item,
+      .age-dynamic-container,
+      .insight-group,
+      .visual,
+      .cover-page,
+      .recommendation-group,
+      .intro-paragraph {
+        page-break-inside: avoid;
+      }
+      
+      /* Avoid breaking after these elements */
+      h1, h2, h3, h4, 
+      .section-title,
+      .intro-subheading,
+      .age-dynamic-title,
+      .metric-card h4 {
+        page-break-after: avoid;
+        page-break-inside: avoid; /* Also avoid breaking inside headings */
+      }
+      
+      /* Force page breaks before major sections (except the first) */
+      .section:not(:first-child) {
+        page-break-before: always;
+      }
+      
+      /* Avoid orphans and widows */
+      p, li {
+        orphans: 3;
+        widows: 3;
+      }
+
+      /* Ensure sections don't break internally if possible */
+      .section {
+          page-break-inside: avoid;
+          margin-bottom: 12mm; /* Ensure consistent margin even in print */
+      }
+    }
+
+    /* NEW CSS for Chronological vs. Biological Age section */
+    .chrono-bio-section {
+      margin-bottom: 20mm;
+    }
+
+    .analysis-subheading {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #004F59; /* Dark Teal */
+      margin-top: 10mm;
+      margin-bottom: 4mm;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 79, 89, 0.1);
+      padding-bottom: 2mm;
+      page-break-after: avoid;
+    }
+
+    .analysis-paragraph {
+      font-size: 12pt;
+      line-height: 1.4;
+      margin-bottom: 6mm;
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+      color: #333333;
+    }
+
+    /* Use existing emphasis classes from intro section (already defined earlier) */
+    /*
+    .positive-emphasis {
+      font-weight: 600;
+      color: #38b000; /* Vibrant Green */
+      display: inline-block;
+    }
+
+    .negative-emphasis {
+      font-weight: 600;
+      color: #d62828; /* Bright Red */
+      display: inline-block;
+    }
+
+    .value-emphasis {
+      font-weight: 600;
+      color: #00A7C7; /* Secondary Blue */
+      display: inline-block;
+    }
+    */
+    /* END NEW CSS */
+
+    /* New CSS rule for Recommendation Group Titles */
+    .recommendation-group-title {
+        font-size: 14pt;
+        font-weight: 600;
+        color: #0077B6; /* Primary Blue */
+        margin-top: 10mm;
+        margin-bottom: 5mm;
+        padding-bottom: 3mm;
+        border-bottom: 1px solid rgba(0, 119, 182, 0.2);
+        page-break-after: avoid;
+    }
+
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mark as HTML preview for CSS targeting
+      document.body.classList.add('html-preview');
+      
+      // No need to add page footers anymore
+    });
+  </script>
+</head>
+<body class="first-page">
+  <div class="container">
+
+    <!-- Cover Page -->
+    <div class="cover-page page-break">
+      <!-- HealthDataLab text -->
+      <div class="cover-brand-text">HealthDataLab</div>
+      <!-- Report Title -->
+      <div class="cover-main-title">HEALTH & LONGEVITY REPORT</div>
+      <!-- Logo -->
+      <img src="https://i.imgur.com/vP6oY12.png" alt="Logo" class="cover-logo" style="display: block; margin-left: auto; margin-right: auto;">
+      <!-- Date -->
+      <div class="cover-date">Date: April 21, 2025</div>
+      <!-- Client Name -->
+      <div class="cover-client-name">Jane Doe</div>
+    </div>
+    
+    <!-- Practitioner Details HTML Section Removed -->
+
+    <!-- 1. Introductory Section with Age-Based Dynamic Content -->
+    <div class="section">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title">Intro</h2>
+
+      <!-- Display the AI-generated intro section when available, otherwise use static content -->
+      
+          
+          <p class="intro-paragraph">Welcome, Jane. At age 50, your Personalised Health and Longevity Report provides a valuable snapshot. With a remarkable biological age of 35.5, you're already demonstrating positive health foundations. Health is the cornerstone of a rich life, influencing everything from energy to purpose. This report acts as a compass, offering insights tailored to your unique situation, including navigating work stress and improving sleep, which you've identified as challenges. Remember, this guide complements, but doesn't replace, professional medical advice.<br />
+<br />
+In Your 50s: Vitality and Renewed Purpose<br />
+'You are never too old to set another goal or to dream a new dream.' – C.S. Lewis<br />
+Your fifties are a pivotal time. This report helps you leverage your strengths and address areas like stress and sleep to maximize vitality. By focusing on hormone balance, gut health, and mindful movement, you can ensure your future years are active and fulfilling.<br />
+<br />
+A Note on Your Journey<br />
+Understanding your starting point is key. Like navigating a city, knowing where you are—your current health metrics, challenges, and goals—is essential before choosing a path. You've bravely taken the first step by seeking this clarity. Let's explore your unique map together.</p> 
+
+      
+
+      
+      <!-- End updated introduction content -->
+
+      <!-- Add fallback logic to still use ai_results.introduction if needed -->
+      
+    </div>
+
+    <!-- New Chronological vs. Biological Age Section -->
+    <div class="section chrono-bio-section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Results</h2>
+
+      <h3 style="color: #004F59; margin-top: 15mm; margin-bottom: 8mm;">Chronological vs. Biological age</h3>
+
+      <!-- Moved 3-card grid layout here -->
+      <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 8mm; margin-bottom: 15mm;">
+          <!-- Card 1: Chronological Age -->
+          <div class="metric-card">
+              <h4>Chronological Age</h4>
+              <div class="metric-value">50</div>
+              <div class="metric-label">Your actual age</div>
+          </div>
+          <!-- Card 2: Biological Age -->
+          <div class="metric-card">
+              <h4>Biological Age</h4>
+              <div class="metric-value">35.5</div>
+              <div class="metric-label">Estimated age based on health</div>
+          </div>
+          <!-- Card 3: Age Shift -->
+          <div class="metric-card">
+               <h4>Age Shift</h4>
+               
+               
+               
+               
+               
+
+               
+                   <div class="metric-value positive-emphasis">
+                       -13.5 yrs
+                   </div>
+                   <div class="metric-label">
+                       
+                           Your <strong>biological age</strong> is estimated to be <strong class="positive-emphasis">lower</strong> than your chronological age by <strong class="positive-emphasis">13.5 years</strong>.
+                       
+                   </div>
+               
+          </div>
+      </div>
+
+      <!-- Moved AI Analysis Text here -->
+      <!-- AI Analysis Text -->
+      <div style="margin-top: 10mm; margin-bottom: 10mm;"> <!-- Adjusted spacing -->
+          
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              <p style="font-size: 13pt; line-height: 1.6; text-align: left;">
+                  <!-- Default text if AI result is not available -->
+                  Your <strong>biological age</strong> is estimated to be 
+                  <strong class="positive-emphasis">
+                      13.5 years 
+                      lower
+                  </strong> 
+                  than your chronological age. This suggests an <strong>aging rate</strong> of <strong>0.72</strong>, which is 
+                  <strong class="positive-emphasis">
+                      slower
+                  </strong> 
+                  compared to others of your age. <strong>Maintaining positive lifestyle habits</strong> is key to 
+                  preserving this 
+                  advantage.
+                  <br><em style="font-size: 10pt; color: #666;">(This is default text. AI analysis for this section would ideally appear here.)</em>
+              </p>
+          
+      </div>
+
+      <!-- NEW LOCATION FOR CHART: Insert QuickChart gauge block here -->
+      <!-- QuickChart: Biological vs Chronological Age Gauge -->
+      
+      
+      
+      <div class="visual" style="min-height: 80mm; margin-top: 8mm;">
+          
+          <div style="
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+            border-radius: 12px;
+            padding: 25px 25px 40px 25px; /* Adjust back padding since main issue is image height */
+            box-shadow: 0 10px 25px rgba(0, 79, 89, 0.05),
+                        0 5px 10px rgba(0, 79, 89, 0.03);
+            margin: 10px auto;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;">
+
+              <!-- Increased QuickChart height from 300 to 400 -->
+              <img src="https://quickchart.io/chart?c=%0A++++++++++%7B%0A++++++++++++type%3A+'gauge'%2C%0A++++++++++++data%3A+%7B%0A++++++++++++++labels%3A+%5B'Slower'%2C+'Average'%2C+'Faster'%5D%2C%0A++++++++++++++datasets%3A+%5B%7B%0A++++++++++++++++data%3A+%5B0.9%2C+1.1%2C+1.4%5D%2C%0A++++++++++++++++value%3A+0.72%2C%0A++++++++++++++++minValue%3A+0.6%2C%0A++++++++++++++++maxValue%3A+1.4%2C%0A++++++++++++++++backgroundColor%3A+%5B%0A++++++++++++++++++'rgba(67%2C+191%2C+85%2C+0.95)'%2C+++%2F*+Vibrant+Green+*%2F%0A++++++++++++++++++'rgba(65%2C+165%2C+238%2C+0.95)'%2C++%2F*+Bright+Blue+*%2F%0A++++++++++++++++++'rgba(255%2C+111%2C+75%2C+0.95)'+++%2F*+Coral+Orange+*%2F%0A++++++++++++++++%5D%2C%0A++++++++++++++++borderWidth%3A+2%2C%0A++++++++++++++++borderColor%3A+'rgba(255%2C+255%2C+255%2C+0.9)'%2C%0A++++++++++++++++borderRadius%3A+5%0A++++++++++++++%7D%5D%0A++++++++++++%7D%2C%0A++++++++++++options%3A+%7B%0A++++++++++++++layout%3A+%7B+padding%3A+%7B+top%3A+35%2C+bottom%3A+20%2C+left%3A+20%2C+right%3A+20+%7D+%7D%2C%0A++++++++++++++plugins%3A+%7B%0A++++++++++++++++annotation%3A+%7B%0A++++++++++++++++++annotations%3A+%7B%0A++++++++++++++++++++%2F%2F+Premium+tick+marks%0A++++++++++++++++++++...Array.from(%7B+length%3A+9+%7D%2C+(_%2C+i)+%3D%3E+(%7B%0A++++++++++++++++++++++type%3A+'line'%2C%0A++++++++++++++++++++++id%3A+%60tick%24%7Bi%7D%60%2C%0A++++++++++++++++++++++yMin%3A+0.85%2C%0A++++++++++++++++++++++yMax%3A+0.95%2C%0A++++++++++++++++++++++xMin%3A+-0.8+%2B+(i+*+0.2)%2C%0A++++++++++++++++++++++xMax%3A+-0.8+%2B+(i+*+0.2)%2C%0A++++++++++++++++++++++borderColor%3A+'rgba(0%2C+79%2C+89%2C+0.4)'%2C%0A++++++++++++++++++++++borderWidth%3A+2%2C%0A++++++++++++++++++++++display%3A+true%0A++++++++++++++++++++%7D))%2C%0A++++++++++++++++++++%2F%2F+Decorative+outer+lines%0A++++++++++++++++++++...Array.from(%7B+length%3A+16+%7D%2C+(_%2C+i)+%3D%3E+(%7B%0A++++++++++++++++++++++type%3A+'line'%2C%0A++++++++++++++++++++++id%3A+%60decorative%24%7Bi%7D%60%2C%0A++++++++++++++++++++++yMin%3A+1.1%2C%0A++++++++++++++++++++++yMax%3A+1.2%2C%0A++++++++++++++++++++++xMin%3A+-1+%2B+(i+*+0.133)%2C%0A++++++++++++++++++++++xMax%3A+-1+%2B+(i+*+0.133)%2C%0A++++++++++++++++++++++borderColor%3A+'rgba(0%2C+79%2C+89%2C+0.15)'%2C%0A++++++++++++++++++++++borderWidth%3A+3%2C%0A++++++++++++++++++++++display%3A+true%0A++++++++++++++++++++%7D))%2C%0A++++++++++++++++++++%2F%2F+Score+labels+with+enhanced+styling%0A++++++++++++++++++++score07%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'0.7'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+-0.9%2C%0A++++++++++++++++++++++yValue%3A+0.75%0A++++++++++++++++++++%7D%2C%0A++++++++++++++++++++score08%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'0.8'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+-0.7%2C%0A++++++++++++++++++++++yValue%3A+0.75%0A++++++++++++++++++++%7D%2C%0A++++++++++++++++++++score09%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'0.9'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+-0.5%2C%0A++++++++++++++++++++++yValue%3A+0.75%0A++++++++++++++++++++%7D%2C%0A++++++++++++++++++++score10%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'1.0'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+0%2C%0A++++++++++++++++++++++yValue%3A+0.8%0A++++++++++++++++++++%7D%2C%0A++++++++++++++++++++score11%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'1.1'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+0.5%2C%0A++++++++++++++++++++++yValue%3A+0.75%0A++++++++++++++++++++%7D%2C%0A++++++++++++++++++++score12%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'1.2'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+0.7%2C%0A++++++++++++++++++++++yValue%3A+0.75%0A++++++++++++++++++++%7D%2C%0A++++++++++++++++++++score13%3A+%7B%0A++++++++++++++++++++++type%3A+'label'%2C%0A++++++++++++++++++++++content%3A+'1.3'%2C%0A++++++++++++++++++++++position%3A+'center'%2C%0A++++++++++++++++++++++font%3A+%7B+size%3A+11%2C+weight%3A+'600'%2C+family%3A+%22'Montserrat'%2C+sans-serif%22+%7D%2C%0A++++++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.7)'%2C%0A++++++++++++++++++++++xValue%3A+0.9%2C%0A++++++++++++++++++++++yValue%3A+0.75%0A++++++++++++++++++++%7D%0A++++++++++++++++++%7D%0A++++++++++++++++%7D%2C%0A++++++++++++++++datalabels%3A+%7B%0A++++++++++++++++++display%3A+'auto'%2C%0A++++++++++++++++++formatter%3A+function+(value%2C+context)+%7B%0A++++++++++++++++++++%2F%2F+Use+the+predefined+labels%3A+'Slower'%2C+'Average'%2C+'Faster'%0A++++++++++++++++++++return+context.chart.data.labels%5Bcontext.dataIndex%5D%3B%0A++++++++++++++++++%7D%2C%0A++++++++++++++++++color%3A+function(context)+%7B%0A++++++++++++++++++++%2F%2F+Make+labels+white+for+better+contrast+on+colored+backgrounds%0A++++++++++++++++++++return+'%23ffffff'%3B%0A++++++++++++++++++%7D%2C%0A++++++++++++++++++font%3A+%7B%0A++++++++++++++++++++size%3A+16%2C+%2F%2F+Adjust+size+as+needed%0A++++++++++++++++++++weight%3A+'bold'%2C%0A++++++++++++++++++++family%3A+%22'Montserrat'%2C+sans-serif%22%0A++++++++++++++++++%7D%2C%0A++++++++++++++++++align%3A+'center'%2C%0A++++++++++++++++++anchor%3A+'center'%2C%0A++++++++++++++++++offset%3A+-20+%2F%2F+Adjust+offset+to+position+label+within+the+arc%0A++++++++++++++++%7D%0A++++++++++++++%7D%2C%0A++++++++++++++needle%3A+%7B%0A++++++++++++++++radiusPercentage%3A+2.5%2C%0A++++++++++++++++widthPercentage%3A+3.5%2C%0A++++++++++++++++lengthPercentage%3A+65%2C%0A++++++++++++++++color%3A+'%23004F59'%2C%0A++++++++++++++++shadowColor%3A+'rgba(0%2C+79%2C+89%2C+0.3)'%2C%0A++++++++++++++++shadowBlur%3A+6%2C%0A++++++++++++++++shadowOffsetY%3A+4%2C%0A++++++++++++++++borderWidth%3A+1%2C%0A++++++++++++++++borderColor%3A+'rgba(255%2C+255%2C+255%2C+0.8)'%0A++++++++++++++%7D%2C%0A++++++++++++++valueLabel%3A+%7B%0A++++++++++++++++display%3A+true%2C%0A++++++++++++++++fontSize%3A+42%2C%0A++++++++++++++++fontFamily%3A+%22'Montserrat'%2C+sans-serif%22%2C%0A++++++++++++++++fontWeight%3A+'bold'%2C%0A++++++++++++++++color%3A+'%23004F59'%2C%0A++++++++++++++++backgroundColor%3A+'transparent'%2C%0A++++++++++++++++formatter%3A+function(value)+%7B%0A++++++++++++++++++return+value.toFixed(2)%3B%0A++++++++++++++++%7D%2C%0A++++++++++++++++bottomMarginPercentage%3A+-10%2C+%2F%2F+Adjusted+from+25+to+move+score+down%0A++++++++++++++++padding%3A+10%0A++++++++++++++%7D%2C%0A++++++++++++++centerArea%3A+%7B%0A++++++++++++++++displayText%3A+false%2C%0A++++++++++++++++backgroundColor%3A+'transparent'%2C%0A++++++++++++++++width%3A+60%2C%0A++++++++++++++++height%3A+60%2C%0A++++++++++++++++border%3A+%7B%0A++++++++++++++++++width%3A+2%2C%0A++++++++++++++++++color%3A+'rgba(0%2C+79%2C+89%2C+0.1)'%0A++++++++++++++++%7D%0A++++++++++++++%7D%2C%0A++++++++++++++arc%3A+%7B%0A++++++++++++++++borderWidth%3A+0%2C%0A++++++++++++++++borderColor%3A+'rgba(0%2C+79%2C+89%2C+0.1)'%2C%0A++++++++++++++++padding%3A+3%2C%0A++++++++++++++++margin%3A+5%2C%0A++++++++++++++++roundedCorners%3A+true%0A++++++++++++++%7D%2C%0A++++++++++++++subtitle%3A+%7B%0A++++++++++++++++display%3A+true%2C%0A++++++++++++++++%0A++++++++++++++++%0A++++++++++++++++text%3A+'Slower'%2C%0A++++++++++++++++color%3A+'%23688C3E'%2C%0A++++++++++++++++font%3A+%7B%0A++++++++++++++++++size%3A+24%2C%0A++++++++++++++++++weight%3A+'bold'%2C%0A++++++++++++++++++family%3A+%22'Montserrat'%2C+sans-serif%22%0A++++++++++++++++%7D%2C%0A++++++++++++++++padding%3A+%7B+top%3A+10+%7D%0A++++++++++++++%7D%0A++++++++++++%7D%0A++++++++++%7D%0A++++++++++&w=450&h=400"
+                   alt="Aging Rate Gauge"
+                   style="max-width: 100%; max-height: none; display: block; margin: 0 auto 5mm auto;" /> <!-- Added bottom margin -->
+
+              <div style="text-align: center; margin-top: 4mm; font-size: 12pt; color: #004F59;">
+                  <span style="font-weight: 600;">Aging Rate:</span> 0.72
+                  <span style="color: #666;">(Biological Age / Chronological Age)</span>
+              </div>
+              <!-- Added new paragraph below -->
+
+          </div>
+      </div>
+      
+      <!-- END MOVED CHART BLOCK -->
+
+      <!-- START INSERTED PROGRESS BARS -->
+      <!-- Progress Bar Visualization Section -->
+      <div style="margin: 15mm 0mm 20mm 0mm; page-break-inside: avoid;">
+        <!-- Added Grid Container for Side-by-Side Layout -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15mm; align-items: start;">
+      
+          <!-- BMI Progress Bar -->
+          <div style="max-width: 100%; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12mm;">
+              <span style="font-weight: 600; font-size: 12pt; color: #004F59;">BMI: 22.1</span>
+              <span style="font-size: 10pt; text-align: right;">
+                <span style="color: #0077B6; font-weight: 500;">Healthy</span> | 
+                <span style="color: #E67E22; font-weight: 500;">Moderate</span> | 
+                <span style="color: #E74C3C; font-weight: 500;">High Risk</span>
+              </span>
+            </div>
+            
+            <div style="position: relative; margin: 0 auto; width: 100%;">
+              <!-- Updated gradient with your website blue transitioning to red -->
+              <div style="height: 28px; background: linear-gradient(to right, #0077B6, #0077B6 30%, #00A7C7 45%, #E67E22 70%, #E74C3C); border-radius: 14px; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+              
+              
+              
+              
+              <!-- Improved pointer style -->
+              <div style="position: absolute; top: -10px; left: 35.50000000000001%; transform: translateX(-50%);">
+                <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 16px solid #004F59; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));"></div>
+              </div>
+              
+              <!-- Better spaced scale markers -->
+              <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10pt; color: #555; font-weight: 500;">
+                <span>15</span>
+                <span>18.5</span>
+                <span>25</span>
+                <span>30</span>
+                <span>35+</span>
+              </div>
+              
+              <!-- Added category labels below scale -->
+              <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 9pt; color: #666;">
+                <span style="width: 20%; text-align: left;">Underweight</span>
+                <span style="width: 30%; text-align: center;">Normal</span>
+                <span style="width: 20%; text-align: center;">Overweight</span>
+                <span style="width: 30%; text-align: right;">Obese</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- WHR Progress Bar -->
+          <div style="max-width: 100%; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12mm;">
+              <span style="font-weight: 600; font-size: 12pt; color: #004F59;">WHR: 0.81</span>
+              <span style="font-size: 10pt; text-align: right;">
+                <span style="color: #0077B6; font-weight: 500;">Healthy</span> | 
+                <span style="color: #E74C3C; font-weight: 500;">Risk</span>
+              </span>
+            </div>
+            
+            <div style="position: relative; margin: 0 auto; width: 100%;">
+              
+              
+              
+              <!-- Updated gradient with smooth transition at threshold -->
+              <div style="height: 28px; background: linear-gradient(to right, #0077B6, #00A7C7 NaN%, #E67E22 NaN%, #E74C3C); border-radius: 14px; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+              
+              
+              
+              <!-- Improved pointer style matching BMI chart -->
+              <div style="position: absolute; top: -10px; left: NaN%; transform: translateX(-50%);">
+                <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 16px solid #004F59; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));"></div>
+              </div>
+              
+              <!-- Better spaced scale markers -->
+              <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10pt; color: #555; font-weight: 500;">
+                <span>0.60</span>
+                <span>0.75</span>
+                <span></span>
+                <span>1.0</span>
+                <span>1.20</span>
+              </div>
+              
+              <!-- Added category labels below scale -->
+              <div style="display: flex; justify-content: space-between; margin-top: 2px; font-size: 9pt; color: #666;">
+                <span style="width: 50%; text-align: center;">Healthy Range</span>
+                <span style="width: 50%; text-align: center;">Increased Health Risk</span>
+              </div>
+            </div>
+          </div>
+      
+        </div> <!-- End Grid Container -->
+        
+        <!-- Added explanation note below charts -->
+        <div style="margin-top: 15mm; font-size: 10pt; color: #666; line-height: 1.4;">
+          <p style="margin-bottom: 4mm;"><strong style="color: #004F59;">Note:</strong> These metrics provide general health indicators. BMI measures weight relative to height, while Waist-Hip Ratio indicates fat distribution patterns that may signal potential health risks.</p>
+        </div>
+      </div>
+      <!-- END INSERTED PROGRESS BARS -->
+
+      <!-- START INSERTED RADAR CHART -->
+      <div style="margin: 0; padding: 0; width: 100%; page-break-inside: avoid;">
+        
+        
+        <!-- Using full-page approach with direct styling for the chart container -->
+        <div style="position: relative; width: 100%; height: 230mm; margin: 0; padding: 0;">
+          <img src="https://quickchart.io/chart?v=4&c=%0A++++++++%7B%0A++++++++++type%3A+'radar'%2C%0A++++++++++data%3A+%7B%0A++++++++++++labels%3A+%5B%0A++++++++++++++%0A++++++++++++++%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A++++++++++++++%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++'Physicalactivity'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Sittostand'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Breathhold'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Balance'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Sleepduration'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Sleepquality'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Stresslevels'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Socialconnections'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Dietquality'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Alcoholconsumption'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Smokingstatus'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Cognitiveactivity'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Sunlightexposure'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Supplementintake'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Skinelasticity'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Bmiscore'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Whrscore'%0A++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%0A+++++++++++++++++%2C'Overallhealthscore'%0A++++++++++++++%0A++++++++++++%5D%2C%0A++++++++++++datasets%3A+%5B%0A++++++++++++++%7B%0A++++++++++++++++label%3A+'Low+Score+Zone'%2C%0A++++++++++++++++backgroundColor%3A+'rgba(255%2C+99%2C+132%2C+0.2)'%2C%0A++++++++++++++++borderColor%3A+'rgba(255%2C+99%2C+132%2C+0.7)'%2C%0A++++++++++++++++borderWidth%3A+2%2C%0A++++++++++++++++borderDash%3A+%5B3%2C+3%5D%2C%0A++++++++++++++++pointRadius%3A+0%2C%0A++++++++++++++++pointHoverRadius%3A+0%2C%0A++++++++++++++++data%3A+%5B%0A++++++++++++++++++%0A++++++++++++++++++2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%2C2%0A++++++++++++++++%5D%0A++++++++++++++%7D%2C%0A++++++++++++++%7B%0A++++++++++++++++label%3A+'Your+Scores'%2C%0A++++++++++++++++backgroundColor%3A+'rgba(54%2C+162%2C+235%2C+0.4)'%2C%0A++++++++++++++++borderColor%3A+'rgb(54%2C+162%2C+235)'%2C%0A++++++++++++++++borderWidth%3A+5%2C%0A++++++++++++++++pointBackgroundColor%3A+'rgb(54%2C+162%2C+235)'%2C%0A++++++++++++++++pointBorderColor%3A+'%23fff'%2C%0A++++++++++++++++pointHoverBackgroundColor%3A+'%23fff'%2C%0A++++++++++++++++pointHoverBorderColor%3A+'rgb(54%2C+162%2C+235)'%2C%0A++++++++++++++++pointRadius%3A+8%2C%0A++++++++++++++++pointBorderWidth%3A+3%2C%0A++++++++++++++++data%3A+%5B%0A++++++++++++++++++%0A++++++++++++++++++4%2C5%2C3%2C4%2C4%2C3%2C2%2C2%2C4%2C5%2C5%2C4%2C3%2C4%2C4%2C4%2C4%2C4%0A++++++++++++++++%5D%0A++++++++++++++%7D%2C%0A++++++++++++++%7B%0A++++++++++++++++label%3A+'Optimal+(5%2F5)'%2C%0A++++++++++++++++backgroundColor%3A+'rgba(0%2C+0%2C+0%2C+0)'%2C%0A++++++++++++++++borderColor%3A+'rgba(75%2C+192%2C+192%2C+0.6)'%2C%0A++++++++++++++++borderWidth%3A+2%2C%0A++++++++++++++++borderDash%3A+%5B6%2C+6%5D%2C%0A++++++++++++++++pointRadius%3A+0%2C%0A++++++++++++++++pointHoverRadius%3A+0%2C%0A++++++++++++++++fill%3A+false%2C%0A++++++++++++++++data%3A+%5B%0A++++++++++++++++++%0A++++++++++++++++++5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%2C5%0A++++++++++++++++%5D%0A++++++++++++++%7D%0A++++++++++++%5D%0A++++++++++%7D%2C%0A++++++++++options%3A+%7B%0A++++++++++++maintainAspectRatio%3A+false%2C%0A++++++++++++responsive%3A+true%2C%0A++++++++++++plugins%3A+%7B%0A++++++++++++++legend%3A+%7B%0A++++++++++++++++display%3A+false%0A++++++++++++++%7D%2C%0A++++++++++++++tooltip%3A+%7B%0A++++++++++++++++enabled%3A+false%0A++++++++++++++%7D%2C%0A++++++++++++++datalabels%3A+%7B%0A++++++++++++++++display%3A+function(context)+%7B%0A++++++++++++++++++return+context.datasetIndex+%3D%3D%3D+1%3B+%2F%2F+Only+show+for+%22Your+Scores%22+dataset%0A++++++++++++++++%7D%2C%0A++++++++++++++++formatter%3A+function(value)+%7B%0A++++++++++++++++++return+value.toFixed(1)%3B%0A++++++++++++++++%7D%2C%0A++++++++++++++++color%3A+'%23333'%2C%0A++++++++++++++++backgroundColor%3A+'rgba(255%2C+255%2C+255%2C+0.95)'%2C%0A++++++++++++++++borderRadius%3A+4%2C%0A++++++++++++++++padding%3A+6%2C%0A++++++++++++++++font%3A+%7B%0A++++++++++++++++++weight%3A+'bold'%2C%0A++++++++++++++++++size%3A+14%0A++++++++++++++++%7D%0A++++++++++++++%7D%0A++++++++++++%7D%2C%0A++++++++++++scales%3A+%7B%0A++++++++++++++r%3A+%7B%0A++++++++++++++++min%3A+0%2C%0A++++++++++++++++max%3A+5%2C%0A++++++++++++++++ticks%3A+%7B%0A++++++++++++++++++stepSize%3A+1%2C%0A++++++++++++++++++display%3A+true%2C%0A++++++++++++++++++backdropColor%3A+'rgba(255%2C+255%2C+255%2C+0.75)'%2C%0A++++++++++++++++++z%3A+1%2C%0A++++++++++++++++++font%3A+%7B%0A++++++++++++++++++++size%3A+16%2C%0A++++++++++++++++++++weight%3A+'bold'%0A++++++++++++++++++%7D%2C%0A++++++++++++++++++color%3A+'%23333'%0A++++++++++++++++%7D%2C%0A++++++++++++++++pointLabels%3A+%7B%0A++++++++++++++++++font%3A+%7B%0A++++++++++++++++++++size%3A+18%2C%0A++++++++++++++++++++weight%3A+'bold'%0A++++++++++++++++++%7D%2C%0A++++++++++++++++++color%3A+'%23005f63'%2C%0A++++++++++++++++++padding%3A+25%0A++++++++++++++++%7D%2C%0A++++++++++++++++grid%3A+%7B%0A++++++++++++++++++color%3A+'rgba(0%2C+0%2C+0%2C+0.2)'%2C%0A++++++++++++++++++circular%3A+true%2C%0A++++++++++++++++++lineWidth%3A+1%0A++++++++++++++++%7D%2C%0A++++++++++++++++angleLines%3A+%7B%0A++++++++++++++++++color%3A+'rgba(0%2C+0%2C+0%2C+0.25)'%2C%0A++++++++++++++++++lineWidth%3A+1.5%0A++++++++++++++++%7D%0A++++++++++++++%7D%0A++++++++++++%7D%0A++++++++++%7D%0A++++++++%7D%0A++++++++&w=1200&h=1200&backgroundColor=white"
+               alt="Health Assessment Radar Chart"
+               style="position: absolute; width: 100%; height: 100%; left: 0; top: 0; object-fit: contain;" />
+        </div>
+      </div>
+      <!-- END INSERTED RADAR CHART -->
+
+      <!-- START INSERTED STRENGTHS/IMPROVEMENTS -->
+      <div class="visual" style="page-break-inside: avoid;">
+        <div class="impact-factors" style="text-align: left; gap: 20mm;">
+            <div style="position: relative;">
+                <h3 style="text-align: left; margin-bottom: 15mm; font-size: 16pt; color: #004F59; page-break-after: avoid;">Strengths</h3>
+                
+                    <div class="custom-list">
+                    
+                        <div class="custom-list-item">
+                            <div class="insight-bullet insight-bullet-strength"></div>
+                            <div class="insight-content">
+                                <span class="insight-text">
+                                    Consistent physical activity routine with moderate exercise 3-4 times weekly, supporting cardiovascular health and muscle maintenance.
+                                </span>
+                                
+                                <span class="insight-score insight-score-strength">
+                                    4 / 5
+                                </span>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="custom-list-item">
+                            <div class="insight-bullet insight-bullet-strength"></div>
+                            <div class="insight-content">
+                                <span class="insight-text">
+                                    Non-smoker status, eliminating a major driver of cellular damage and premature aging.
+                                </span>
+                                
+                                <span class="insight-score insight-score-strength">
+                                    5 / 5
+                                </span>
+                                
+                            </div>
+                        </div>
+                    
+                        <div class="custom-list-item">
+                            <div class="insight-bullet insight-bullet-strength"></div>
+                            <div class="insight-content">
+                                <span class="insight-text">
+                                    Minimal alcohol consumption, preserving liver function and reducing inflammation throughout your body.
+                                </span>
+                                
+                                <span class="insight-score insight-score-strength">
+                                    5 / 5
+                                </span>
+                                
+                            </div>
+                        </div>
+                    
+                    </div>
+                
+            </div>
+            <div style="position: relative;">
+                <h3 style="text-align: left; margin-bottom: 15mm; font-size: 16pt; color: #004F59; page-break-after: avoid;">Improvement Areas</h3>
+                
+                    <div class="custom-list">
+                    
+                        <div class="custom-list-item">
+                             <div class="insight-bullet insight-bullet-improvement"></div>
+                             <div class="insight-content">
+                                <span class="insight-text">
+                                    Work-related stress management requires attention, as your current moderate stress levels affect both sleep quality and cellular aging processes.
+                                </span>
+                                
+                                <span class="insight-score insight-score-improvement">
+                                    2 / 5
+                                </span>
+                                
+                             </div>
+                        </div>
+                    
+                        <div class="custom-list-item">
+                             <div class="insight-bullet insight-bullet-improvement"></div>
+                             <div class="insight-content">
+                                <span class="insight-text">
+                                    Sleep quality could be optimized, particularly addressing the occasional night-time waking that disrupts restorative deep sleep phases.
+                                </span>
+                                
+                                <span class="insight-score insight-score-improvement">
+                                    3 / 5
+                                </span>
+                                
+                             </div>
+                        </div>
+                    
+                        <div class="custom-list-item">
+                             <div class="insight-bullet insight-bullet-improvement"></div>
+                             <div class="insight-content">
+                                <span class="insight-text">
+                                    Social connection enhancement would provide emotional resilience and has been linked to longevity in numerous studies.
+                                </span>
+                                
+                                <span class="insight-score insight-score-improvement">
+                                    2 / 5
+                                </span>
+                                
+                             </div>
+                        </div>
+                    
+                    </div>
+                
+            </div>
+        </div>
+      </div>
+      <!-- END INSERTED STRENGTHS/IMPROVEMENTS -->
+
+      <!-- Summary Panel for Main AI Explanation -->
+      <!-- REMOVED AI Summary Panel Block -->
+
+      <!-- Integrated Text for Age Numbers -->
+      <!-- REMOVED Age Number Text Block -->
+
+      <!-- Placeholder for Detailed AI Explanation Following Numbers -->
+      <!-- REMOVED ai_results.chronologicalVsBio Block -->
+
+      <!-- Subsequent Sections -->
+      <!-- REMOVED Understanding Aging Processes Block -->
+
+      <!-- REMOVED Modern Research and Traditional Wisdom Block -->
+
+      <!-- REMOVED Lifespan and Healthspan Block -->
+    </div>
+
+    <!-- 2. Lifestyle Assessment Section (Previously Biological Age with Gauge) -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Analysis</h2>
+      
+      <h3 style="color: #004F59; margin-top: 15mm; margin-bottom: 8mm;">Chronological vs. Biological Age</h3>
+      <!-- Display the AI generated text -->
+      
+         <p class="analysis-paragraph">The remarkable 13.5-year difference between your chronological and biological ages represents a significant health advantage. Your dedication to regular exercise 3-4 times weekly has maintained cardiovascular fitness and muscle mass that many people lose with age. As a non-smoker who rarely consumes alcohol, you've avoided two major accelerators of cellular aging. Your healthy BMI of 22.1 and favorable waist-to-hip ratio further contribute to your youthful biological profile. The areas most affecting your aging process now are work-related stress and occasional sleep disruptions – addressing these could potentially extend your biological advantage even further.</p>
+      
+      
+      <h3 style="color: #004F59; margin-top: 20mm; margin-bottom: 8mm;">Overall Lifestyle Score</h3>
+      <!-- Removed specific AI blocks for lifestyleScoreIntro and lifestyleScoreExplanation -->
+      
+      <!-- Display the AI generated text for Lifestyle Score Analysis -->
+      
+         <p class="analysis-paragraph" style="font-style: italic; color: #666;">[AI-generated introduction and explanation for the Overall Lifestyle Score will appear here.]</p>
+      
+
+      <h3 style="color: #004F59; margin-top: 20mm; margin-bottom: 8mm;">BMI and Waist-Hip Ratio</h3>
+      <!-- Display the AI generated text for BMI/WHR -->
+      
+        <p class="analysis-paragraph" style="font-style: italic; color: #666;">[AI-generated analysis of BMI and Waist-Hip Ratio implications will appear here.]</p>
+      
+      
+
+      <h3 style="color: #004F59; margin-top: 20mm; margin-bottom: 8mm;">Longevity Influences</h3>
+      <!-- Display the AI generated text for Longevity Influences Explanation -->
+       
+          <p class="analysis-paragraph">Your Longevity Influences chart reveals impressive strengths in physical measures, smoking abstinence, and alcohol moderation – cornerstones of your significant biological age advantage. The chart highlights moderate stress management and social connection as primary opportunities for enhancement. This visual representation offers a comprehensive view of your health factors, showing how your strong physical foundation could be complemented by improvements in specific lifestyle factors to optimize your longevity potential.</p>
+       
+
+      <!-- Removed misplaced combined-section -->
+    </div>
+
+    <!-- 4. Body Composition Section -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey\'s built-in header -->
+      <!-- h2 Section Title Removed -->
+      <h2 class="section-title" style="page-break-after: avoid;">Actionable Recommendations</h2>
+      
+      <!-- Display raw recommendations text if available -->
+      
+         <p>[object Object]</p> 
+      
+
+    </div>
+    <!-- End New Actionable Recommendations Section -->
+
+    <!-- 9. Summary & Conclusion Section (Updated & Merged) -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Summary & Conclusion</h2>
+      
+      <!-- Display the AI-generated summary_conclusion_narrative -->
+      
+          <div style="margin-bottom: 20mm; padding: 15px; background-color: #f9f9fa; border-radius: 10px; border-left: 4px solid #0077B6;">
+            <p style="font-size: 13pt; line-height: 1.6; font-style: italic; color: #666;">Your assessment reveals key insights about your health and longevity profile. Your biological age compared to your chronological age indicates areas of strength and opportunity. By focusing on your primary health metrics and addressing specific lifestyle factors, you can optimize your aging trajectory and enhance overall wellbeing.</p>
+          </div>
+      
+
+      <!-- "Your Next Steps" content removed from here -->
+
+    </div>
+    <!-- End Moved Summary & Conclusion Section -->
+
+    <!-- New Next Steps Section -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Next Steps</h2>
+      
+      <!-- Existing "Your Next Steps" content moved here -->
+      <h3 style="color: #005f63; margin-top: 0; margin-bottom: 8mm; page-break-after: avoid;">Your Next Steps</h3>
+      
+      <!-- Enhanced Next Steps Layout -->
+      <div class="next-steps-container" style="margin-top: 15mm; page-break-inside: avoid;">
+          <!-- Step 1: Connect -->
+          <div class="next-step-item" style="background-color: #fdfdfd; border: 1px solid rgba(0, 119, 182, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; padding: 12mm; margin-bottom: 10mm; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; flex-grow: 1; margin-right: 10mm;">
+                  <span class="step-number" style="font-size: 18pt; font-weight: bold; color: #00B4D8; margin-right: 8mm; min-width: 25px; text-align: center;">1.</span>
+                  <div>
+                      <span style="font-weight: 600; display: block; margin-bottom: 3mm; color: #005f63; font-size: 12pt;">Connect with a Practitioner</span>
+                      <span style="font-size: 11pt; color: #333; line-height: 1.4;">Reach out to a holistic health professional for personalised guidance.</span>
+                  </div>
+              </div>
+              <a href="https://www.healthdatalab.com/contact" target="_blank" class="cta-button" style="padding: 4mm 8mm; font-size: 11pt; min-width: 120px; text-align: center;">Contact Us</a>
+          </div>
+
+          <!-- Step 2: Schedule -->
+          <div class="next-step-item" style="background-color: #fdfdfd; border: 1px solid rgba(0, 119, 182, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; padding: 12mm; margin-bottom: 10mm; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; flex-grow: 1; margin-right: 10mm;">
+                   <span class="step-number" style="font-size: 18pt; font-weight: bold; color: #00B4D8; margin-right: 8mm; min-width: 25px; text-align: center;">2.</span>
+                  <div>
+                      <span style="font-weight: 600; display: block; margin-bottom: 3mm; color: #005f63; font-size: 12pt;">Schedule a Consultation</span>
+                      <span style="font-size: 11pt; color: #333; line-height: 1.4;">Book a session to dive deeper into your report.</span>
+                  </div>
+              </div>
+              <a href="https://calendly.com/healthdatalab/consult" target="_blank" class="cta-button" style="padding: 4mm 8mm; font-size: 11pt; min-width: 120px; text-align: center;">Schedule Now</a>
+          </div>
+
+          <!-- Step 3: Understand Limitations -->
+          <div class="next-step-item" style="background-color: #fdfdfd; border: 1px solid rgba(0, 119, 182, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; padding: 12mm; margin-bottom: 10mm; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; flex-grow: 1; margin-right: 10mm;">
+                   <span class="step-number" style="font-size: 18pt; font-weight: bold; color: #00B4D8; margin-right: 8mm; min-width: 25px; text-align: center;">3.</span>
+                  <div>
+                      <span style="font-weight: 600; display: block; margin-bottom: 3mm; color: #005f63; font-size: 12pt;">Understand Limitations</span>
+                      <span style="font-size: 11pt; color: #333; line-height: 1.4;">Review the scope and disclaimers of this report for clarity.</span>
+                  </div>
+              </div>
+              <a href="#" target="_blank" class="cta-button" style="padding: 4mm 8mm; font-size: 11pt; min-width: 120px; text-align: center;">View Disclaimer</a>
+          </div>
+
+          <!-- Step 4: Track Progress (No Button) -->
+          <div class="next-step-item" style="background-color: #fdfdfd; border: 1px solid rgba(0, 119, 182, 0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; padding: 12mm; margin-bottom: 10mm; display: flex; align-items: center;"> <!-- Removed justify-content -->
+              <div style="display: flex; align-items: center; flex-grow: 1;"> <!-- Removed margin-right -->
+                   <span class="step-number" style="font-size: 18pt; font-weight: bold; color: #00B4D8; margin-right: 8mm; min-width: 25px; text-align: center;">4.</span>
+                  <div>
+                      <span style="font-weight: 600; display: block; margin-bottom: 3mm; color: #005f63; font-size: 12pt;">Track Progress</span>
+                      <span style="font-size: 11pt; color: #333; line-height: 1.4;">Retake this assessment in a few months to measure your growth and refine your path.</span>
+                  </div>
+              </div>
+              <!-- No button for this item -->
+          </div>
+      </div>
+      <!-- End Enhanced Next Steps -->
+
+      
+         <p class="intro-paragraph" style="margin-top: 20mm; margin-bottom: 15mm;"> We wish you continued strength, clarity, and joy as you integrate these insights, Jane. Remember, progress is a journey, not a destination, and we are here to support you whenever needed. </p>
+      
+      <!-- End New Content -->
+    </div>
+    <!-- End New Next Steps Section -->
+
+    <!-- New Disclaimer Section -->
+    <div class="section" style="page-break-before: always;">
+      <!-- Header removed - will use PDFMonkey's built-in header -->
+      <h2 class="section-title" style="page-break-after: avoid;">Disclaimer - Terms and Conditions</h2>
+
+      <!-- Content for this section can be added here -->
+      <p style="font-style: italic; color: #666;">[Disclaimer and Terms & Conditions text will go here.]</p>
+
+    </div>
+    <!-- End New Disclaimer Section -->
+
+    <!-- 5. Dedicated Detailed Scores Section (Moved) -->
+    
+
+    <!-- 6. Health Insights Section -->
+    
+    <!-- End Health Insights Section -->
+
+    <!-- 10. Closing & Next Steps Section (Removed) -->
+
+    <!-- Remove Footer -->
+    <!-- Footer div should be removed -->
+  </div> <!-- End .container -->
+
+  <!-- Remove Page number container -->
+  <!-- page-number div should be removed -->
+
+</body>
+<!-- Remove PDFmonkey's page number container -->
+</html>
